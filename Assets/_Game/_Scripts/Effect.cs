@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 
+// template for an effect that can be pooled
 
 public class Effect : MonoBehaviour, IPoolable
 {
