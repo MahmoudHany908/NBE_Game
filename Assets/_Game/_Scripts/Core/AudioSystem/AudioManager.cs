@@ -1,0 +1,143 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class AudioManager : MonoBehaviour
+{
+    [SerializeField] private PooledAudioSource soundSourcePrefab;
+
+    [Header("Audio Settings")]
+    [Range(0f, 1f)][SerializeField] private float masterVolume = 1f;
+    [Range(0f, 1f)][SerializeField] private float musicVolume = 1f;
+    [Range(0f, 1f)][SerializeField] private float sfxVolume = 1f;
+    [Range(0f, 1f)][SerializeField] private float ambientVolume = 1f;
+
+    private bool isMuted = false;
+    public bool IsMuted
+    {
+        get => isMuted;
+        set { isMuted = value; ApplyMuteState(); }
+    }
+
+    private void ApplyMuteState()
+    {
+        Debug.Log($"AudioManager: Mute state changed to {isMuted}");
+    }
+
+    private AudioSource musicAudioSource;
+    public static AudioManager Instance { get; private set; }
+
+    private List<PooledAudioSource> activeAmbientSources = new List<PooledAudioSource>();
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        musicAudioSource = new GameObject("MusicAudioSource").AddComponent<AudioSource>();
+        musicAudioSource.transform.SetParent(transform);
+    }
+
+    #region SFX
+
+    public void PlaySoundAtPosition(SoundData data, Vector3 position)
+    {
+        AudioClip clip = data.GetClip();
+        if (clip == null)
+        {
+            Debug.LogWarning("AudioManager.PlaySoundAtPosition: SoundData returned a null clip.");
+            return;
+        }
+
+        PooledAudioSource pooled = PoolManager.Instance.Spawn<PooledAudioSource>(
+            soundSourcePrefab.gameObject, position, Quaternion.identity);
+
+        pooled.Source.pitch = RandomizePitch(data.pitchRange);
+        pooled.Source.PlayOneShot(clip, GetFinalVolume(data.volume, sfxVolume));
+
+        // Schedule return after the clip finishes.
+        // We do this here (not in OnSpawned) because the clip is known only now.
+        pooled.ReturnToPool(clip.length + 0.1f);
+    }
+
+    #endregion
+
+    #region AMBIENT
+
+    public PooledAudioSource PlayAmbientAtPosition(SoundData data, Vector3 position)
+    {
+        AudioClip clip = data.GetClip();
+        if (clip == null)
+        {
+            Debug.LogWarning("AudioManager.PlayAmbientAtPosition: SoundData returned a null clip.");
+            return null;
+        }
+
+        PooledAudioSource pooled = PoolManager.Instance.Spawn<PooledAudioSource>(
+            soundSourcePrefab.gameObject, position, Quaternion.identity);
+
+        pooled.Source.clip = clip;
+        pooled.Source.volume = GetFinalVolume(data.volume, ambientVolume);
+        pooled.Source.loop = data.loop;
+        pooled.Source.pitch = RandomizePitch(data.pitchRange);
+        pooled.Source.Play();
+
+        activeAmbientSources.Add(pooled);
+
+        // OnDespawned fires OnReturnedToPool, which removes it from our list.
+        pooled.OnReturnedToPool += () => activeAmbientSources.Remove(pooled);
+
+        // No ReturnToPool call here — ambient lives until StopAmbient() is called.
+        return pooled;
+    }
+
+    public void StopAmbient(PooledAudioSource source)
+    {
+        if (source == null) return;
+        source.ReturnToPool(); 
+    }
+
+    public void StopAllAmbient()
+    {
+        for (int i = activeAmbientSources.Count - 1; i >= 0; i--)
+            StopAmbient(activeAmbientSources[i]);
+    }
+
+    #endregion
+
+    #region MUSIC
+
+    public void PlayMusic(SoundData data)
+    {
+        musicAudioSource.clip = data.GetClip();
+        musicAudioSource.volume = GetFinalVolume(data.volume, musicVolume);
+        musicAudioSource.loop = data.loop;
+        musicAudioSource.Play();
+    }
+
+    public void StopMusic()
+    {
+        musicAudioSource.Stop();
+    }
+
+    #endregion
+
+
+    #region HELPERS
+
+    private float GetFinalVolume(float soundVolume, float categoryVolume)
+    {
+        return isMuted ? 0f : soundVolume * categoryVolume * masterVolume;
+    }
+
+    private float RandomizePitch(Vector2 pitchRange)
+    {
+        return Random.Range(pitchRange.x, pitchRange.y);
+    }
+
+    #endregion
+}
