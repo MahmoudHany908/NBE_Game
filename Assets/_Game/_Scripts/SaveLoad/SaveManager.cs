@@ -2,18 +2,20 @@ using System;
 using System.IO;
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour 
+public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
+
+    public static event Action<GameData> OnSave;
+    public static event Action<GameData> OnLoad;
 
     private string savePath;
 
     void Awake()
     {
-        if (Instance != null)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
-            Debug.Log("object destroyed!!!");
             return;
         }
 
@@ -22,8 +24,11 @@ public class SaveManager : MonoBehaviour
         savePath = Path.Combine(Application.persistentDataPath, "save.json");
     }
 
-    public void Save(GameData data)
+    public void Save()
     {
+        GameData data = HasSaveFile() ? Load() : new GameData();
+        OnSave?.Invoke(data);
+
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(savePath, json);
         Debug.Log("Game Saved to: " + savePath);
@@ -36,30 +41,25 @@ public class SaveManager : MonoBehaviour
             Debug.Log("No save file found, returning new GameData");
             return new GameData();
         }
-        
+
         string json = File.ReadAllText(savePath);
-        return JsonUtility.FromJson<GameData>(json);
+        GameData data = JsonUtility.FromJson<GameData>(json);
+
+        OnLoad?.Invoke(data);
+        return data;
     }
 
     public bool HasSaveFile()
     {
         return File.Exists(savePath);
     }
-    
-    public long DateTimeToLong(DateTime time)
-    {
-        return time.ToBinary();
-    }
 
-    public DateTime LongToDateTime(long time)
-    {
-        return DateTime.FromBinary(time);
-    }
+    public static long DateTimeToToLong(DateTime time) => time.ToBinary();
+    public static DateTime LongToDateTime(long time) => DateTime.FromBinary(time);
 
-    public float GetRemainingSeconds(long endTimeLong)
+    public static float GetRemainingSeconds(long endTimeLong)
     {
-        DateTime endTime = DateTime.FromBinary(endTimeLong);
-        float remaining = (float)(endTime - DateTime.Now).TotalSeconds;
-        return (int)Mathf.Max(0f, remaining);
+        float remaining = (float)(DateTime.FromBinary(endTimeLong) - DateTime.Now).TotalSeconds;
+        return Mathf.Max(0f, remaining);
     }
 }
