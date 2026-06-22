@@ -20,7 +20,6 @@ public class PlayerInputs : MonoBehaviour
     {
         Vector2 inputVector = inputActions.Player.Move.ReadValue<Vector2>();
 
-        // Simple world-relative movement (ignoring camera rotation)
         return new Vector3(inputVector.x, 0, inputVector.y).normalized;
     }
 
