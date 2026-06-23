@@ -3,22 +3,35 @@ using TMPro;
 
 public class StructureBase : MonoBehaviour, IInteractable
 {
-    [SerializeField] private string _name;
-    [SerializeField] private PanelUI _structureUI;
-    [SerializeField] private TextMeshProUGUI _structureNameText;
-
-    public string InteractionText => _name;
+    [Header("Structure Data")]
+    [SerializeField] private StructureSO structureData;
 
 
+
+    [Header("References")]
+    [SerializeField] private PanelUI structurePanelUI;
+    [SerializeField] private TextMeshProUGUI structureNameText;
+
+
+    [Header("other")]
+    public string InteractionText => structureData.InteractionText;
+
+    private IStructureBehaviour structureBehaviour;
+
+
+    void Awake()
+    {
+        structureBehaviour = GetComponent<IStructureBehaviour>();
+    }
 
     public void Interact(Interactor interactor)
     {
-        _structureUI.Show();
-        _structureNameText.text = _name;
+        structurePanelUI.Show();
+        structureNameText.text = structureData.Name;
     }
 
     public void CancelInteraction(Interactor interactor)
     {
-        _structureUI.Hide();
+        structurePanelUI.Hide();
     }
 }
