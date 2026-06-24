@@ -14,38 +14,38 @@ public class SettingsMenu : MonoBehaviour
     //checkbox mute settings
 
 
-  
-    
 
-    [Header("Buttons")]
-    [SerializeField] private Button settingsButton;
-    [SerializeField] private Button closeButton;
+
+
+    // [Header("Buttons")]
+    // [SerializeField] private Button settingsButton;
+    // [SerializeField] private Button closeButton;
 
     private void OnEnable()
     {
         // add listeners
 
         // buttons
-        settingsButton.onClick.AddListener(OpenSettingsMenu);
-        closeButton.onClick.AddListener(CloseSettingsMenu);
+        // settingsButton.onClick.AddListener(OpenSettingsMenu);
+        // closeButton.onClick.AddListener(CloseSettingsMenu);
 
         // toggle
         volumeToggle.onValueChanged.AddListener(OnMuteTogglePressed);
 
         //sliders
         masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeSliderChange);
-        musicVolumeSlider.onValueChanged.AddListener (OnMusicVolumeSliderChange);
+        musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeSliderChange);
         sfxVolumeSlider.onValueChanged.AddListener(OnSFXSliderChange);
         ambientVolumeSlider.onValueChanged.AddListener(OnAmbientSliderChange);
-        
+
     }
     private void OnDisable()
     {
         //remove listeners
 
         //buttons
-        settingsButton.onClick.RemoveListener(OpenSettingsMenu);
-        closeButton.onClick.RemoveListener(CloseSettingsMenu);
+        // settingsButton.onClick.RemoveListener(OpenSettingsMenu);
+        // closeButton.onClick.RemoveListener(CloseSettingsMenu);
 
         //toggle
         volumeToggle.onValueChanged.RemoveListener(OnMuteTogglePressed);
@@ -56,20 +56,20 @@ public class SettingsMenu : MonoBehaviour
         sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXSliderChange);
         ambientVolumeSlider.onValueChanged.RemoveListener(OnAmbientSliderChange);
 
-        
+
 
     }
 
 
 
-    private void OpenSettingsMenu()
-    {
-        settingsMenu.Show();
-    }
-    private void CloseSettingsMenu()
-    {
-        settingsMenu.Hide();  
-    }
+    // private void OpenSettingsMenu()
+    // {
+    //     settingsMenu.Show();
+    // }
+    // private void CloseSettingsMenu()
+    // {
+    //     settingsMenu.Hide();  
+    // }
 
     private void OnMuteTogglePressed(bool mute)
     {
@@ -86,7 +86,7 @@ public class SettingsMenu : MonoBehaviour
 
     }
 
-    
+
     private void OnSFXSliderChange(float volume)
     {
 
