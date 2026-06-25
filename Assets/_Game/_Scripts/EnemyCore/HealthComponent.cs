@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class HealthComponent : MonoBehaviour
 {
-    [SerializeField] private int maxHealth = 100f;
+    [SerializeField] private int maxHealth = 100;
     
     private int currentHealth;
     private bool isDead;
@@ -27,7 +27,7 @@ public class HealthComponent : MonoBehaviour
         if (!isDead) return;
         currentHealth -= amount;
         OnDamageTaken?.Invoke(gameObject, amount);
-        if (currentHealth <= 0f) Die();
+        if (currentHealth <= 0) Die();
     }
 
     private void Die()
