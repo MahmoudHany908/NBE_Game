@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class HealthComponent : MonoBehaviour
 {
-    [SerializeField] private int maxHealth = 100f;
-    
+    [SerializeField] private int maxHealth = 100;
+
     private int currentHealth;
     private bool isDead;
-    
+
     public static event System.Action<GameObject> OnDied;
     public static event System.Action<GameObject, int> OnDamageTaken;
 

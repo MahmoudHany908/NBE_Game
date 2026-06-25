@@ -6,6 +6,6 @@ public class MeleeRobot : Enemy
     {
         moveSpeed = 5f;
         base.Awake();
-        GetComponent<HealthComponent>().SetMaxHealth(80f);
+        GetComponent<HealthComponent>().SetMaxHealth(80);
     }
 }

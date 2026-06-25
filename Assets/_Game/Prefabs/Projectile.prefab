@@ -30,9 +30,9 @@ Transform:
   m_GameObject: {fileID: 4604808887283385158}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.39417, y: 2.5, z: 2.64029}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 47daba7bcda1d914ebfd7a1b6d5c37d1, type: 2}
+  - {fileID: 2100000, guid: c43ba72dd87db1b4bbe9ed726bde4a03, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -126,6 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b123f7162b0034287c8b24d8ef87e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  lifeTime: 1
+  speed: 10
 --- !u!114 &2071282090456095421
 MonoBehaviour:
   m_ObjectHideFlags: 0
