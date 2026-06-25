@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class HealthComponent : MonoBehaviour
 {
-    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private int maxHealth = 100f;
     
-    private float currentHealth;
+    private int currentHealth;
     private bool isDead;
     
     public static event System.Action<GameObject> OnDied;
-    public static event System.Action<GameObject, float> OnDamageTaken;
+    public static event System.Action<GameObject, int> OnDamageTaken;
 
     void OnEnable()
     {
@@ -16,13 +16,13 @@ public class HealthComponent : MonoBehaviour
         isDead = false;
     }
 
-    public void SetMaxHealth(float value)
+    public void SetMaxHealth(int value)
     {
         maxHealth = value;
         currentHealth = value;
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(int amount)
     {
         if (!isDead) return;
         currentHealth -= amount;
