@@ -2,6 +2,10 @@
 
 public class Projectile : MonoBehaviour, IPoolable
 {
+    [SerializeField] private float lifeTime;
+
+
+
     private PooledObject pooledObject;
 
 
@@ -12,13 +16,13 @@ public class Projectile : MonoBehaviour, IPoolable
 
     public void OnDespawned()
     {
-        Debug.Log("Projectile Despawned");
+
     }
 
     public void OnSpawned()
     {
-        Debug.Log("Projectile Spawned");
-        pooledObject.ReturnToPool(2f);
+
+        pooledObject.ReturnToPool(lifeTime);
 
     }
 }
