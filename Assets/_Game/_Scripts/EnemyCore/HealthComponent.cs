@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class HealthComponent : MonoBehaviour
 {
@@ -7,8 +8,6 @@ public class HealthComponent : MonoBehaviour
     private int currentHealth;
     private bool isDead;
 
-    public static event System.Action<GameObject> OnDied;
-    public static event System.Action<GameObject, int> OnDamageTaken;
 
     void OnEnable()
     {
@@ -22,11 +21,18 @@ public class HealthComponent : MonoBehaviour
         currentHealth = value;
     }
 
+
     public void TakeDamage(int amount)
     {
-        if (!isDead) return;
+        if (isDead) return;
         currentHealth -= amount;
-        OnDamageTaken?.Invoke(gameObject, amount);
+        EventBus.Publish(new EnemyTakeDamageEvent
+        {
+            Damage = amount,
+            Enemy = GetComponent<Enemy>(),
+            DamagePosition = transform.position
+        });
+
         if (currentHealth <= 0f) Die();
     }
 
@@ -34,6 +40,7 @@ public class HealthComponent : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
-        OnDied?.Invoke(gameObject);
+        EventBus.Publish(new EnemyDiedEvent { gameObject = gameObject, DeathPosition = transform.position });
+
     }
 }
