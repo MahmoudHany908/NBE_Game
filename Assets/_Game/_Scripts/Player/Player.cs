@@ -7,7 +7,8 @@ public class Player : MonoBehaviour
     private PlayerMovement playerMovement;
     private PlayerInputs playerInputs;
     private PlayerVisuals playerVisuals;
-
+    private PlayerReference playerReference;
+    
     private Rigidbody rb;
 
 
@@ -17,6 +18,7 @@ public class Player : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         playerInputs = GetComponent<PlayerInputs>();
         playerVisuals = GetComponent<PlayerVisuals>();
+        playerReference = GetComponent<PlayerReference>();
         rb = GetComponent<Rigidbody>();
     }
 
@@ -29,6 +31,7 @@ public class Player : MonoBehaviour
     public PlayerMovement GetPlayerMovement() => playerMovement;
     public PlayerVisuals GetPlayerVisuals() => playerVisuals;
     public PlayerInputs GetPlayerInputs() => playerInputs;
+    public PlayerReference GetPlayerReference() => playerReference;
     public Rigidbody GetPlayerRigidBody() => rb;
 
 }

@@ -33,6 +33,7 @@ public class HealthComponent : MonoBehaviour
             DamagePosition = transform.position
         });
 
+        Debug.Log(currentHealth);
         if (currentHealth <= 0f) Die();
     }
 
