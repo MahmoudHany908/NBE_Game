@@ -8,6 +8,8 @@ public class ClosestTargeter : MonoBehaviour, ITargetProvider
 
     private readonly List<Transform> targetsInRange = new();
 
+    public event System.Action<GameObject> TargetChanged;
+
     private float timer;
     private float checkInterval;
 
@@ -63,6 +65,7 @@ public class ClosestTargeter : MonoBehaviour, ITargetProvider
         if (IsValidTarget(other.gameObject))
         {
             targetsInRange.Add(other.transform);
+            TargetChanged?.Invoke(GetTarget());
         }
     }
 

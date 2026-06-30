@@ -6,29 +6,44 @@ public class MeleeRobotAI : MonoBehaviour
     [SerializeField] private float attackRange = 1.5f;
     [SerializeField] private int attackDamage = 10;
     [SerializeField] private float attackCooldown = 1f;
+    [SerializeField] private float moveSpeed = 3f;
 
     private Enemy enemy;
-    private HealthComponent playerHealth;
+    private Vector3 direction;
+    private Transform target;
     private float attackTimer;
+    private ITargetProvider targetProvider;
 
     void Awake()
     {
         enemy = GetComponent<Enemy>();
+        targetProvider = GetComponentInChildren<ITargetProvider>();
+        if (targetProvider == null)
+            Debug.LogError("Target Provider is not set! ");
     }
 
-    void Start()
+    void OnEnable()
     {
-        playerHealth = PlayerReference.Instance.PlayerTransform.GetComponent<HealthComponent>();
+        // Added null check to prevent crashes if targetProvider failed to assign
+        if (targetProvider != null)
+            targetProvider.TargetChanged += SetTarget;
+    }
+
+    void OnDisable()
+    {
+        if (targetProvider != null)
+            targetProvider.TargetChanged -= SetTarget;
     }
 
     void Update()
     {
-        if (PlayerReference.Instance == null) return;
+        if (target == null) return;
 
-        Transform player = PlayerReference.Instance.PlayerTransform;
-        float distance = Vector3.Distance(transform.position, player.position);
-
+        direction = (target.position - transform.position).normalized;
+        float distance = Vector3.Distance(transform.position, target.position);
         attackTimer -= Time.deltaTime;
+
+        FacePlayer();
 
         if (distance <= attackRange)
         {
@@ -36,25 +51,42 @@ public class MeleeRobotAI : MonoBehaviour
         }
         else
         {
-            Chase(player);
+            Chase(target);
+        }
+    }
+
+    private void FacePlayer()
+    {
+        Vector3 flatDirection = new Vector3(direction.x, 0f, direction.z);
+
+
+        if (flatDirection.sqrMagnitude > 0.001f)
+        {
+            transform.rotation = Quaternion.LookRotation(flatDirection);
         }
     }
 
     private void Chase(Transform player)
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        transform.position = Vector3.MoveTowards(transform.position, player.position, enemy.MoveSpeed * Time.deltaTime);
+        if (target == null) return;
 
-        // face the player
-        if (direction != Vector3.zero)
-            transform.forward = direction;
+        // Changed 'attackDamage' to 'moveSpeed'
+        transform.position += direction * moveSpeed * Time.deltaTime;
     }
 
     private void Attack()
     {
         if (attackTimer > 0f) return;
         attackTimer = attackCooldown;
-        playerHealth?.TakeDamage(attackDamage);
-        Debug.Log("Melee Robot attacked player");
+
+        if (target.TryGetComponent<PlayerHealthComponent>(out PlayerHealthComponent player)) player.TakeDamage(attackDamage);
     }
+
+
+
+    private void SetTarget(GameObject _target)
+    {
+        target = _target.transform;
+    }
+
 }
