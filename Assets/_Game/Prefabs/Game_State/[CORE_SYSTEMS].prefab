@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5460148768371282258}
   - component: {fileID: 4292161560943560897}
+  - component: {fileID: 5884312414785146713}
+  - component: {fileID: 3131977312487856825}
   m_Layer: 0
   m_Name: '[CORE_SYSTEMS]'
   m_TagString: Untagged
@@ -44,3 +46,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08207fd1b64634343bb6de862070c313, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameStateManager
+--- !u!114 &5884312414785146713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6172223271634217121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba104a47e2a681f4a879e54329fe7b3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VaultSurvivors.Core.Production.ProductionManager
+--- !u!114 &3131977312487856825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6172223271634217121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fef4b4aca5999f498902d3fdf78412f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SaveManager
