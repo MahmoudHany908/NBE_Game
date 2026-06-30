@@ -41,7 +41,12 @@ public class HealthComponent : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
-        EventBus.Publish(new EnemyDiedEvent { gameObject = gameObject, DeathPosition = transform.position });
+        EventBus.Publish(new EnemyDiedEvent
+        {
+            gameObject = gameObject,
+            Enemy = GetComponent<Enemy>(),
+            DeathPosition = transform.position
+        });
 
     }
 }

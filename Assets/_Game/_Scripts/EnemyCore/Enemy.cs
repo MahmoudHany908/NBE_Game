@@ -15,26 +15,24 @@ public class Enemy : MonoBehaviour, IPoolable
         healthComponent = GetComponent<HealthComponent>();
     }
 
-
-
+    
     void OnEnable()
     {
         EventBus.Subscribe<EnemyDiedEvent>(HandleDeath);
     }
+
     void OnDisable()
     {
         EventBus.Unsubscribe<EnemyDiedEvent>(HandleDeath);
-
     }
+
     public void OnSpawned()
     {
         EnemyRegistry.Instance.Register(this);
-
     }
 
     public void OnDespawned()
     {
-
         EnemyRegistry.Instance.Unregister(this);
     }
 
