@@ -24,9 +24,10 @@ public class SaveManager : MonoBehaviour
         savePath = Path.Combine(Application.persistentDataPath, "save.json");
     }
 
-    public void Save()
+    public void Save(GameData explicitData = null)
     {
-        GameData data = HasSaveFile() ? Load() : new GameData();
+        GameData data = explicitData != null ? explicitData : (HasSaveFile() ? Load() : new GameData());
+
         OnSave?.Invoke(data);
 
         string json = JsonUtility.ToJson(data, true);

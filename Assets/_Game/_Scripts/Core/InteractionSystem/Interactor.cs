@@ -52,5 +52,12 @@ public class Interactor : MonoBehaviour
         _currentInteractable = null;
     }
 
+    public void ToggleButtonVisibility(bool isVisible)
+    {
+        if (_interactButton != null)
+        {
+            _interactButton.gameObject.SetActive(isVisible);
+        }
+    }
 
 }

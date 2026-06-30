@@ -24,11 +24,6 @@ public class StructureBase : MonoBehaviour, IInteractable
     {
         structurePanelUI.Show();
         structureNameText.text = structureData.Name;
-
-        if (structureBehaviour is FactoryBehavior factory)
-        {
-            factory.CollectResources();
-        }
     }
 
     public void CancelInteraction(Interactor interactor)
@@ -36,6 +31,5 @@ public class StructureBase : MonoBehaviour, IInteractable
         structurePanelUI.Hide();
     }
 
-    // Helper accessor script so the UI can easily query values from this facility object instance
     public IStructureBehaviour GetBehaviour() => structureBehaviour;
 }
