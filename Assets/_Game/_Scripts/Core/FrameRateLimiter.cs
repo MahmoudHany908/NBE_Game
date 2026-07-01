@@ -1,39 +1,79 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public class FrameRateLimiter : MonoBehaviour
+public class FrameRateTester : MonoBehaviour
 {
-    [Header("Frame Rate Settings")]
-    [Tooltip("Target frame rate. Set to -1 for uncapped.")]
-    [SerializeField] private int targetFrameRate = 60;
+    [Header("UI Display (Optional)")]
+    [Tooltip("Assign a UI Text element here to see the real-time FPS on your phone.")]
+    [SerializeField] private Text fpsCounterText;
 
-    // [Tooltip("Disable VSync. If VSync is enabled, the target frame rate will be ignored.")]
-    // [SerializeField] private bool disableVSync = true;
+    // Internal variables for the FPS counter
+    private float deltaTime = 0.0f;
+    private float currentFps = 0.0f;
 
-    private void Awake()
+    private void Start()
     {
-        ApplyFrameRateSettings();
+        // Default to standard 60 FPS on launch
+        SetTo60FPS();
     }
 
-    private void ApplyFrameRateSettings()
+    private void Update()
     {
-        // 0 = Don't Sync (Vsync off)
-        // 1 = Every V Blank
-        // 2 = Every Second V Blank
-        // QualitySettings.vSyncCount = disableVSync ? 0 : 1;
+        // Simple, efficient calculation for the real-time FPS counter
+        deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
+        currentFps = 1.0f / deltaTime;
 
-        Application.targetFrameRate = targetFrameRate;
-
-        Debug.Log($"[FrameRateLimiter] Target FPS set to {targetFrameRate}.");
-    }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        // This allows changing the frame rate in the inspector during Play Mode
-        if (Application.isPlaying)
+        if (fpsCounterText != null)
         {
-            ApplyFrameRateSettings();
+            fpsCounterText.text = $"FPS: {Mathf.Ceil(currentFps)} | Target: {Application.targetFrameRate}";
         }
     }
+
+    // --- BUTTON CLICK FUNCTIONS ---
+
+    /// <summary> Button 1: Cinematic / Battery Saver Mode </summary>
+    public void SetTo30FPS()
+    {
+        ApplyFrameRate(30, "30 FPS (Battery Saver)");
+    }
+
+    /// <summary> Button 2: Standard Target Mode </summary>
+    public void SetTo60FPS()
+    {
+        ApplyFrameRate(60, "60 FPS (Standard/Ideal)");
+    }
+
+    /// <summary> Button 3: Match Hardware Max Mode </summary>
+    public void SetToDeviceMax()
+    {
+        float hardwareRate = GetDeviceRefreshRate();
+        int target = hardwareRate > 0 ? Mathf.RoundToInt(hardwareRate) : 60;
+
+        ApplyFrameRate(target, $"Device Max Hardware ({target}Hz)");
+    }
+
+    /// <summary> Button 4 (Bonus!): Uncapped / Stress Test Mode </summary>
+    public void SetToUncapped()
+    {
+        // Note: Mobile hardware VSync will still try to cap this at your max refresh rate, 
+        // but this allows you to see if your game can handle raw uncapped performance.
+        ApplyFrameRate(-1, "Uncapped Performance Mode");
+    }
+
+    // --- HELPER METHODS ---
+
+    private void ApplyFrameRate(int target, string modeName)
+    {
+        Application.targetFrameRate = target;
+        Debug.Log($"[FrameRateTester] Switched to {modeName}. Target set to {target}.");
+    }
+
+    private float GetDeviceRefreshRate()
+    {
+#if UNITY_2022_2_OR_NEWER
+        return (float)Screen.currentResolution.refreshRateRatio.value;
+#else
+        return Screen.currentResolution.refreshRate;
 #endif
+    }
 }
