@@ -38,5 +38,18 @@ public class Projectile : MonoBehaviour, IPoolable
         transform.position += velocity * Time.deltaTime * speed;
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        HealthComponent health = other.GetComponent<HealthComponent>();
+
+        if (health == null)
+        {
+            health.TakeDamage(20);
+            pooledObject.ReturnToPool();
+            return;
+        }
+        pooledObject.ReturnToPool();
+    }
+
 
 }

@@ -50,7 +50,9 @@ public class WaveSpawner : MonoBehaviour
             foreach (GameObject prefab in squad)
             {
                 Vector3 spawnPos = GetGroundedSpawnPosition();
-                GameObject enemy = PoolManager.Instance.Spawn(prefab, spawnPos, Quaternion.identity);
+                GameObject enemy = PoolManager.Instance.Spawn(prefab, spawnPos +
+                new Vector3(0, prefab.gameObject.transform.localScale.y, 0),
+                Quaternion.identity);
                 if (enemy != null)
                     activeEnemies.Add(enemy);
             }

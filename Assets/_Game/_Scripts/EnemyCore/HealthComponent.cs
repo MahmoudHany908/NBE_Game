@@ -26,6 +26,7 @@ public class HealthComponent : MonoBehaviour
     {
         if (isDead) return;
         currentHealth -= amount;
+        Debug.Log(currentHealth);
         EventBus.Publish(new EnemyTakeDamageEvent
         {
             Damage = amount,
@@ -33,7 +34,6 @@ public class HealthComponent : MonoBehaviour
             DamagePosition = transform.position
         });
 
-        Debug.Log(currentHealth);
         if (currentHealth <= 0f) Die();
     }
 
