@@ -50,3 +50,37 @@ public struct MilestoneChoiceEvent : IGameEvent
     public MilestoneChoice Choice;
     public int AtWaveNumber;
 }
+
+public enum MilestoneChoice
+{
+    Extract,  // player cashes out — run ends successfully
+    Continue  // player keeps going
+}
+
+/// <summary>
+/// Fired once when the run ends (extraction or game-over).
+/// </summary>
+public struct RunEndedEvent : IGameEvent
+{
+    public RunEndReason Reason;
+    public int FinalWave;
+    public RunStats Stats;
+}
+
+public enum RunEndReason
+{
+    Extracted,   // player chose to extract
+    PlayerDied,  // all players eliminated
+}
+
+// ─────────────────────────────────────────────
+//  Value object — passed with milestone events
+// ─────────────────────────────────────────────
+[System.Serializable]
+public struct RunStats
+{
+    public int WavesCleared;
+    public int TotalKills;
+    public int TotalDamageTaken;
+    public float TotalTimeSurvived;
+}
