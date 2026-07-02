@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     private PlayerInputs playerInputs;
     private PlayerVisuals playerVisuals;
 
+
     private Rigidbody rb;
 
 
