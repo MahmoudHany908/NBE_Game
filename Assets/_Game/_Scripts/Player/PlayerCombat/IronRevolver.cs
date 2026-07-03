@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 public class IronRevolver : MonoBehaviour, IAttack
 {
@@ -31,6 +30,9 @@ public class IronRevolver : MonoBehaviour, IAttack
 
     public void Attack()
     {
+        if (bulletPrefab == null || attackPos == null)
+            return;
+
         GameObject target = targetProvider.GetTarget();
 
         if (target == null)
@@ -39,16 +41,27 @@ public class IronRevolver : MonoBehaviour, IAttack
         Vector3 pos = target.transform.position;
         Vector3 dir = (pos - attackPos.position).normalized;
 
+        // Prevent "Look rotation viewing vector is zero" error if target is exactly at attackPos
+        if (dir == Vector3.zero)
+        {
+            dir = attackPos.forward;
+        }
+
+        Quaternion rotation = Quaternion.LookRotation(dir);
+
         Projectile projectile = PoolManager.Instance.Spawn<Projectile>(
             bulletPrefab.gameObject,
             attackPos.position,
-            Quaternion.LookRotation(dir)
+            rotation
         );
 
-        projectile.Initialize(
-            attackPos.position,
-            dir,
-            Quaternion.LookRotation(dir)
-        );
+        if (projectile != null)
+        {
+            projectile.Initialize(
+                attackPos.position,
+                dir,
+                rotation
+            );
+        }
     }
 }

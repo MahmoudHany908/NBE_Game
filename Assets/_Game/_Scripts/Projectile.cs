@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class Projectile : MonoBehaviour, IPoolable
 {
@@ -30,7 +30,7 @@ public class Projectile : MonoBehaviour, IPoolable
 
     public void OnSpawned()
     {
-        pooledObject.ReturnToPool(lifeTime);
+
     }
 
     void Update()
@@ -40,14 +40,24 @@ public class Projectile : MonoBehaviour, IPoolable
 
     void OnTriggerEnter(Collider other)
     {
-        HealthComponent health = other.GetComponent<HealthComponent>();
+        // 1. Ignore other triggers (like the player's ClosestTargeter radius or enemy aggro ranges)
+        if (other.isTrigger) return;
 
-        if (health == null)
+        // 2. Ignore collisions with the Player so it doesn't destroy itself on spawn
+        if (other.GetComponentInParent<PlayerHealthComponent>() != null) return;
+
+        // 3. Look for the HealthComponent on this object or its parents (in case the collider is on a child object)
+        HealthComponent health = other.GetComponentInParent<HealthComponent>();
+
+        if (health != null)
         {
             health.TakeDamage(20);
+            Debug.Log("Projectile hit something: " + other.name);
             pooledObject.ReturnToPool();
             return;
         }
+
+        // Destroy the projectile if it hits a solid object like a wall
         pooledObject.ReturnToPool();
     }
 
