@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class HealthComponent : MonoBehaviour
+public class HealthComponent : MonoBehaviour, IDamageable
 {
     [SerializeField] private int maxHealth = 100;
 
@@ -33,6 +32,8 @@ public class HealthComponent : MonoBehaviour
             Enemy = GetComponent<Enemy>(),
             DamagePosition = transform.position
         });
+
+        Debug.Log("-------------Enemy took damage: " + currentHealth);
 
         if (currentHealth <= 0f) Die();
     }
