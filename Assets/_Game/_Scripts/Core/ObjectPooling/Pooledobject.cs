@@ -10,10 +10,12 @@ public class PooledObject : MonoBehaviour
 
     public void ReturnToPool()
     {
+        if (!gameObject.activeInHierarchy) return;
         PoolManager.Instance.Despawn(gameObject);
     }
     public void ReturnToPool(float delay)
     {
+        if (!gameObject.activeInHierarchy) return;
         PoolManager.Instance.DespawnAfter(gameObject, delay);
     }
 }

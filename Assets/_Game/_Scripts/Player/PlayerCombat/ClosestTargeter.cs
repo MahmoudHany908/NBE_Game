@@ -27,7 +27,7 @@ public class ClosestTargeter : MonoBehaviour, ITargetProvider
             timer = 0f;
             checkInterval = Random.Range(0.5f, 1.5f);
 
-            targetsInRange.RemoveAll(t => t == null);
+            targetsInRange.RemoveAll(t => t == null || !t.gameObject.activeInHierarchy);
         }
     }
 
@@ -43,6 +43,9 @@ public class ClosestTargeter : MonoBehaviour, ITargetProvider
 
         foreach (var target in targetsInRange)
         {
+            if (target == null || !target.gameObject.activeInHierarchy)
+                continue;
+
             float sqrDistance = (target.position - position).sqrMagnitude;
 
             if (sqrDistance < closestDistance)
@@ -62,6 +65,9 @@ public class ClosestTargeter : MonoBehaviour, ITargetProvider
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!other.gameObject.activeInHierarchy)
+            return;
+
         if (IsValidTarget(other.gameObject))
         {
             targetsInRange.Add(other.transform);
