@@ -7,6 +7,5 @@ public class ArenaLifetimeScope : LifetimeScope
     {
         builder.RegisterComponentInHierarchy<WaveSpawner>();
         builder.RegisterComponentInHierarchy<IronRevolver>();
-        builder.RegisterComponentInHierarchy<SecurityDroneAI>();   
     }
 }

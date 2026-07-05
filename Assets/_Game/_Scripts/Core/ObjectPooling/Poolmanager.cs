@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using VContainer;
+using VContainer.Unity;
 
 public class PoolManager : MonoBehaviour
 {
-
+    [Inject] private IObjectResolver _resolver;
 
     [System.Serializable]
     public class PrewarmEntry
@@ -15,7 +17,6 @@ public class PoolManager : MonoBehaviour
     }
 
     [SerializeField] private List<PrewarmEntry> prewarmPools = new();
-
 
     [SerializeField] private Transform poolParent;
 
@@ -75,6 +76,13 @@ public class PoolManager : MonoBehaviour
     private GameObject CreateInstance(GameObject prefab, int prefabKey)
     {
         var instance = Instantiate(prefab, poolParent);
+        
+        // Inject dependencies into the newly spawned object!
+        if (_resolver != null)
+        {
+            _resolver.InjectGameObject(instance);
+        }
+
         var pooled = instance.GetComponent<PooledObject>();
         if (pooled == null)
             pooled = instance.AddComponent<PooledObject>();

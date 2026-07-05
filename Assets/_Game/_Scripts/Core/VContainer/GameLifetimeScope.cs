@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -13,9 +12,5 @@ public class GameLifetimeScope : LifetimeScope
     {
         builder.RegisterComponent(audioManager);
         builder.RegisterComponent(poolManager);
-
-        builder.RegisterComponentInHierarchy<WaveSpawner>();
-        builder.RegisterComponentInHierarchy<IronRevolver>();
-        builder.RegisterComponentInHierarchy<SecurityDroneAI>();   
     }
 }
