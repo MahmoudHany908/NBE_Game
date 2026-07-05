@@ -35,7 +35,7 @@ public class WaveSpawner : MonoBehaviour
 
     public bool AreAllEnemiesDead()
     {
-        activeEnemies.RemoveAll(e => e == null);
+        activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
         return activeEnemies.Count == 0;
     }
 
