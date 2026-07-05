@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 public class IronRevolver : MonoBehaviour, IAttack
 {
@@ -8,6 +9,7 @@ public class IronRevolver : MonoBehaviour, IAttack
 
     private ITargetProvider targetProvider;
     private float timer;
+    [Inject] private PoolManager poolManager;
 
     private void Awake()
     {
@@ -41,7 +43,6 @@ public class IronRevolver : MonoBehaviour, IAttack
         Vector3 pos = target.transform.position;
         Vector3 dir = (pos - attackPos.position).normalized;
 
-        // Prevent "Look rotation viewing vector is zero" error if target is exactly at attackPos
         if (dir == Vector3.zero)
         {
             dir = attackPos.forward;
@@ -49,7 +50,7 @@ public class IronRevolver : MonoBehaviour, IAttack
 
         Quaternion rotation = Quaternion.LookRotation(dir);
 
-        Projectile projectile = PoolManager.Instance.Spawn<Projectile>(
+        Projectile projectile = poolManager.Spawn<Projectile>(
             bulletPrefab.gameObject,
             attackPos.position,
             rotation

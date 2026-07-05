@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 public class AudioManager : MonoBehaviour
 {
@@ -24,20 +25,15 @@ public class AudioManager : MonoBehaviour
     }
 
     private AudioSource musicAudioSource;
-    public static AudioManager Instance { get; private set; }
+
+    // 1. Inject PoolManager via DI instead of using PoolManager.Instance
+    [Inject] private PoolManager poolManager;
 
     private List<PooledAudioSource> activeAmbientSources = new List<PooledAudioSource>();
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
         DontDestroyOnLoad(gameObject);
-
         musicAudioSource = new GameObject("MusicAudioSource").AddComponent<AudioSource>();
         musicAudioSource.transform.SetParent(transform);
     }
@@ -53,14 +49,13 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        PooledAudioSource pooled = PoolManager.Instance.Spawn<PooledAudioSource>(
+        // 2. Use the injected poolManager
+        PooledAudioSource pooled = poolManager.Spawn<PooledAudioSource>(
             soundSourcePrefab.gameObject, position, Quaternion.identity);
 
         pooled.Source.pitch = RandomizePitch(data.pitchRange);
         pooled.Source.PlayOneShot(clip, GetFinalVolume(data.volume, sfxVolume));
 
-        // Schedule return after the clip finishes.
-        // We do this here (not in OnSpawned) because the clip is known only now.
         pooled.ReturnToPool(clip.length + 0.1f);
     }
 
@@ -77,7 +72,7 @@ public class AudioManager : MonoBehaviour
             return null;
         }
 
-        PooledAudioSource pooled = PoolManager.Instance.Spawn<PooledAudioSource>(
+        PooledAudioSource pooled = poolManager.Spawn<PooledAudioSource>(
             soundSourcePrefab.gameObject, position, Quaternion.identity);
 
         pooled.Source.clip = clip;
@@ -88,17 +83,16 @@ public class AudioManager : MonoBehaviour
 
         activeAmbientSources.Add(pooled);
 
-        // OnDespawned fires OnReturnedToPool, which removes it from our list.
+        // Your original lambda is perfectly fine and correctly captures the specific instance!
         pooled.OnReturnedToPool += () => activeAmbientSources.Remove(pooled);
 
-        // No ReturnToPool call here — ambient lives until StopAmbient() is called.
         return pooled;
     }
 
     public void StopAmbient(PooledAudioSource source)
     {
         if (source == null) return;
-        source.ReturnToPool(); 
+        source.ReturnToPool();
     }
 
     public void StopAllAmbient()
@@ -125,7 +119,6 @@ public class AudioManager : MonoBehaviour
     }
 
     #endregion
-
 
     #region HELPERS
 

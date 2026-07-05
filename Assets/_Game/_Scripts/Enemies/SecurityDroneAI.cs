@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 public class SecurityDroneAI : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class SecurityDroneAI : MonoBehaviour
     private float attackTimer;
     private float targetHeight;
     private ITargetProvider targetProvider;
+
+    [Inject] private PoolManager poolManager;
 
     void Awake()
     {
@@ -84,7 +87,7 @@ public class SecurityDroneAI : MonoBehaviour
     private void Attack()
     {
         attackTimer = attackCooldown;
-        var projectile = PoolManager.Instance.Spawn<DroneProjectile>(projectilePrefab, transform.position, Quaternion.identity);
+        var projectile = poolManager.Spawn<DroneProjectile>(projectilePrefab, transform.position, Quaternion.identity);
         projectile?.Init(target.position, attackDamage);
     }
 
