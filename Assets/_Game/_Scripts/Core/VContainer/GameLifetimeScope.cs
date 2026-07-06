@@ -10,7 +10,9 @@ public class GameLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterComponent(audioManager);
         builder.RegisterComponent(poolManager);
+        builder.RegisterComponent(audioManager);
+        poolManager.gameObject.transform.parent = null;
+        audioManager.gameObject.transform.parent = null;
     }
 }
