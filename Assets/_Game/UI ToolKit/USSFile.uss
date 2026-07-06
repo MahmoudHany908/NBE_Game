@@ -1,0 +1,98 @@
+/* 1. Root Container: Centers the panel on the screen */
+#root-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center;     /* Centers vertically */
+}
+
+/* 2. Background Overlay: Full screen, semi-transparent black */
+#background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* 3. Settings Panel: THE NON-STRETCHING MAGIC */
+#settings-panel {
+    /* Use percentages for width so it scales on phones, but cap it for tablets */
+    width: 85%; 
+    max-width: 500px; /* Prevents it from getting too huge on large screens */
+    max-height: 85%;
+    
+    /* Styling */
+    background-color: #222831; /* Dark modern mobile background */
+    border-radius: 20px;
+    padding: 30px;
+    border-width: 2px;
+    border-color: #393E46;
+    
+    /* Stack children vertically */
+    flex-direction: column; 
+}
+
+/* 4. Header Styling */
+#header {
+    flex-direction: row;
+    justify-content: space-between; /* Pushes title to left, button to right */
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+#title {
+    font-size: 36px;
+    color: #EEEEEE;
+    -unity-font-style: bold;
+}
+
+#close-button {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    color: #EEEEEE;
+    background-color: #E94560; /* Nice red accent for closing */
+    border-radius: 25px;
+    -unity-text-align: middle-center;
+    -unity-background-color-tint: #E94560;
+}
+
+/* 5. Content Area (Sliders & Toggles) */
+#content {
+    /* Stack vertically */
+}
+
+/* Mobile UX: Make touch targets larger! */
+Toggle, Slider {
+    margin-bottom: 25px;
+    min-height: 45px; /* Crucial for mobile fingers */
+}
+
+/* Put the toggle switch on the right side */
+Toggle {
+    flex-direction: row-reverse; 
+    justify-content: space-between;
+}
+
+Toggle Label, Slider Label {
+    font-size: 24px;
+    color: #CCCCCC;
+    min-width: 120px; /* Prevents text from squishing the slider */
+}
+
+/* Make the slider track and thumb look a bit more modern */
+Slider .unity-base-slider__tracker {
+    background-color: #393E46;
+    height: 12px;
+    border-radius: 6px;
+}
+
+Slider .unity-base-slider__drag {
+    background-color: #E94560; /* Matches close button */
+    width: 35px;
+    height: 35px;
+    border-radius: 17px;
+}
