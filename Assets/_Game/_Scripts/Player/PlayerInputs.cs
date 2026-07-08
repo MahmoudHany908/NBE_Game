@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInputs : MonoBehaviour
@@ -11,7 +11,20 @@ public class PlayerInputs : MonoBehaviour
     {
         cam = Camera.main;
         inputActions = new PlayerInputActions();
+    }
+
+    private void OnEnable()
+    {
+        if (inputActions == null)
+        {
+            inputActions = new PlayerInputActions();
+        }
         inputActions.Player.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputActions?.Player.Disable();
     }
 
 
