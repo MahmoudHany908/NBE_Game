@@ -3,9 +3,10 @@
 public class PlayerVisuals : MonoBehaviour
 {
     [SerializeField] private Transform playerVisualTransform;
-
+    [SerializeField] private Animator animator;
     private Player player;
-    
+
+    private bool isMoving;
     void Start()
     {
         player = GetComponent<Player>();
@@ -14,7 +15,9 @@ public class PlayerVisuals : MonoBehaviour
     void Update()
     {
         RotateToMovementDirection();
+        isMoving = player.GetPlayerMovement().MovementDirection.sqrMagnitude > 0.01f;
 
+        animator.SetBool("isMoving", isMoving);
 
     }
 

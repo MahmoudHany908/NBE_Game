@@ -23,6 +23,10 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 moveDirection;
     private Collider col;
 
+
+    public Vector3 MovementDirection => moveDirection;
+
+
     void Start()
     {
         player = GetComponent<Player>();
