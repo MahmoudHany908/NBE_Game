@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using VContainer; 
+
 public class SettingsMenu : MonoBehaviour
 {
     [SerializeField] private UIDocument document;
 
-    // UI Toolkit references
     private VisualElement rootContainer;
     private VisualElement backgroundOverlay;
     private VisualElement settingsPanel;
@@ -14,17 +15,23 @@ public class SettingsMenu : MonoBehaviour
     private Toggle volumeToggle;
     private Slider masterVolumeSlider, musicVolumeSlider, sfxVolumeSlider, ambientVolumeSlider;
 
+    private IEventPublisher _eventPublisher;
+
+    [Inject]
+    public void Construct(IEventPublisher eventPublisher)
+    {
+        _eventPublisher = eventPublisher;
+    }
+
     private void Awake()
     {
         var root = document.rootVisualElement;
 
-        // Query the new elements
         rootContainer = root.Q<VisualElement>("root-container");
         backgroundOverlay = root.Q<VisualElement>("background-overlay");
         settingsPanel = root.Q<VisualElement>("settings-panel");
         closeButton = root.Q<Button>("close-button");
 
-        // Query controls
         volumeToggle = root.Q<Toggle>("volume-toggle");
         masterVolumeSlider = root.Q<Slider>("master-volume");
         musicVolumeSlider = root.Q<Slider>("music-volume");
@@ -32,7 +39,8 @@ public class SettingsMenu : MonoBehaviour
         ambientVolumeSlider = root.Q<Slider>("ambient-volume");
     }
 
-
+    // Eventually we might want to replace this direct 
+    // SceneManager call with an event that the GameStateManager listens to!
     public void LoadAreana(string name)
     {
         SceneManager.LoadScene(name);
@@ -51,17 +59,14 @@ public class SettingsMenu : MonoBehaviour
         sfxVolumeSlider.RegisterValueChangedCallback(OnSFXSliderChange);
         ambientVolumeSlider.RegisterValueChangedCallback(OnAmbientSliderChange);
 
-        // Open the menu by default when this script enables
         OpenSettingsMenu();
     }
 
     private void OnDisable()
     {
-        // Unregister close events
         closeButton.clicked -= CloseSettingsMenu;
         backgroundOverlay.UnregisterCallback<ClickEvent>(evt => CloseSettingsMenu());
 
-        // Unregister control events
         volumeToggle.UnregisterValueChangedCallback(OnMuteTogglePressed);
         masterVolumeSlider.UnregisterValueChangedCallback(OnMasterVolumeSliderChange);
         musicVolumeSlider.UnregisterValueChangedCallback(OnMusicVolumeSliderChange);
@@ -79,16 +84,14 @@ public class SettingsMenu : MonoBehaviour
         rootContainer.style.display = DisplayStyle.None;
     }
 
-    // --- Callbacks ---
-    private void OnMuteTogglePressed(ChangeEvent<bool> evt) => EventBus.Publish(new OnMuteTogglePressedEvent { newValue = evt.newValue });
-    private void OnMasterVolumeSliderChange(ChangeEvent<float> evt) => EventBus.Publish(new OnMasterVolumeChangedEvent { newValue = evt.newValue });
-    private void OnMusicVolumeSliderChange(ChangeEvent<float> evt) => EventBus.Publish(new OnMusicVolumeChangedEvent { newValue = evt.newValue });
-    private void OnSFXSliderChange(ChangeEvent<float> evt) => EventBus.Publish(new OnSFXSliderChangeEvent { newValue = evt.newValue });
-    private void OnAmbientSliderChange(ChangeEvent<float> evt) => EventBus.Publish(new OnAmbientSliderChangeEvent { newValue = evt.newValue });
+    private void OnMuteTogglePressed(ChangeEvent<bool> evt) => _eventPublisher?.Publish(new OnMuteTogglePressedEvent { newValue = evt.newValue });
+    private void OnMasterVolumeSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnMasterVolumeChangedEvent { newValue = evt.newValue });
+    private void OnMusicVolumeSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnMusicVolumeChangedEvent { newValue = evt.newValue });
+    private void OnSFXSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnSFXSliderChangeEvent { newValue = evt.newValue });
+    private void OnAmbientSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnAmbientSliderChangeEvent { newValue = evt.newValue });
 
 }
 
-//events
 public struct OnMuteTogglePressedEvent : IGameEvent { public bool newValue; }
 public struct OnMasterVolumeChangedEvent : IGameEvent { public float newValue; }
 public struct OnMusicVolumeChangedEvent : IGameEvent { public float newValue; }

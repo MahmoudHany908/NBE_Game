@@ -1,14 +1,19 @@
 using UnityEngine;
-
+using VContainer; // Required for injection
 
 public class PlayerHealthComponent : MonoBehaviour, IDamageable
 {
-
     [SerializeField] private int maxHealth = 100;
 
     private int currentHealth;
     private bool isDead;
+    private IEventPublisher _eventPublisher;
 
+    [Inject]
+    public void Construct(IEventPublisher eventPublisher)
+    {
+        _eventPublisher = eventPublisher;
+    }
 
     void OnEnable()
     {
@@ -22,15 +27,14 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         currentHealth = value;
     }
 
-
     public void TakeDamage(int amount)
     {
         if (isDead) return;
         currentHealth -= amount;
-        EventBus.Publish(new PlayerTakeDamageEvent
+
+        _eventPublisher?.Publish(new PlayerTakeDamageEvent
         {
             Damage = amount,
-
         });
 
         Debug.Log("Player took damage: " + currentHealth);
@@ -41,7 +45,6 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         isDead = true;
-        EventBus.Publish(new PlayerDeathEvent { deathPostion = transform.position });
-
+        _eventPublisher?.Publish(new PlayerDeathEvent { deathPostion = transform.position });
     }
 }

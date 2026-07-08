@@ -33,7 +33,6 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
         musicAudioSource = new GameObject("MusicAudioSource").AddComponent<AudioSource>();
         musicAudioSource.transform.SetParent(transform);
     }

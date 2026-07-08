@@ -1,26 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
-
-public static class EventBus
+// -------------------------------------------------------------------------
+// VContainer Domain Contracts
+// -------------------------------------------------------------------------
+public interface IEventPublisher
 {
-    private static readonly Dictionary<Type, List<Delegate>> _subscribers = new();
-    private static readonly Dictionary<Type, List<Delegate>> _toAdd = new();
-    private static readonly Dictionary<Type, List<Delegate>> _toRemove = new();
+    void Publish<T>(T eventData) where T : IGameEvent;
+}
 
+public interface IEventSubscriber
+{
+    void Subscribe<T>(Action<T> handler) where T : IGameEvent;
+    void Unsubscribe<T>(Action<T> handler) where T : IGameEvent;
+}
 
-    private static readonly object _lock = new();
+// -------------------------------------------------------------------------
+// Pure C# Service Implementation (Non-Static)
+// -------------------------------------------------------------------------
+public class EventBus : IEventPublisher, IEventSubscriber
+{
+    private readonly Dictionary<Type, List<Delegate>> _subscribers = new();
+    private readonly Dictionary<Type, List<Delegate>> _toAdd = new();
+    private readonly Dictionary<Type, List<Delegate>> _toRemove = new();
 
-
-    private static int _publishDepth = 0;
+    private readonly object _lock = new();
+    private int _publishDepth = 0;
 
     // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
 
-    public static void Subscribe<T>(Action<T> handler) where T : IGameEvent
+    public void Subscribe<T>(Action<T> handler) where T : IGameEvent
     {
         if (handler == null)
         {
@@ -37,7 +49,6 @@ public static class EventBus
             if (!target.ContainsKey(type))
                 target[type] = new List<Delegate>();
 
-
             if (target[type].Contains(handler))
             {
                 Debug.LogWarning($"[EventBus] Handler already subscribed to {type.Name}. " +
@@ -49,7 +60,7 @@ public static class EventBus
         }
     }
 
-    public static void Unsubscribe<T>(Action<T> handler) where T : IGameEvent
+    public void Unsubscribe<T>(Action<T> handler) where T : IGameEvent
     {
         if (handler == null)
         {
@@ -71,7 +82,6 @@ public static class EventBus
             {
                 if (_subscribers.TryGetValue(type, out var list))
                 {
-
                     int removed = list.RemoveAll(d => d.Equals(handler));
                     if (removed == 0)
                         Debug.LogWarning($"[EventBus] Unsubscribe called for {type.Name} but handler was not found. " +
@@ -85,12 +95,11 @@ public static class EventBus
         }
     }
 
-    public static void Publish<T>(T eventData) where T : IGameEvent
+    public void Publish<T>(T eventData) where T : IGameEvent
     {
         var type = typeof(T);
-
-
         List<Delegate> snapshot;
+
         lock (_lock)
         {
             if (!_subscribers.TryGetValue(type, out var handlers) || handlers.Count == 0)
@@ -113,7 +122,6 @@ public static class EventBus
                     }
                     catch (Exception e)
                     {
-
                         Debug.LogException(e);
                     }
                 }
@@ -131,8 +139,7 @@ public static class EventBus
         }
     }
 
-
-    public static void Clear()
+    public void Clear()
     {
         lock (_lock)
         {
@@ -143,9 +150,8 @@ public static class EventBus
         }
     }
 
-
     // NOTE: Must be called while holding _lock.
-    private static void ProcessPending()
+    private void ProcessPending()
     {
         foreach (var kvp in _toAdd)
         {
@@ -179,11 +185,8 @@ public static class EventBus
         _toRemove.Clear();
     }
 
-
-
 #if UNITY_EDITOR
-
-    public static Dictionary<string, int> GetSubscriberCounts()
+    public Dictionary<string, int> GetSubscriberCounts()
     {
         lock (_lock)
         {
@@ -194,7 +197,7 @@ public static class EventBus
         }
     }
 
-    public static void LogSubscriberCounts()
+    public void LogSubscriberCounts()
     {
         lock (_lock)
         {

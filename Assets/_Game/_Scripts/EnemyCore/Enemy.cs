@@ -1,13 +1,24 @@
 using System;
 using UnityEngine;
+using VContainer; 
 
+[RequireComponent(typeof(PooledObject))]
+[RequireComponent(typeof(HealthComponent))]
 public class Enemy : MonoBehaviour, IPoolable
 {
     protected float moveSpeed;
     private PooledObject pooledObject;
     private HealthComponent healthComponent;
 
+    private IEventSubscriber eventSubscriber;
+
     public float MoveSpeed => moveSpeed;
+
+    [Inject]
+    public void Construct(IEventSubscriber subscriber)
+    {
+        eventSubscriber = subscriber;
+    }
 
     protected virtual void Awake()
     {
@@ -15,15 +26,14 @@ public class Enemy : MonoBehaviour, IPoolable
         healthComponent = GetComponent<HealthComponent>();
     }
 
-
     void OnEnable()
     {
-        EventBus.Subscribe<EnemyDiedEvent>(HandleDeath);
+        eventSubscriber?.Subscribe<EnemyDiedEvent>(HandleDeath);
     }
 
     void OnDisable()
     {
-        EventBus.Unsubscribe<EnemyDiedEvent>(HandleDeath);
+        eventSubscriber?.Unsubscribe<EnemyDiedEvent>(HandleDeath);
     }
 
     public void OnSpawned()
@@ -39,7 +49,7 @@ public class Enemy : MonoBehaviour, IPoolable
     private void HandleDeath(EnemyDiedEvent obj)
     {
         if (obj.gameObject != gameObject) return;
-        Debug.Log($"{obj.gameObject.name} died{obj.DeathPosition}");
+        Debug.Log($"{obj.gameObject.name} died at {obj.DeathPosition}");
         pooledObject.ReturnToPool(0.1f);
     }
 }
