@@ -34,7 +34,6 @@ public class PoolManager : MonoBehaviour
 
     private void Awake()
     {
-
         if (poolParent == null)
         {
             var holder = new GameObject("PooledObjects");

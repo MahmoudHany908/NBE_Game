@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using VContainer;
 
-
 public class WaveMilestoneController : MonoBehaviour
 {
     [Header("Refs")]
@@ -11,21 +10,30 @@ public class WaveMilestoneController : MonoBehaviour
     [Header("Milestone Config")]
     [SerializeField] private int milestoneInterval = 5;
 
-
     private int currentWave = 0;
     private bool waitingOnDecision = false;
     private bool squadsFinishedSpawning = false;
 
+    private IEventPublisher _eventPublisher;
+    private IEventSubscriber _eventSubscriber;
+
+    [Inject]
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    {
+        _eventPublisher = eventPublisher;
+        _eventSubscriber = eventSubscriber;
+    }
+
     private void OnEnable()
     {
         waveSpawner.OnAllSquadsSpawned += HandleAllSquadsSpawned;
-        EventBus.Subscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
+        _eventSubscriber?.Subscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
     }
 
     private void OnDisable()
     {
         waveSpawner.OnAllSquadsSpawned -= HandleAllSquadsSpawned;
-        EventBus.Unsubscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
+        _eventSubscriber?.Unsubscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
     }
 
     /// <summary>Call this once, e.g. when the arena scope is entered, to kick off wave 1.</summary>
@@ -53,14 +61,13 @@ public class WaveMilestoneController : MonoBehaviour
         while (!waveSpawner.AreAllEnemiesDead())
             yield return null;
 
-        EventBus.Publish(new WaveClearedEvent(currentWave));
+        _eventPublisher?.Publish(new WaveClearedEvent(currentWave));
 
         bool isMilestone = milestoneInterval > 0 && currentWave > 0 && currentWave % milestoneInterval == 0;
         if (isMilestone)
         {
             waitingOnDecision = true;
-            EventBus.Publish(new ExtractionAvailableEvent(currentWave));
-            // Loop pauses here — HandleExtractionDecision resumes it.
+            _eventPublisher?.Publish(new ExtractionAvailableEvent(currentWave));
         }
         else
         {
@@ -75,8 +82,7 @@ public class WaveMilestoneController : MonoBehaviour
 
         if (evt.DidExtract)
         {
-            // TODO: hook up to your actual hub-transition (scene load / scope teardown).
-            // e.g. hubTransitionService.ReturnToHub();
+            // The hub transition is handled in ExtractionUIController now
         }
         else
         {

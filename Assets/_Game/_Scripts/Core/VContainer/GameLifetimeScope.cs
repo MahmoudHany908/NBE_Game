@@ -6,18 +6,22 @@ public class GameLifetimeScope : LifetimeScope
 {
     [SerializeField] private PoolManager poolManager;
     [SerializeField] private AudioManager audioManager;
+    [SerializeField] private GameStateManager gameStateManager;
 
     protected override void Configure(IContainerBuilder builder)
     {
+        // Register Managers
         builder.RegisterComponent(audioManager);
-        builder.RegisterComponent(poolManager);
+        builder.RegisterComponent(gameStateManager).As<IGameStateManager>();
 
-        // Register managers
-        builder.RegisterComponentInHierarchy<GameStateManager>().As<IGameStateManager>();
+        // Register PoolManager as a singleton so it persists globally
+        builder.RegisterComponent(poolManager).AsSelf();
+
+        // Register Event System
         builder.Register<EventBus>(Lifetime.Singleton).As<IEventPublisher>().As<IEventSubscriber>();
 
-        // Add these lines to handle the UI Toolkit scripts in the scene
+        // Register Hub UI & Triggers
         builder.RegisterComponentInHierarchy<SettingsMenu>();
-        builder.RegisterComponentInHierarchy<SceneTransitionView>(); // <--- ADD THIS LINE
+        builder.RegisterComponentInHierarchy<GateTrigger>();
     }
 }

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using VContainer;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Shows the "Extract or Continue" prompt when a milestone wave (every 5th) is cleared.
@@ -11,8 +10,6 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(UIDocument))]
 public class ExtractionUIController : MonoBehaviour
 {
-
-
     private UIDocument document;
     private VisualElement root;
     private VisualElement panel;
@@ -21,7 +18,15 @@ public class ExtractionUIController : MonoBehaviour
     private Button extractButton;
     private Button continueButton;
 
+    private IEventPublisher _eventPublisher;
+    private IEventSubscriber _eventSubscriber;
 
+    [Inject]
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    {
+        _eventPublisher = eventPublisher;
+        _eventSubscriber = eventSubscriber;
+    }
 
     private void Awake()
     {
@@ -42,12 +47,12 @@ public class ExtractionUIController : MonoBehaviour
 
     private void OnEnable()
     {
-        EventBus.Subscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
+        _eventSubscriber?.Subscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
     }
 
     private void OnDisable()
     {
-        EventBus.Unsubscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
+        _eventSubscriber?.Unsubscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
     }
 
     private void OnDestroy()
@@ -67,17 +72,19 @@ public class ExtractionUIController : MonoBehaviour
     private void OnExtractClicked()
     {
         HidePanel();
-        EventBus.Publish(new ExtractionDecisionEvent(didExtract: true));
-        SceneManager.LoadScene("HubScene");
 
-
-
+        _eventPublisher?.Publish(new ExtractionDecisionEvent(didExtract: true));
+        _eventPublisher?.Publish(new ChangeStateCommand
+        {
+            TargetSceneName = "HubScene",
+            TargetState = new HideoutState()
+        });
     }
 
     private void OnContinueClicked()
     {
         HidePanel();
-        EventBus.Publish(new ExtractionDecisionEvent(didExtract: false));
+        _eventPublisher?.Publish(new ExtractionDecisionEvent(didExtract: false));
     }
 
     private void ShowPanel()
@@ -92,9 +99,6 @@ public class ExtractionUIController : MonoBehaviour
         Time.timeScale = 1f;
     }
 }
-
-
-
 
 internal static class VisualElementExtensions
 {

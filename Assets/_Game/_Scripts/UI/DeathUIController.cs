@@ -1,17 +1,26 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using VContainer; 
 
 [RequireComponent(typeof(UIDocument))]
 public class DeathUIController : MonoBehaviour
 {
-
     private UIDocument document;
     private VisualElement root;
     private VisualElement panel;
     private Label waveReachedLabel;
     private Button retryButton;
     private Button hubButton;
+
+    private IEventPublisher _eventPublisher;
+    private IEventSubscriber _eventSubscriber;
+
+    [Inject]
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    {
+        _eventPublisher = eventPublisher;
+        _eventSubscriber = eventSubscriber;
+    }
 
     private void Awake()
     {
@@ -31,12 +40,12 @@ public class DeathUIController : MonoBehaviour
 
     private void OnEnable()
     {
-        EventBus.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
+        _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void OnDisable()
     {
-        EventBus.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
+        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void OnDestroy()
@@ -54,15 +63,18 @@ public class DeathUIController : MonoBehaviour
     private void OnRetryClicked()
     {
         HidePanel();
-        // TODO: hook up to your arena scope reset / scene reload
-        // e.g. arenaLifetimeScope.RestartRun();
+
     }
 
     private void OnReturnToHubClicked()
     {
         HidePanel();
-        // TODO: hook up to your hub-transition service
-        // e.g. hubTransitionService.ReturnToHub();
+
+        _eventPublisher?.Publish(new ChangeStateCommand
+        {
+            TargetSceneName = "HubScene",
+            TargetState = new HideoutState()
+        });
     }
 
     private void ShowPanel()
