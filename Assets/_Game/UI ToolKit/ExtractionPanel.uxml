@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="ExtractionPanel.uss" />
+
+    <ui:VisualElement name="extraction-panel" class="overlay hidden">
+        <ui:VisualElement name="extraction-box" class="panel-box">
+            <ui:Label name="wave-label" text="WAVE 5 CLEARED" class="title-label" />
+            <ui:Label name="resource-label" text="Carrying 0 credits" class="subtitle-label" />
+
+            <ui:VisualElement class="button-row">
+                <ui:Button name="extract-button" text="EXTRACT TO HUB" class="action-button extract-btn" />
+                <ui:Button name="continue-button" text="PUSH ONWARD" class="action-button continue-btn" />
+            </ui:VisualElement>
+
+            <ui:Label text="Extracting banks your current resources. Continuing raises the stakes." class="hint-label" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

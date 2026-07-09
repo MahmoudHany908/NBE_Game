@@ -41,7 +41,8 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         isDead = true;
-        EventBus.Publish(new PlayerDeathEvent { deathPostion = transform.position });
+        EventBus.Publish(new PlayerDiedEvent(1)); // TODO: pass in current wave number
+
 
     }
 }

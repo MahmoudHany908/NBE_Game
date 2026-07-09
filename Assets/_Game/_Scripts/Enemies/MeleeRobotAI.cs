@@ -1,4 +1,3 @@
-using UnityEditorInternal;
 using UnityEngine;
 
 public class MeleeRobotAI : MonoBehaviour
@@ -8,8 +7,8 @@ public class MeleeRobotAI : MonoBehaviour
     [SerializeField] private int attackDamage = 10;
     [SerializeField] private float attackCooldown = 1f;
     [SerializeField] private float moveSpeed = 3f;
-    
-    
+
+
     private Enemy enemy;
     private Vector3 direction;
     private Transform target;

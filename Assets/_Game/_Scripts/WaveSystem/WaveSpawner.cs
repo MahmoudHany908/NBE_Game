@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,9 @@ public class WaveSpawner : MonoBehaviour
 
     [Inject] private PoolManager poolManager;
 
+    /// <summary>Fired once every squad in the current wave has finished spawning (enemies may still be alive).</summary>
+    public event Action OnAllSquadsSpawned;
+
     private void Awake()
     {
         budgetCalculator = GetComponent<BudgetCalculator>();
@@ -41,7 +45,6 @@ public class WaveSpawner : MonoBehaviour
 
     private IEnumerator SpawnSquadsRoutine(int totalBudget)
     {
-        // Split budget into N roughly equal chunks
         int baseChunk = totalBudget / squadCount;
         int remainder = totalBudget % squadCount;
 
@@ -76,20 +79,20 @@ public class WaveSpawner : MonoBehaviour
             if (i < squadCount - 1)
                 yield return new WaitForSeconds(delayBetweenSquads);
         }
+
+        OnAllSquadsSpawned?.Invoke();
     }
 
     private Vector3 GetGroundedSpawnPosition()
     {
-        // Pick a random XZ point inside the box, cast down to find ground Y
         Vector3 center = transform.position;
-        float x = Random.Range(-spawnBoxSize.x / 2f, spawnBoxSize.x / 2f);
-        float z = Random.Range(-spawnBoxSize.z / 2f, spawnBoxSize.z / 2f);
+        float x = UnityEngine.Random.Range(-spawnBoxSize.x / 2f, spawnBoxSize.x / 2f);
+        float z = UnityEngine.Random.Range(-spawnBoxSize.z / 2f, spawnBoxSize.z / 2f);
         Vector3 origin = center + new Vector3(x, raycastOriginHeight, z);
 
         if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, raycastOriginHeight * 2f, groundMask))
             return hit.point;
 
-        // Fallback: no ground found, use flat position
         return center + new Vector3(x, 0f, z);
     }
 
@@ -107,7 +110,7 @@ public class WaveSpawner : MonoBehaviour
             List<EnemyEntry> affordable = enemies.FindAll(e => e.cost <= remaining);
             if (affordable.Count == 0) break;
 
-            EnemyEntry selected = affordable[Random.Range(0, affordable.Count)];
+            EnemyEntry selected = affordable[UnityEngine.Random.Range(0, affordable.Count)];
             if (selected.enemyPrefab != null)
             {
                 enemiesToSpawn.Add(selected.enemyPrefab);

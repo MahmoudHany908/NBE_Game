@@ -51,8 +51,8 @@ public class SettingsMenu : MonoBehaviour
         sfxVolumeSlider.RegisterValueChangedCallback(OnSFXSliderChange);
         ambientVolumeSlider.RegisterValueChangedCallback(OnAmbientSliderChange);
 
-        // Open the menu by default when this script enables
-        OpenSettingsMenu();
+        // Ensure the menu is closed by default when this script enables
+        CloseSettingsMenu();
     }
 
     private void OnDisable()
