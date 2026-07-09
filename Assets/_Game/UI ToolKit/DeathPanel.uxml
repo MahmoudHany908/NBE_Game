@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Game/UI%20ToolKit/DeathPanel.uss?fileID=7433441132597879392&amp;guid=4e16ed0f7fa1ca84f874017c62513501&amp;type=3#DeathPanel"/>
+    <ui:VisualElement name="death-panel" class="overlay hidden" style="display: none;">
+        <ui:VisualElement name="death-box" class="panel-box">
+            <ui:Label text="YOU DIED" class="title-label"/>
+            <ui:Label name="wave-reached-label" text="FELL AT WAVE 1" class="subtitle-label"/>
+            <ui:VisualElement class="button-row">
+                <ui:Button name="retry-button" text="RETRY" class="action-button retry-btn"/>
+                <ui:Button name="hub-button" text="RETURN TO HUB" class="action-button hub-btn"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
