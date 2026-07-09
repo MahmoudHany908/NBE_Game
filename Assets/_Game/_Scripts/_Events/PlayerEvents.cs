@@ -5,9 +5,3 @@ public struct PlayerTakeDamageEvent : IGameEvent
 
 }
 
-public struct PlayerDeathEvent : IGameEvent
-{
-    public Vector3 deathPostion;
-
-}
-
