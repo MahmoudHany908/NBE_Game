@@ -9,15 +9,16 @@ public class GameStateManager : MonoBehaviour, IGameStateManager
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
 
-    // Inject BOTH interfaces from your EventBus
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
     {
+        Debug.Log("[GameStateManager] Construct called! Injecting dependencies.");
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
 
         // Subscribe to incoming UI commands immediately
         _eventSubscriber.Subscribe<ChangeStateCommand>(HandleChangeStateCommand);
+        Debug.Log("[GameStateManager] Successfully subscribed to ChangeStateCommand.");
     }
 
     private void OnDestroy()

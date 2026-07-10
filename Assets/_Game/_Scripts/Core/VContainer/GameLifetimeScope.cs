@@ -20,8 +20,10 @@ public class GameLifetimeScope : LifetimeScope
         // Register Event System
         builder.Register<EventBus>(Lifetime.Singleton).As<IEventPublisher>().As<IEventSubscriber>();
 
-        // Register Hub UI & Triggers
-        builder.RegisterComponentInHierarchy<SettingsMenu>();
-        builder.RegisterComponentInHierarchy<GateTrigger>();
+        // Force injection on components that are not resolved by others
+        builder.RegisterBuildCallback(container => 
+        {
+            container.Resolve<IGameStateManager>();
+        });
     }
 }
