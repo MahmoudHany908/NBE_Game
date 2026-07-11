@@ -1,0 +1,97 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Unity Technologies.
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+using System.Collections.Generic;
+using System.IO;
+
+namespace Microsoft.Unity.VisualStudio.Editor
+{
+	internal static class Discovery
+	{
+		public static IEnumerable<IVisualStudioInstallation> GetInstallations()
+		{
+			foreach (var installation in TraeInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in TraeCNInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in QoderInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in KiroInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in CursorInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in WindsurfInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in AntigravityInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in CodeBuddyInstallation.GetInstallations())
+				yield return installation;
+
+			foreach (var installation in CodeBuddyCNInstallation.GetInstallations())
+				yield return installation;
+		}
+
+		public static bool TryDiscoverInstallation(string editorPath, out IVisualStudioInstallation installation)
+		{
+			try
+			{
+				if (TraeCNInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (TraeInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (QoderInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (KiroInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (CursorInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (WindsurfInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (AntigravityInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (CodeBuddyCNInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+				if (CodeBuddyInstallation.TryDiscoverInstallation(editorPath, out installation))
+					return true;
+
+			}
+			catch (IOException)
+			{
+				installation = null;
+			}
+
+			return false;
+		}
+
+		public static void Initialize() // ?
+		{
+			TraeInstallation.Initialize();
+			TraeCNInstallation.Initialize();
+			QoderInstallation.Initialize();
+			KiroInstallation.Initialize();
+			CursorInstallation.Initialize();
+			WindsurfInstallation.Initialize();
+			AntigravityInstallation.Initialize();
+			CodeBuddyInstallation.Initialize();
+			CodeBuddyCNInstallation.Initialize();
+		}
+	}
+}

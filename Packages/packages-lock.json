@@ -42,24 +42,22 @@
       "hash": "ebddf1a0f70ef61d88dc609fcfd2b4817f48e456"
     },
     "com.ivanmurzak.unity.mcp": {
-      "version": "0.82.4",
+      "version": "file:com.ivanmurzak.unity.mcp",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.test-framework": "1.1.33",
         "com.unity.modules.uielements": "1.0.0",
         "extensions.unity.playerprefsex": "2.1.5"
-      },
-      "url": "https://package.openupm.com"
+      }
     },
     "com.unifan.ides": {
-      "version": "https://github.com/821869798/com.unifan.ides.git",
+      "version": "file:com.unifan.ides",
       "depth": 0,
-      "source": "git",
+      "source": "embedded",
       "dependencies": {
         "com.unity.test-framework": "1.1.9"
-      },
-      "hash": "d486f31ed53a056c11f5dbbd11290e11e42ebc67"
+      }
     },
     "com.unity.ai.navigation": {
       "version": "2.0.13",
