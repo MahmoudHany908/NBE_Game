@@ -14,10 +14,13 @@ public class Enemy : MonoBehaviour, IPoolable
 
     public float MoveSpeed => moveSpeed;
 
+    private bool isSubscribed = false;
+
     [Inject]
     public void Construct(IEventSubscriber subscriber)
     {
         eventSubscriber = subscriber;
+        SubscribeToEvents();
     }
 
     protected virtual void Awake()
@@ -28,12 +31,26 @@ public class Enemy : MonoBehaviour, IPoolable
 
     void OnEnable()
     {
-        eventSubscriber?.Subscribe<EnemyDiedEvent>(HandleDeath);
+        SubscribeToEvents();
     }
 
     void OnDisable()
     {
-        eventSubscriber?.Unsubscribe<EnemyDiedEvent>(HandleDeath);
+        UnsubscribeFromEvents();
+    }
+
+    private void SubscribeToEvents()
+    {
+        if (isSubscribed || eventSubscriber == null) return;
+        eventSubscriber.Subscribe<EnemyDiedEvent>(HandleDeath);
+        isSubscribed = true;
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        if (!isSubscribed || eventSubscriber == null) return;
+        eventSubscriber.Unsubscribe<EnemyDiedEvent>(HandleDeath);
+        isSubscribed = false;
     }
 
     public void OnSpawned()
