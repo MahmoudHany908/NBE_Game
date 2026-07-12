@@ -39,16 +39,16 @@ public class HealthComponent : MonoBehaviour, IDamageable
         if (isDead) return;
 
         currentHealth -= amount;
-        Debug.Log(currentHealth);
+
+        Debug.Log("Enemy Took Damage: " + currentHealth);
 
         eventPublisher?.Publish(new EnemyTakeDamageEvent
         {
             Damage = amount,
-            Enemy = cachedEnemy, 
+            Enemy = cachedEnemy,
             DamagePosition = transform.position
         });
 
-        Debug.Log("-------------Entity took damage: " + currentHealth);
 
         if (currentHealth <= 0f) Die();
     }
