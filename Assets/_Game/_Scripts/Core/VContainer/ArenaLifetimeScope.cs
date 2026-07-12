@@ -11,7 +11,6 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<ExtractionUIController>();
         builder.RegisterComponentInHierarchy<WaveMilestoneController>();
 
-        builder.Register<EventBus>(Lifetime.Singleton).As<IEventPublisher>().As<IEventSubscriber>();
     }
 
     private void Start()
