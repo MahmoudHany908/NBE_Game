@@ -20,6 +20,9 @@ public class GameLifetimeScope : LifetimeScope
         // Register Event System
         builder.Register<EventBus>(Lifetime.Singleton).As<IEventPublisher>().As<IEventSubscriber>();
 
+        // Register Save System
+        builder.Register<SaveManager>(Lifetime.Singleton).As<ISaveSystem>();
+
         // Force injection on components that are not resolved by others
         builder.RegisterBuildCallback(container => 
         {
