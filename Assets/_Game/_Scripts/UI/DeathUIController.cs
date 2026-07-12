@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-using VContainer; 
+using VContainer;
 
 [RequireComponent(typeof(UIDocument))]
 public class DeathUIController : MonoBehaviour
@@ -20,6 +20,7 @@ public class DeathUIController : MonoBehaviour
     {
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+        _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void Awake()
@@ -38,25 +39,17 @@ public class DeathUIController : MonoBehaviour
         HidePanel();
     }
 
-    private void OnEnable()
-    {
-        _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
-    }
-
-    private void OnDisable()
-    {
-        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
-    }
 
     private void OnDestroy()
     {
         retryButton.clicked -= OnRetryClicked;
         hubButton.clicked -= OnReturnToHubClicked;
+        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void HandlePlayerDied(PlayerDiedEvent evt)
     {
-        waveReachedLabel.text = $"FELL AT WAVE {evt.WaveReached}";
+        waveReachedLabel.text = $"FELL AT WAVE {5555555555}";
         ShowPanel();
     }
 

@@ -1,5 +1,6 @@
 using UnityEngine;
-using VContainer; // Required for injection
+using UnityEngine.InputSystem;
+using VContainer;
 
 public class PlayerHealthComponent : MonoBehaviour, IDamageable
 {
@@ -21,6 +22,10 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         isDead = false;
     }
 
+    void Update()
+    {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame) TakeDamage(20);
+    }
     public void SetMaxHealth(int value)
     {
         maxHealth = value;
@@ -32,19 +37,18 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         if (isDead) return;
         currentHealth -= amount;
 
-        _eventPublisher?.Publish(new PlayerTakeDamageEvent
-        {
-            Damage = amount,
-        });
+        _eventPublisher?.Publish(new PlayerTakeDamageEvent(damage: amount));
 
         Debug.Log("Player took damage: " + currentHealth);
-        if (currentHealth <= 0f) Die();
+        if (currentHealth <= 0) Die();
     }
 
     private void Die()
     {
         if (isDead) return;
         isDead = true;
-        _eventPublisher?.Publish(new PlayerDeathEvent { deathPostion = transform.position });
+        Debug.Log($"Player died at {transform.position}");
+        Debug.Log("Publishing PlayerDiedEvent");
+        _eventPublisher?.Publish(new PlayerDiedEvent(position: transform.position));
     }
 }
