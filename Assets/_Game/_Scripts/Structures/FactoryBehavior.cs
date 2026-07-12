@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 using VaultSurvivors.Core.Production;
 using ResourceType = VaultSurvivors.Core.Production.ResourceType;
 
@@ -17,6 +18,14 @@ public class FactoryBehavior : MonoBehaviour, IStructureBehaviour
 
     [Header("Live State Reference")]
     public FactoryProductionState state;
+
+
+    private ISaveSystem _saveSystem;
+    [Inject]
+    public void Construct(ISaveSystem saveSystem)
+    {
+        _saveSystem = saveSystem;
+    }
 
     private void Start()
     {
@@ -52,28 +61,26 @@ public class FactoryBehavior : MonoBehaviour, IStructureBehaviour
             state.currentAccumulated -= amountToCollect;
             state.lastCollectionTimeUnix = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            if (SaveManager.Instance != null)
+            GameData cachedData = _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
+
+            switch (state.resourceType)
             {
-                GameData cachedData = SaveManager.Instance.HasSaveFile() ? SaveManager.Instance.Load() : new GameData();
-
-                switch (state.resourceType)
-                {
-                    case ResourceType.Gold: cachedData.resources.gold += amountToCollect; break;
-                    case ResourceType.Food: cachedData.resources.food += amountToCollect; break;
-                    case ResourceType.Energy: cachedData.resources.energy += amountToCollect; break;
-                    case ResourceType.Electronics: cachedData.resources.electronics += amountToCollect; break;
-                }
-
-                SaveManager.Instance.Save(cachedData); 
+                case ResourceType.Gold: cachedData.resources.gold += amountToCollect; break;
+                case ResourceType.Food: cachedData.resources.food += amountToCollect; break;
+                case ResourceType.Energy: cachedData.resources.energy += amountToCollect; break;
+                case ResourceType.Electronics: cachedData.resources.electronics += amountToCollect; break;
             }
+
+            _saveSystem.Save(cachedData);
+
         }
     }
 
     private void LoadStateFromSave()
     {
-        if (SaveManager.Instance == null || !SaveManager.Instance.HasSaveFile()) return;
+        if (!_saveSystem.HasSaveFile()) return;
 
-        GameData gameData = SaveManager.Instance.Load();
+        GameData gameData = _saveSystem.Load();
         FactoryEntry savedEntry = gameData.production.factories.Find(f => f.structureId == factoryId.GetHashCode());
 
         if (savedEntry != null)
@@ -103,10 +110,8 @@ public class FactoryBehavior : MonoBehaviour, IStructureBehaviour
 
     public void TryUpgrade()
     {
-        if (SaveManager.Instance == null) return;
-
         int cost = GetUpgradeCost();
-        GameData cachedData = SaveManager.Instance.HasSaveFile() ? SaveManager.Instance.Load() : new GameData();
+        GameData cachedData = _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
 
         float availableResources = 0f;
         switch (upgradeCostType)
@@ -126,7 +131,7 @@ public class FactoryBehavior : MonoBehaviour, IStructureBehaviour
                 case ResourceType.Energy: cachedData.resources.energy -= cost; break;
                 case ResourceType.Electronics: cachedData.resources.electronics -= cost; break;
             }
-            SaveManager.Instance.Save(cachedData);
+            _saveSystem.Save(cachedData);
 
             Upgrade();
         }

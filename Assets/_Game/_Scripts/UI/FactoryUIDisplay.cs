@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 using TMPro;
 using VaultSurvivors.Core.Production;
 using ResourceType = VaultSurvivors.Core.Production.ResourceType; // Prevents the Mono.Cecil conflict!
@@ -24,6 +25,14 @@ public class FactoryUIDisplay : MonoBehaviour
 
     private PanelUI _panelUI;
     private FactoryBehavior _factoryBehavior;
+
+    private ISaveSystem _saveSystem;
+    [Inject]
+    public void Construct(ISaveSystem saveSystem)
+    {
+        _saveSystem = saveSystem;
+    }
+
 
     private void Awake()
     {
@@ -74,9 +83,9 @@ public class FactoryUIDisplay : MonoBehaviour
 
     private void UpdateWalletDisplay()
     {
-        if (playerWalletText != null && SaveManager.Instance != null && SaveManager.Instance.HasSaveFile())
+        if (playerWalletText != null && _saveSystem.HasSaveFile())
         {
-            GameData cachedData = SaveManager.Instance.Load();
+            GameData cachedData = _saveSystem.Load();
 
             // Dynamically check whatever resource this factory costs to upgrade
             float availableResources = 0f;

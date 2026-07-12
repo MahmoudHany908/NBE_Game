@@ -1,66 +1,55 @@
-using System;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class SaveManager : MonoBehaviour
+public class SaveManager : ISaveSystem
 {
-    public static SaveManager Instance { get; private set; }
+    private readonly string _savePath;
+    private readonly IEventPublisher _eventPublisher;
 
-    public static event Action<GameData> OnSave;
-    public static event Action<GameData> OnLoad;
-
-    private string savePath;
-
-    void Awake()
+    public SaveManager(IEventPublisher eventPublisher)
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        savePath = Path.Combine(Application.persistentDataPath, "save.json");
+        _eventPublisher = eventPublisher;
+        _savePath = Path.Combine(Application.persistentDataPath, "save.json");
     }
 
     public void Save(GameData explicitData = null)
     {
         GameData data = explicitData != null ? explicitData : (HasSaveFile() ? Load() : new GameData());
 
-        OnSave?.Invoke(data);
-
         string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(savePath, json);
-        Debug.Log("Game Saved to: " + savePath);
+        File.WriteAllText(_savePath, json);
+        Debug.Log("Game Saved to: " + _savePath);
     }
 
     public GameData Load()
     {
         if (!HasSaveFile())
         {
-            Debug.Log("No save file found, returning new GameData");
+            Debug.Log("[SaveManager] No save file found, returning new GameData");
             return new GameData();
         }
 
-        string json = File.ReadAllText(savePath);
+        string json = File.ReadAllText(_savePath);
         GameData data = JsonUtility.FromJson<GameData>(json);
 
-        OnLoad?.Invoke(data);
+        _eventPublisher.Publish(new SaveDataLoadedEvent { Data = data });
+
         return data;
     }
 
     public bool HasSaveFile()
     {
-        return File.Exists(savePath);
+        return File.Exists(_savePath);
     }
 
-    public static long DateTimeToToLong(DateTime time) => time.ToBinary();
-    public static DateTime LongToDateTime(long time) => DateTime.FromBinary(time);
+    public static long DateTimeToLong(System.DateTime time) => time.ToBinary();
+    public static System.DateTime LongToDateTime(long time) => System.DateTime.FromBinary(time);
 
     public static float GetRemainingSeconds(long endTimeLong)
     {
-        float remaining = (float)(DateTime.FromBinary(endTimeLong) - DateTime.Now).TotalSeconds;
+        float remaining = (float)(System.DateTime.FromBinary(endTimeLong)
+                                    - System.DateTime.Now).TotalSeconds;
         return Mathf.Max(0f, remaining);
     }
 }
