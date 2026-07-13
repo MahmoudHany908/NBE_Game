@@ -1,4 +1,4 @@
-
+using UnityEngine;
 
 /// <summary>Raised the moment a wave has been fully spawned and every enemy in it is dead.</summary>
 public readonly struct WaveClearedEvent : IGameEvent
@@ -17,16 +17,23 @@ public readonly struct ExtractionAvailableEvent : IGameEvent
     public ExtractionAvailableEvent(int waveNumber) => WaveNumber = waveNumber;
 }
 
-/// <summary>Raised by the UI once the player picks extract or continue at a milestone.</summary>
 public readonly struct ExtractionDecisionEvent : IGameEvent
 {
-    public readonly bool DidExtract; // true = go to hub, false = keep going
+    public readonly bool DidExtract;
     public ExtractionDecisionEvent(bool didExtract) => DidExtract = didExtract;
 }
 
-/// <summary>Raised when the player dies mid-run.</summary>
+
 public readonly struct PlayerDiedEvent : IGameEvent
 {
-    public readonly int WaveReached;
-    public PlayerDiedEvent(int waveReached) => WaveReached = waveReached;
+    public readonly Vector3 deathPostion;
+    public PlayerDiedEvent(Vector3 position) => deathPostion = position;
+
+}
+
+public readonly struct PlayerTakeDamageEvent : IGameEvent
+{
+    public readonly int damage;
+    public PlayerTakeDamageEvent(int damage) => this.damage = damage;
+
 }
