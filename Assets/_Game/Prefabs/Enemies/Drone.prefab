@@ -93,8 +93,8 @@ MonoBehaviour:
   preferredDistance: 1
   distanceThreshold: 1
   moveSpeed: 6
-  minHeight: 2
-  maxHeight: 5
+  minHeight: 3
+  maxHeight: 3.5
   projectilePrefab: {fileID: 7234830729728081170, guid: 97aa96dfba278ce46a48281007219f86, type: 3}
 --- !u!65 &138340309132177678
 BoxCollider:
