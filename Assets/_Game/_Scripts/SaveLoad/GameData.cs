@@ -45,15 +45,10 @@ public class Structure
 [System.Serializable]
 public class ProductionData
 {
-    public List<FactoryEntry> factories = new List<FactoryEntry>();
-}
-
-[System.Serializable]
-public class FactoryEntry : Structure
-{
-    public string selectedResource = "";
+    public int globalFactoryLevel = 1;
+    public string activeResourceType = "Gold";
     public float accumulatedAmount = 0f;
-    public bool isProducing = false;
+    public long lastCollectionTimeUnix = 0;
 }
 
 // add market later in its sprint 

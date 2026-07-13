@@ -13,6 +13,7 @@ public class GameLifetimeScope : LifetimeScope
         // Register Managers
         builder.RegisterComponent(audioManager);
         builder.RegisterComponent(gameStateManager).As<IGameStateManager>();
+        builder.RegisterEntryPoint<VaultSurvivors.Core.Production.ProductionManager>().As<VaultSurvivors.Core.Production.IProductionManager>();
 
         // Register PoolManager as a singleton so it persists globally
         builder.RegisterComponent(poolManager).AsSelf();
