@@ -10,6 +10,7 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<DeathUIController>();
         builder.RegisterComponentInHierarchy<ExtractionUIController>();
         builder.RegisterComponentInHierarchy<WaveMilestoneController>();
+        builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
 
     }
 

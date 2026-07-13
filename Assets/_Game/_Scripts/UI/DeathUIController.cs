@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using VContainer; 
+using VContainer;
 
 [RequireComponent(typeof(UIDocument))]
 public class DeathUIController : MonoBehaviour
@@ -20,6 +21,7 @@ public class DeathUIController : MonoBehaviour
     {
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+        _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void Awake()
@@ -38,31 +40,25 @@ public class DeathUIController : MonoBehaviour
         HidePanel();
     }
 
-    private void OnEnable()
-    {
-        _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
-    }
-
-    private void OnDisable()
-    {
-        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
-    }
 
     private void OnDestroy()
     {
         retryButton.clicked -= OnRetryClicked;
         hubButton.clicked -= OnReturnToHubClicked;
+        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void HandlePlayerDied(PlayerDiedEvent evt)
     {
-        waveReachedLabel.text = $"FELL AT WAVE {evt.WaveReached}";
+        waveReachedLabel.text = $"FELL AT WAVE {5555555555}";
         ShowPanel();
     }
 
     private void OnRetryClicked()
     {
         HidePanel();
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
 
     }
 
@@ -80,6 +76,7 @@ public class DeathUIController : MonoBehaviour
     private void ShowPanel()
     {
         panel.RemoveFromClassList("hidden");
+        panel.style.display = DisplayStyle.Flex;
         Time.timeScale = 0f;
     }
 
@@ -87,6 +84,7 @@ public class DeathUIController : MonoBehaviour
     {
         if (!panel.ClassListContains("hidden"))
             panel.AddToClassList("hidden");
+        panel.style.display = DisplayStyle.None;
         Time.timeScale = 1f;
     }
 }
