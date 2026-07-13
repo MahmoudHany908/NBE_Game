@@ -16,10 +16,13 @@ public class ArenaLifetimeScope : LifetimeScope
 
     private void Start()
     {
-        var milestoneController = GetComponentInChildren<WaveMilestoneController>();
-        if (milestoneController != null)
+        if (Container != null)
         {
-            milestoneController.BeginRun();
+            var milestoneController = Container.Resolve<WaveMilestoneController>();
+            if (milestoneController != null)
+            {
+                milestoneController.BeginRun();
+            }
         }
     }
 }

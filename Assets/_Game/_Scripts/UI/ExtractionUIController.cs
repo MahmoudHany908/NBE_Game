@@ -26,6 +26,11 @@ public class ExtractionUIController : MonoBehaviour
     {
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+
+        if (isActiveAndEnabled)
+        {
+            _eventSubscriber?.Subscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
+        }
     }
 
     private void Awake()
