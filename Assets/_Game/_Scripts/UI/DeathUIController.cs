@@ -50,7 +50,7 @@ public class DeathUIController : MonoBehaviour
 
     private void HandlePlayerDied(PlayerDiedEvent evt)
     {
-        waveReachedLabel.text = $"FELL AT WAVE {5555555555}";
+        waveReachedLabel.text = $"FELL AT WAVE {42}";
         ShowPanel();
     }
 
