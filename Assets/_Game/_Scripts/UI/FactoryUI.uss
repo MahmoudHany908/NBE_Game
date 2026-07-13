@@ -123,3 +123,44 @@
 .close-button:hover {
     color: white;
 }
+
+.top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: rgba(26, 32, 44, 0.95);
+    border-bottom-width: 2px;
+    border-color: var(--color-cyan);
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.resource-item {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 15px;
+    border-width: 1px;
+    border-color: rgba(0, 255, 255, 0.3);
+}
+
+.resource-name {
+    color: rgb(160, 174, 192);
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.resource-value {
+    color: var(--color-gold);
+    font-size: 20px;
+    -unity-font-style: bold;
+}

@@ -183,6 +183,9 @@ namespace VaultSurvivors.Core.Production
         {
             GameData gameData = _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
             float gold = gameData.resources.gold;
+            float food = gameData.resources.food;
+            float energy = gameData.resources.energy;
+            float electronics = gameData.resources.electronics;
             
             _eventPublisher.Publish(new Event_FactoryStateUpdated(
                 _globalLevel,
@@ -191,7 +194,10 @@ namespace VaultSurvivors.Core.Production
                 GetMaxCapacity(),
                 GetProductionRate(),
                 GetUpgradeCost(),
-                gold
+                gold,
+                food,
+                energy,
+                electronics
             ));
         }
     }

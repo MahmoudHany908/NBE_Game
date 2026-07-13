@@ -16,7 +16,11 @@ public class FactoryUIController : MonoBehaviour
     private Label _headerLabel;
     private Label _rateLabel;
     private Label _capacityLabel;
-    private Label _walletLabel;
+
+    private Label _goldAmount;
+    private Label _foodAmount;
+    private Label _energyAmount;
+    private Label _electronicsAmount;
 
     private RadioButton _radioEnergy;
     private RadioButton _radioFood;
@@ -58,7 +62,11 @@ public class FactoryUIController : MonoBehaviour
         _headerLabel = _root.Q<Label>("header-label");
         _rateLabel = _root.Q<Label>("rate-label");
         _capacityLabel = _root.Q<Label>("capacity-label");
-        _walletLabel = _root.Q<Label>("wallet-label");
+
+        _goldAmount = _root.Q<Label>("gold-amount");
+        _foodAmount = _root.Q<Label>("food-amount");
+        _energyAmount = _root.Q<Label>("energy-amount");
+        _electronicsAmount = _root.Q<Label>("electronics-amount");
 
         _radioEnergy = _root.Q<RadioButton>("radio-energy");
         _radioFood = _root.Q<RadioButton>("radio-food");
@@ -127,8 +135,10 @@ public class FactoryUIController : MonoBehaviour
         if (_capacityLabel != null)
             _capacityLabel.text = $"Max Storage: {Mathf.FloorToInt(evt.MaxCapacity)}";
 
-        if (_walletLabel != null)
-            _walletLabel.text = $"Wallet: {evt.WalletGold} Gold";
+        if (_goldAmount != null) _goldAmount.text = Mathf.FloorToInt(evt.WalletGold).ToString();
+        if (_foodAmount != null) _foodAmount.text = Mathf.FloorToInt(evt.WalletFood).ToString();
+        if (_energyAmount != null) _energyAmount.text = Mathf.FloorToInt(evt.WalletEnergy).ToString();
+        if (_electronicsAmount != null) _electronicsAmount.text = Mathf.FloorToInt(evt.WalletElectronics).ToString();
 
         if (_collectBtn != null)
         {

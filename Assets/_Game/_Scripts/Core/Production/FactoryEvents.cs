@@ -25,8 +25,11 @@ namespace VaultSurvivors.Core.Production
         public float ProductionRate { get; }
         public int UpgradeCost { get; }
         public float WalletGold { get; }
+        public float WalletFood { get; }
+        public float WalletEnergy { get; }
+        public float WalletElectronics { get; }
 
-        public Event_FactoryStateUpdated(int globalLevel, ResourceType activeResource, float currentAccumulation, float maxCapacity, float productionRate, int upgradeCost, float walletGold)
+        public Event_FactoryStateUpdated(int globalLevel, ResourceType activeResource, float currentAccumulation, float maxCapacity, float productionRate, int upgradeCost, float walletGold, float walletFood, float walletEnergy, float walletElectronics)
         {
             GlobalLevel = globalLevel;
             ActiveResource = activeResource;
@@ -35,6 +38,9 @@ namespace VaultSurvivors.Core.Production
             ProductionRate = productionRate;
             UpgradeCost = upgradeCost;
             WalletGold = walletGold;
+            WalletFood = walletFood;
+            WalletEnergy = walletEnergy;
+            WalletElectronics = walletElectronics;
         }
     }
 }
