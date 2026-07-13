@@ -7,34 +7,45 @@ public class HubLifetimeScope : LifetimeScope
     [SerializeField] private SettingsMenu settingsMenu;
     [SerializeField] private GateTrigger gateTrigger;
     [SerializeField] private FactoryBehavior factoryBehavior;
-    [SerializeField] private FactoryUIDisplay factoryUIDisplay;
+
+    private FactoryControlPanel _factoryControlPanel;
+    private FactoryUIController _factoryUIController;
 
     protected override void Configure(IContainerBuilder builder)
     {
         Debug.Log("[HubLifetimeScope] Configuring scope...");
 
-        // Only register if they are assigned!
+        _factoryControlPanel = FindAnyObjectByType<FactoryControlPanel>();
+        _factoryUIController = FindAnyObjectByType<FactoryUIController>();
+
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
         if (factoryBehavior != null) builder.RegisterComponent(factoryBehavior);
-        if (factoryUIDisplay != null) builder.RegisterComponent(factoryUIDisplay);
 
-        // Force explicit injection on the instances
+        if (_factoryControlPanel != null) builder.RegisterComponent(_factoryControlPanel);
+        if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
+
         builder.RegisterBuildCallback(container =>
         {
-            Debug.Log("[HubLifetimeScope] Scope built! Manually injecting scene components...");
-
             if (settingsMenu != null) container.Inject(settingsMenu);
-            else Debug.LogWarning("[HubLifetimeScope] SettingsMenu is not assigned in the inspector!");
-
             if (gateTrigger != null) container.Inject(gateTrigger);
-            else Debug.LogWarning("[HubLifetimeScope] GateTrigger is not assigned in the inspector!");
-
             if (factoryBehavior != null) container.Inject(factoryBehavior);
-            else Debug.LogWarning("[HubLifetimeScope] FactoryBehavior is not assigned in the inspector!");
 
-            if (factoryUIDisplay != null) container.Inject(factoryUIDisplay);
-            else Debug.LogWarning("[HubLifetimeScope] FactoryUIDisplay is not assigned in the inspector!");
+            if (_factoryControlPanel != null)
+            {
+                container.Inject(_factoryControlPanel);
+                Debug.Log("[FactoryControlPanel] Successfully Injected!");
+            }
+            else
+            {
+                Debug.LogError("[HubLifetimeScope] FactoryControlPanel NOT FOUND in scene!");
+            }
+
+            if (_factoryUIController != null)
+            {
+                container.Inject(_factoryUIController);
+                Debug.Log("[FactoryUIController] Successfully Injected!");
+            }
         });
     }
 }
