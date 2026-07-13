@@ -47,8 +47,6 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         isDead = true;
-        Debug.Log($"Player died at {transform.position}");
-        Debug.Log("Publishing PlayerDiedEvent");
         _eventPublisher?.Publish(new PlayerDiedEvent(position: transform.position));
     }
 }

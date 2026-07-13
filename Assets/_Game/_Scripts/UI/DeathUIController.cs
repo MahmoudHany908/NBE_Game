@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using VContainer;
 
@@ -56,6 +57,8 @@ public class DeathUIController : MonoBehaviour
     private void OnRetryClicked()
     {
         HidePanel();
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
 
     }
 
@@ -73,6 +76,7 @@ public class DeathUIController : MonoBehaviour
     private void ShowPanel()
     {
         panel.RemoveFromClassList("hidden");
+        panel.style.display = DisplayStyle.Flex;
         Time.timeScale = 0f;
     }
 
@@ -80,6 +84,7 @@ public class DeathUIController : MonoBehaviour
     {
         if (!panel.ClassListContains("hidden"))
             panel.AddToClassList("hidden");
+        panel.style.display = DisplayStyle.None;
         Time.timeScale = 1f;
     }
 }
