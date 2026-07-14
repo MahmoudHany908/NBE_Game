@@ -26,6 +26,12 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame) TakeDamage(20);
     }
+
+    void Start()
+    {
+
+        _eventPublisher?.Publish(new PlayerHealedEvent(healAmount: 0, healthPercentage: GetHealthPercentage()));
+    }
     public void SetMaxHealth(int value)
     {
         maxHealth = value;
@@ -37,7 +43,7 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         if (isDead) return;
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
-        _eventPublisher?.Publish(new PlayerHealedEvent(healAmount: amount));
+        _eventPublisher?.Publish(new PlayerHealedEvent(healAmount: amount, healthPercentage: GetHealthPercentage()));
         Debug.Log("Player healed: " + currentHealth);
     }
 
@@ -46,7 +52,7 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         if (isDead) return;
         currentHealth -= amount;
 
-        _eventPublisher?.Publish(new PlayerTakeDamageEvent(damage: amount));
+        _eventPublisher?.Publish(new PlayerTakeDamageEvent(damage: amount, healthPercentage: GetHealthPercentage()));
 
         Debug.Log("Player took damage: " + currentHealth);
         if (currentHealth <= 0) Die();

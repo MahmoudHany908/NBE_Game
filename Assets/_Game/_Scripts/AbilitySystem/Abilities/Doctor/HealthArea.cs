@@ -13,6 +13,7 @@ public class HealthArea : MonoBehaviour
             if (playerHealth != null)
             {
                 playerHealth.Heal(healAmount);
+                Destroy(gameObject);
             }
         }
     }

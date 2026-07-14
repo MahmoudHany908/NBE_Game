@@ -40,7 +40,7 @@ public class HealthComponent : MonoBehaviour, IDamageable
 
         currentHealth -= amount;
 
-        Debug.Log("Enemy Took Damage: " + currentHealth);
+        //Debug.Log("Enemy Took Damage: " + currentHealth);
 
         eventPublisher?.Publish(new EnemyTakeDamageEvent
         {

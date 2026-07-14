@@ -46,7 +46,7 @@ public class Projectile : MonoBehaviour, IPoolable
 
         if (hasHit) return;
         hasHit = true;
-        
+
         // 2. Ignore collisions with the Player so it doesn't destroy itself on spawn
         if (other.GetComponentInParent<PlayerHealthComponent>() != null) return;
 
@@ -54,7 +54,6 @@ public class Projectile : MonoBehaviour, IPoolable
         if (damageable != null)
         {
             damageable.TakeDamage(20);
-            Debug.Log("Projectile hit something: " + other.name);
         }
 
         // Destroy the projectile if it hits a solid object like a wall
