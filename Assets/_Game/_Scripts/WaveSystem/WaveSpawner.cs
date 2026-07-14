@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,17 +23,37 @@ public class WaveSpawner : MonoBehaviour
 
     [Inject] private PoolManager poolManager;
 
+    public event Action OnAllSquadsSpawned;
+
     private void Awake()
     {
         budgetCalculator = GetComponent<BudgetCalculator>();
+        if (budgetCalculator == null)
+            Debug.LogError($"[{nameof(WaveSpawner)}] Missing required BudgetCalculator component on {gameObject.name}.", this);
+
+        int removed = enemies.RemoveAll(e => e.enemyPrefab == null);
+        if (removed > 0)
+            Debug.LogWarning($"[{nameof(WaveSpawner)}] Removed {removed} EnemyEntry with a null prefab on {gameObject.name}. Check the 'enemies' list.", this);
     }
 
     public void StartSpawningWave(int wave)
     {
+        if (budgetCalculator == null)
+        {
+            Debug.LogError($"[{nameof(WaveSpawner)}] Cannot start wave {wave}: BudgetCalculator is missing.", this);
+            return;
+        }
+
         int totalBudget = budgetCalculator.GetBudgetForWave(wave);
+        if (totalBudget <= 0)
+        {
+            Debug.LogWarning($"[{nameof(WaveSpawner)}] Wave {wave} has zero/negative budget ({totalBudget}). No enemies will spawn.", this);
+        }
+
         StartCoroutine(SpawnSquadsRoutine(totalBudget));
     }
 
+    /// <summary>Removes dead/null enemies from tracking and reports whether any remain alive.</summary>
     public bool AreAllEnemiesDead()
     {
         activeEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
@@ -41,7 +62,6 @@ public class WaveSpawner : MonoBehaviour
 
     private IEnumerator SpawnSquadsRoutine(int totalBudget)
     {
-        // Split budget into N roughly equal chunks
         int baseChunk = totalBudget / squadCount;
         int remainder = totalBudget % squadCount;
 
@@ -52,12 +72,6 @@ public class WaveSpawner : MonoBehaviour
 
             foreach (GameObject prefab in squad)
             {
-                if (prefab == null)
-                {
-                    Debug.LogWarning($"[{nameof(WaveSpawner)}] A prefab in the squad is null. Skipping spawn.", this);
-                    continue;
-                }
-
                 if (poolManager == null)
                 {
                     Debug.LogError($"[{nameof(WaveSpawner)}] PoolManager dependency is null! Cannot spawn enemy '{prefab.name}'. Make sure PoolManager is registered in VContainer and injected.", this);
@@ -76,20 +90,20 @@ public class WaveSpawner : MonoBehaviour
             if (i < squadCount - 1)
                 yield return new WaitForSeconds(delayBetweenSquads);
         }
+
+        OnAllSquadsSpawned?.Invoke();
     }
 
     private Vector3 GetGroundedSpawnPosition()
     {
-        // Pick a random XZ point inside the box, cast down to find ground Y
         Vector3 center = transform.position;
-        float x = Random.Range(-spawnBoxSize.x / 2f, spawnBoxSize.x / 2f);
-        float z = Random.Range(-spawnBoxSize.z / 2f, spawnBoxSize.z / 2f);
+        float x = UnityEngine.Random.Range(-spawnBoxSize.x / 2f, spawnBoxSize.x / 2f);
+        float z = UnityEngine.Random.Range(-spawnBoxSize.z / 2f, spawnBoxSize.z / 2f);
         Vector3 origin = center + new Vector3(x, raycastOriginHeight, z);
 
         if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, raycastOriginHeight * 2f, groundMask))
             return hit.point;
 
-        // Fallback: no ground found, use flat position
         return center + new Vector3(x, 0f, z);
     }
 
@@ -107,20 +121,9 @@ public class WaveSpawner : MonoBehaviour
             List<EnemyEntry> affordable = enemies.FindAll(e => e.cost <= remaining);
             if (affordable.Count == 0) break;
 
-            EnemyEntry selected = affordable[Random.Range(0, affordable.Count)];
-            if (selected.enemyPrefab != null)
-            {
-                enemiesToSpawn.Add(selected.enemyPrefab);
-                remaining -= selected.cost;
-            }
-            else
-            {
-                Debug.LogWarning($"[{nameof(WaveSpawner)}] Found an EnemyEntry with a null prefab. Please check the 'enemies' config list on {gameObject.name}.", this);
-                if (affordable.TrueForAll(e => e.enemyPrefab == null))
-                {
-                    break;
-                }
-            }
+            EnemyEntry selected = affordable[UnityEngine.Random.Range(0, affordable.Count)];
+            enemiesToSpawn.Add(selected.enemyPrefab);
+            remaining -= selected.cost;
         }
 
         return enemiesToSpawn;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 public class HealthComponent : MonoBehaviour, IDamageable
 {
@@ -7,6 +8,19 @@ public class HealthComponent : MonoBehaviour, IDamageable
     private int currentHealth;
     private bool isDead;
 
+    private Enemy cachedEnemy;
+    private IEventPublisher eventPublisher;
+
+    [Inject]
+    public void Construct(IEventPublisher publisher)
+    {
+        eventPublisher = publisher;
+    }
+
+    private void Awake()
+    {
+        cachedEnemy = GetComponent<Enemy>();
+    }
 
     void OnEnable()
     {
@@ -20,20 +34,21 @@ public class HealthComponent : MonoBehaviour, IDamageable
         currentHealth = value;
     }
 
-
     public void TakeDamage(int amount)
     {
         if (isDead) return;
+
         currentHealth -= amount;
-        Debug.Log(currentHealth);
-        EventBus.Publish(new EnemyTakeDamageEvent
+
+        Debug.Log("Enemy Took Damage: " + currentHealth);
+
+        eventPublisher?.Publish(new EnemyTakeDamageEvent
         {
             Damage = amount,
-            Enemy = GetComponent<Enemy>(),
+            Enemy = cachedEnemy,
             DamagePosition = transform.position
         });
 
-        Debug.Log("-------------Enemy took damage: " + currentHealth);
 
         if (currentHealth <= 0f) Die();
     }
@@ -42,12 +57,12 @@ public class HealthComponent : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         isDead = true;
-        EventBus.Publish(new EnemyDiedEvent
+
+        eventPublisher?.Publish(new EnemyDiedEvent
         {
             gameObject = gameObject,
-            Enemy = GetComponent<Enemy>(),
+            Enemy = cachedEnemy,
             DeathPosition = transform.position
         });
-
     }
 }

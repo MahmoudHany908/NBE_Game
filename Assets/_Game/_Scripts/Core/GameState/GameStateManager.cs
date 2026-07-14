@@ -1,28 +1,30 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VContainer;
 
-public class GameStateManager : MonoBehaviour
+public class GameStateManager : MonoBehaviour, IGameStateManager
 {
-    public static GameStateManager Instance { get; private set; }
-
-    // Event broadcast when the state changes (Time Manager will listen to this)
-    public static event Action<IGameState> OnGameStateChanged;
     private IGameState _currentState;
+    private IEventPublisher _eventPublisher;
+    private IEventSubscriber _eventSubscriber;
 
-    private void Awake()
+    [Inject]
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        Debug.Log("[GameStateManager] Construct called! Injecting dependencies.");
+        _eventPublisher = eventPublisher;
+        _eventSubscriber = eventSubscriber;
+
+        // Subscribe to incoming UI commands immediately
+        _eventSubscriber.Subscribe<ChangeStateCommand>(HandleChangeStateCommand);
+        Debug.Log("[GameStateManager] Successfully subscribed to ChangeStateCommand.");
+    }
+
+    private void OnDestroy()
+    {
+        // Always clean up subscriptions to prevent memory leaks!
+        _eventSubscriber?.Unsubscribe<ChangeStateCommand>(HandleChangeStateCommand);
     }
 
     private void Start()
@@ -35,6 +37,21 @@ public class GameStateManager : MonoBehaviour
         _currentState?.UpdateState(this);
     }
 
+    // --- Command Handler ---
+    private void HandleChangeStateCommand(ChangeStateCommand command)
+    {
+        Debug.Log($"[GameState] Received command to load: {command.TargetSceneName}");
+
+        if (!string.IsNullOrEmpty(command.TargetSceneName))
+        {
+            LoadSceneAndChangeState(command.TargetSceneName, command.TargetState);
+        }
+        else
+        {
+            ChangeState(command.TargetState);
+        }
+    }
+
     public void ChangeState(IGameState newState)
     {
         _currentState?.ExitState(this);
@@ -42,13 +59,13 @@ public class GameStateManager : MonoBehaviour
         _currentState = newState;
         _currentState.EnterState(this);
 
-        OnGameStateChanged?.Invoke(_currentState);
+        _eventPublisher?.Publish(new GameStateChangedEvent { NewState = _currentState });
 
         Debug.Log($"[GameState] Transitioned to: {_currentState.GetType().Name}");
     }
+
     public void LoadSceneAndChangeState(string sceneName, IGameState stateAfterLoading)
     {
-        // Start the loading process on a separate timeline
         StartCoroutine(LoadSceneRoutine(sceneName, stateAfterLoading));
     }
 
@@ -57,8 +74,9 @@ public class GameStateManager : MonoBehaviour
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         while (!asyncLoad.isDone)
         {
-            yield return null; 
+            yield return null;
         }
+
         Resources.UnloadUnusedAssets();
         ChangeState(stateAfterLoading);
     }

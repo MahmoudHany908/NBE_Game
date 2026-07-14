@@ -7,5 +7,22 @@ public class ArenaLifetimeScope : LifetimeScope
     {
         builder.RegisterComponentInHierarchy<WaveSpawner>();
         builder.RegisterComponentInHierarchy<IronRevolver>();
+        builder.RegisterComponentInHierarchy<DeathUIController>();
+        builder.RegisterComponentInHierarchy<ExtractionUIController>();
+        builder.RegisterComponentInHierarchy<WaveMilestoneController>();
+        builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
+
+    }
+
+    private void Start()
+    {
+        if (Container != null)
+        {
+            var milestoneController = Container.Resolve<WaveMilestoneController>();
+            if (milestoneController != null)
+            {
+                milestoneController.BeginRun();
+            }
+        }
     }
 }

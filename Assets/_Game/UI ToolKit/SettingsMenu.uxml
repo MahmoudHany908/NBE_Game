@@ -1,19 +1,20 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/_Game/UI%20ToolKit/USSFile.uss?fileID=7433441132597879392&amp;guid=2e958ceab897eb24bb405c8930669127&amp;type=3#USSFile"/>
     <ui:VisualElement name="root-container">
-        <ui:VisualElement name="background-overlay"/>
-        <ui:VisualElement name="settings-panel">
-            <ui:VisualElement name="header">
+        <ui:VisualElement name="background-overlay" style="top: 0; left: 4px;"/>
+        <ui:VisualElement name="settings-panel" style="background-image: url(&quot;project://database/Assets/_Game/Art/Sprites/Buttons%20Menus/Settings%20Menu%20UI.png?fileID=2800000&amp;guid=21543732077281f48964429b5731ee6b&amp;type=3#Settings Menu UI&quot;); background-color: rgba(255, 255, 255, 0); height: 685px; background-size: 117% 100%; width: 501px; scale: 1 1; flex-direction: column;">
+            <ui:VisualElement name="header" style="display: none;">
                 <ui:Label name="title" text="Settings"/>
                 <ui:Button name="close-button" text="X"/>
             </ui:VisualElement>
-            <ui:VisualElement name="content">
-                <ui:Toggle name="volume-toggle" label="Mute All" value="false"/>
+            <ui:VisualElement name="content" style="translate: 0 128px;">
                 <ui:Slider name="master-volume" label="Master" low-value="0" high-value="1" value="1"/>
                 <ui:Slider name="music-volume" label="Music" low-value="0" high-value="1" value="1"/>
                 <ui:Slider name="sfx-volume" label="SFX" low-value="0" high-value="1" value="1"/>
                 <ui:Slider name="ambient-volume" label="Ambient" low-value="0" high-value="1" value="1"/>
+                <ui:Toggle name="volume-toggle" label="Mute All" value="false"/>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Button text="Enter Arena" name="transition-button" style="height: 36px; width: 186px; top: 26px; left: 24px; bottom: 0; right: 0;"/>
     </ui:VisualElement>
 </ui:UXML>
