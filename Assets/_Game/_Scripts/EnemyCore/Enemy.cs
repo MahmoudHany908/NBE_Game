@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using VContainer; 
+using VContainer;
 
 [RequireComponent(typeof(PooledObject))]
 [RequireComponent(typeof(HealthComponent))]
@@ -66,7 +66,6 @@ public class Enemy : MonoBehaviour, IPoolable
     private void HandleDeath(EnemyDiedEvent obj)
     {
         if (obj.gameObject != gameObject) return;
-        Debug.Log($"{obj.gameObject.name} died at {obj.DeathPosition}");
         pooledObject.ReturnToPool(0.1f);
     }
 }
