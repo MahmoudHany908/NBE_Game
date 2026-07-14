@@ -32,6 +32,15 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         currentHealth = value;
     }
 
+    public void Heal(int amount)
+    {
+        if (isDead) return;
+        currentHealth += amount;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
+        _eventPublisher?.Publish(new PlayerHealedEvent(healAmount: amount));
+        Debug.Log("Player healed: " + currentHealth);
+    }
+
     public void TakeDamage(int amount)
     {
         if (isDead) return;
@@ -48,5 +57,10 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         if (isDead) return;
         isDead = true;
         _eventPublisher?.Publish(new PlayerDiedEvent(position: transform.position));
+    }
+
+    public float GetHealthPercentage()
+    {
+        return (float)currentHealth / maxHealth;
     }
 }

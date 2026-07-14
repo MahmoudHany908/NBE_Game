@@ -37,3 +37,8 @@ public readonly struct PlayerTakeDamageEvent : IGameEvent
     public PlayerTakeDamageEvent(int damage) => this.damage = damage;
 
 }
+public readonly struct PlayerHealedEvent : IGameEvent
+{
+    public readonly int healAmount;
+    public PlayerHealedEvent(int healAmount) => this.healAmount = healAmount;
+}
