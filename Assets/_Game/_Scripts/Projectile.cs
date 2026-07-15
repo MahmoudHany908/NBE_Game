@@ -48,7 +48,7 @@ public class Projectile : MonoBehaviour, IPoolable
 
         if (hasHit) return;
         hasHit = true;
-        
+
         // 2. Ignore collisions with the Player so it doesn't destroy itself on spawn
         if (other.GetComponentInParent<PlayerHealthComponent>() != null) return;
 
