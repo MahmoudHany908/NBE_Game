@@ -9,8 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 725875423408512679}
-  - component: {fileID: 1677792040192122333}
-  - component: {fileID: 1090476934491455968}
+  - component: {fileID: 4546598921178004743}
   - component: {fileID: 6823896736790411283}
   - component: {fileID: 7664341175451969755}
   - component: {fileID: 5174813929392864169}
@@ -39,7 +38,7 @@ Transform:
   - {fileID: 7723521940168617292}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1677792040192122333
+--- !u!114 &4546598921178004743
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -48,25 +47,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2199268082326825481}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce56d2bc8c8a4a3c8e0347914eb0176e, type: 3}
+  m_Script: {fileID: 11500000, guid: 4a5e8a285d161c544871d2275b0f8b8c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeRobot
---- !u!114 &1090476934491455968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2199268082326825481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 212291716e375264e81416966b3d761a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeRobotAI
-  attackRange: 1.5
-  attackDamage: 10
-  attackCooldown: 1
-  moveSpeed: 3
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  enemyData: {fileID: 11400000, guid: 640204483f7b4a64a8da05237586e3d0, type: 2}
 --- !u!114 &6823896736790411283
 MonoBehaviour:
   m_ObjectHideFlags: 0

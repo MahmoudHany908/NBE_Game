@@ -126,8 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67992e08c928c0149b3cc8cf17458d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DroneProjectile
-  speed: 12
-  lifetime: 3
+  speed: 10
+  lifetime: 4
   playerLayer:
     serializedVersion: 2
     m_Bits: 8

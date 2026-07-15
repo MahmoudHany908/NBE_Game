@@ -9,10 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7836215284157092496}
+  - component: {fileID: 821364632941724776}
   - component: {fileID: 7170847601209022616}
   - component: {fileID: 1876031081308827287}
-  - component: {fileID: 5891218582318076142}
-  - component: {fileID: 4568469426591470160}
   - component: {fileID: 138340309132177678}
   - component: {fileID: 8596325106021846323}
   m_Layer: 31
@@ -39,6 +38,19 @@ Transform:
   - {fileID: 7125963156221324771}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &821364632941724776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4334310894541899027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a5e8a285d161c544871d2275b0f8b8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  enemyData: {fileID: 11400000, guid: 302ec096361ed6d4f8a4ff24cdfc4e99, type: 2}
 --- !u!114 &7170847601209022616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64,38 +76,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bcb53fa33f6d074486f529a7f7a100a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PooledObject
---- !u!114 &5891218582318076142
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4334310894541899027}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1558d1d6310407343adf2f854a8db11b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SecurityDrone
---- !u!114 &4568469426591470160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4334310894541899027}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029186c7ca67bed42967b13019a38647, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SecurityDroneAI
-  attackDamage: 5
-  attackCooldown: 0.5
-  preferredDistance: 1
-  distanceThreshold: 1
-  moveSpeed: 6
-  minHeight: 3
-  maxHeight: 3.5
-  projectilePrefab: {fileID: 7234830729728081170, guid: 97aa96dfba278ce46a48281007219f86, type: 3}
 --- !u!65 &138340309132177678
 BoxCollider:
   m_ObjectHideFlags: 0
