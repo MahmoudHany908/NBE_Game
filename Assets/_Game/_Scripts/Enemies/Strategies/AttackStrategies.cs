@@ -25,9 +25,16 @@ public class ProjectileAttackStrategy : IAttackStrategy
     {
         if (projectilePrefab == null) return;
 
-        var projectile = poolManager.Spawn<DroneProjectile>(
-            projectilePrefab, enemy.transform.position, Quaternion.identity);
+        Vector3 aimTarget = target.position + Vector3.up * 1.5f;
+        Vector3 direction = (aimTarget - enemy.transform.position).normalized;
         
-        projectile?.Init(target.position, enemy.Data.attackDamage);
+        Quaternion rotation = direction.sqrMagnitude > 0.001f 
+            ? Quaternion.LookRotation(direction) 
+            : Quaternion.identity;
+
+        var projectile = poolManager.Spawn<DroneProjectile>(
+            projectilePrefab, enemy.transform.position, rotation);
+        
+        projectile?.Init(aimTarget, enemy.Data.attackDamage);
     }
 }
