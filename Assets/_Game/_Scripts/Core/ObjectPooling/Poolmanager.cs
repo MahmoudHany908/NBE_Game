@@ -23,6 +23,7 @@ public class PoolManager : MonoBehaviour
     private readonly Dictionary<int, ObjectPool<GameObject>> _pools = new();
     private readonly Dictionary<int, GameObject> _prefabLookup = new();
     private readonly List<ScheduledDespawn> _scheduledDespawns = new();
+    private readonly HashSet<GameObject> _activeObjects = new();
 
     private struct ScheduledDespawn
     {
@@ -30,6 +31,34 @@ public class PoolManager : MonoBehaviour
         public PooledObject pooled;
         public int version;
         public float expireTime;
+    }
+
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        DespawnAllActive();
+    }
+
+    public void DespawnAllActive()
+    {
+        var activeCopy = new List<GameObject>(_activeObjects);
+        foreach (var obj in activeCopy)
+        {
+            if (obj != null && obj.activeSelf)
+            {
+                Despawn(obj);
+            }
+        }
+        _activeObjects.Clear();
     }
 
     private void Awake()
@@ -88,9 +117,10 @@ public class PoolManager : MonoBehaviour
         return instance;
     }
 
-    private static void OnGet(GameObject instance)
+    private void OnGet(GameObject instance)
     {
         instance.SetActive(true);
+        _activeObjects.Add(instance);
 
         var pooled = instance.GetComponent<PooledObject>();
         if (pooled != null)
@@ -102,6 +132,7 @@ public class PoolManager : MonoBehaviour
 
     private void OnRelease(GameObject instance)
     {
+        _activeObjects.Remove(instance);
         foreach (var poolable in instance.GetComponents<IPoolable>())
             poolable.OnDespawned();
 

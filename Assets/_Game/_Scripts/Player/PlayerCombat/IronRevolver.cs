@@ -6,6 +6,7 @@ public class IronRevolver : MonoBehaviour, IAttack
     [SerializeField] private Projectile bulletPrefab;
     [SerializeField] private Transform attackPos;
     [SerializeField] private float fireRate = 1f;
+    [SerializeField] private int damage = 20;
 
     private ITargetProvider targetProvider;
     private float timer;
@@ -61,7 +62,8 @@ public class IronRevolver : MonoBehaviour, IAttack
             projectile.Initialize(
                 attackPos.position,
                 dir,
-                rotation
+                rotation,
+                damage
             );
         }
     }
