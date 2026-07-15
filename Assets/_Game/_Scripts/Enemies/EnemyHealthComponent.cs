@@ -1,7 +1,7 @@
 using UnityEngine;
 using VContainer;
 
-public class HealthComponent : MonoBehaviour, IDamageable
+public class EnemyHealthComponent : MonoBehaviour, IDamageable
 {
     [SerializeField] private int maxHealth = 100;
 
