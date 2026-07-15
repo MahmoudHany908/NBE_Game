@@ -27,10 +27,10 @@ public class ProjectileAttackStrategy : IAttackStrategy
 
         Vector3 aimTarget = target.position + Vector3.up * 1.5f;
         Vector3 direction = (aimTarget - enemy.transform.position).normalized;
-        
-        Quaternion rotation = direction.sqrMagnitude > 0.001f 
-            ? Quaternion.LookRotation(direction) 
-            : Quaternion.identity;
+
+        Quaternion rotation = direction.sqrMagnitude > 0.001f
+            ? Quaternion.LookRotation(direction) * Quaternion.Euler(90f, 0f, 0f)
+            : Quaternion.Euler(90f, 0f, 0f);
 
         var projectile = poolManager.Spawn<DroneProjectile>(
             projectilePrefab, enemy.transform.position, rotation);
