@@ -1,35 +1,38 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
+using TMPro;
 using VContainer;
 using VaultSurvivors.Core.Production;
 
-[RequireComponent(typeof(UIDocument))]
 public class FactoryUIController : MonoBehaviour
 {
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
 
-    private UIDocument _uiDocument;
-    private VisualElement _root;
-    private VisualElement _panelContainer;
+    [Header("Main Panel")]
+    [SerializeField] private GameObject _panelContainer;
 
-    private Label _headerLabel;
-    private Label _rateLabel;
-    private Label _capacityLabel;
+    [Header("Text Fields")]
+    [SerializeField] private TMP_Text _headerLabel; // Equivalent to global factory title
+    [SerializeField] private TMP_Text _rateLabel;
+    [SerializeField] private TMP_Text _capacityLabel;
 
-    private Label _goldAmount;
-    private Label _foodAmount;
-    private Label _energyAmount;
-    private Label _electronicsAmount;
+    [Header("Resource Amounts")]
+    [SerializeField] private TMP_Text _goldAmount;
+    [SerializeField] private TMP_Text _foodAmount;
+    [SerializeField] private TMP_Text _energyAmount;
+    [SerializeField] private TMP_Text _electronicsAmount;
 
-    private RadioButton _radioEnergy;
-    private RadioButton _radioFood;
-    private RadioButton _radioElectronics;
-    private RadioButton _radioGold;
+    [Header("Buttons")]
+    [SerializeField] private Button _collectBtn;
+    [SerializeField] private Button _upgradeBtn;
+    [SerializeField] private Button _closeBtn;
 
-    private Button _collectBtn;
-    private Button _upgradeBtn;
-    private Button _closeBtn;
+    [Header("Resource Selection (Optional UGUI Buttons)")]
+    [SerializeField] private Button _selectEnergyBtn;
+    [SerializeField] private Button _selectFoodBtn;
+    [SerializeField] private Button _selectElectronicsBtn;
+    [SerializeField] private Button _selectGoldBtn;
 
     private ResourceType _currentActiveResource = ResourceType.Energy;
     private bool _isUpdatingFromEvent = false;
@@ -43,48 +46,34 @@ public class FactoryUIController : MonoBehaviour
 
     private void Awake()
     {
-        _uiDocument = GetComponent<UIDocument>();
-        if (_uiDocument == null) return;
-
-        _root = _uiDocument.rootVisualElement;
-        
-        _panelContainer = _root.Q<VisualElement>(className: "factory-panel-container");
         if (_panelContainer != null)
         {
-            _panelContainer.style.display = DisplayStyle.None; // Hide initially
-            Debug.Log("[FactoryUIController] Found _panelContainer and hid it initially.");
+            _panelContainer.SetActive(false); // Hide initially
         }
-        else
-        {
-            Debug.LogError("[FactoryUIController] Could not find VisualElement with class 'factory-panel-container'!");
-        }
+    }
 
-        _headerLabel = _root.Q<Label>("header-label");
-        _rateLabel = _root.Q<Label>("rate-label");
-        _capacityLabel = _root.Q<Label>("capacity-label");
+    private void OnEnable()
+    {
+        if (_collectBtn != null) _collectBtn.onClick.AddListener(OnCollectClicked);
+        if (_upgradeBtn != null) _upgradeBtn.onClick.AddListener(OnUpgradeClicked);
+        if (_closeBtn != null) _closeBtn.onClick.AddListener(CloseUI);
 
-        _goldAmount = _root.Q<Label>("gold-amount");
-        _foodAmount = _root.Q<Label>("food-amount");
-        _energyAmount = _root.Q<Label>("energy-amount");
-        _electronicsAmount = _root.Q<Label>("electronics-amount");
+        if (_selectEnergyBtn != null) _selectEnergyBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Energy));
+        if (_selectFoodBtn != null) _selectFoodBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Food));
+        if (_selectElectronicsBtn != null) _selectElectronicsBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Electronics));
+        if (_selectGoldBtn != null) _selectGoldBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Gold));
+    }
 
-        _radioEnergy = _root.Q<RadioButton>("radio-energy");
-        _radioFood = _root.Q<RadioButton>("radio-food");
-        _radioElectronics = _root.Q<RadioButton>("radio-electronics");
-        _radioGold = _root.Q<RadioButton>("radio-gold");
+    private void OnDisable()
+    {
+        if (_collectBtn != null) _collectBtn.onClick.RemoveListener(OnCollectClicked);
+        if (_upgradeBtn != null) _upgradeBtn.onClick.RemoveListener(OnUpgradeClicked);
+        if (_closeBtn != null) _closeBtn.onClick.RemoveListener(CloseUI);
 
-        _collectBtn = _root.Q<Button>("collect-btn");
-        _upgradeBtn = _root.Q<Button>("upgrade-btn");
-        _closeBtn = _root.Q<Button>("close-btn");
-
-        _radioEnergy?.RegisterValueChangedCallback(evt => OnResourceRadioChanged(evt, ResourceType.Energy));
-        _radioFood?.RegisterValueChangedCallback(evt => OnResourceRadioChanged(evt, ResourceType.Food));
-        _radioElectronics?.RegisterValueChangedCallback(evt => OnResourceRadioChanged(evt, ResourceType.Electronics));
-        _radioGold?.RegisterValueChangedCallback(evt => OnResourceRadioChanged(evt, ResourceType.Gold));
-
-        if (_collectBtn != null) _collectBtn.clicked += OnCollectClicked;
-        if (_upgradeBtn != null) _upgradeBtn.clicked += OnUpgradeClicked;
-        if (_closeBtn != null) _closeBtn.clicked += CloseUI;
+        if (_selectEnergyBtn != null) _selectEnergyBtn.onClick.RemoveAllListeners();
+        if (_selectFoodBtn != null) _selectFoodBtn.onClick.RemoveAllListeners();
+        if (_selectElectronicsBtn != null) _selectElectronicsBtn.onClick.RemoveAllListeners();
+        if (_selectGoldBtn != null) _selectGoldBtn.onClick.RemoveAllListeners();
     }
 
     private void Start()
@@ -92,29 +81,40 @@ public class FactoryUIController : MonoBehaviour
         _eventSubscriber?.Subscribe<Event_FactoryStateUpdated>(OnStateUpdated);
         _eventSubscriber?.Subscribe<Command_OpenFactoryUI>(OnOpenUI);
         _eventSubscriber?.Subscribe<Command_CloseFactoryUI>(OnCloseUI);
+        _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
     }
-
+    
     private void OnDestroy()
     {
         _eventSubscriber?.Unsubscribe<Event_FactoryStateUpdated>(OnStateUpdated);
         _eventSubscriber?.Unsubscribe<Command_OpenFactoryUI>(OnOpenUI);
         _eventSubscriber?.Unsubscribe<Command_CloseFactoryUI>(OnCloseUI);
+        _eventSubscriber?.Unsubscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+    }
+
+    private void OnCloseAllMenus(Command_CloseAllMenus cmd)
+    {
+        OnCloseUI(new Command_CloseFactoryUI());
     }
 
     private void OnOpenUI(Command_OpenFactoryUI cmd)
     {
         Debug.Log("[FactoryUIController] Received Command_OpenFactoryUI.");
-        if (_panelContainer != null)
+        if (_panelContainer != null && !_panelContainer.activeSelf)
         {
-            _panelContainer.style.display = DisplayStyle.Flex;
-            Debug.Log("[FactoryUIController] Set _panelContainer display to Flex.");
+            _eventPublisher?.Publish(new Command_CloseAllMenus());
+            _panelContainer.SetActive(true);
+            _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
         }
     }
 
     private void OnCloseUI(Command_CloseFactoryUI cmd)
     {
-        if (_panelContainer != null)
-            _panelContainer.style.display = DisplayStyle.None;
+        if (_panelContainer != null && _panelContainer.activeSelf)
+        {
+            _panelContainer.SetActive(false);
+            _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = false });
+        }
     }
 
     private void CloseUI()
@@ -143,29 +143,29 @@ public class FactoryUIController : MonoBehaviour
         if (_collectBtn != null)
         {
             int amount = Mathf.FloorToInt(evt.CurrentAccumulation);
-            _collectBtn.text = $"Collect ({amount} {evt.ActiveResource})";
-            _collectBtn.SetEnabled(amount > 0);
+            var collectText = _collectBtn.GetComponentInChildren<TMP_Text>();
+            if (collectText != null) collectText.text = $"Collect ({amount} {evt.ActiveResource})";
+            _collectBtn.interactable = amount > 0;
         }
 
         if (_upgradeBtn != null)
         {
-            _upgradeBtn.text = $"Upgrade Factory (Cost: {evt.UpgradeCost} Gold)";
-            _upgradeBtn.SetEnabled(evt.WalletGold >= evt.UpgradeCost);
+            var upgradeText = _upgradeBtn.GetComponentInChildren<TMP_Text>();
+            if (upgradeText != null) upgradeText.text = $"Upgrade Factory (Cost: {evt.UpgradeCost} Gold)";
+            _upgradeBtn.interactable = evt.WalletGold >= evt.UpgradeCost;
         }
 
         _currentActiveResource = evt.ActiveResource;
         
-        if (_radioEnergy != null) _radioEnergy.value = (_currentActiveResource == ResourceType.Energy);
-        if (_radioFood != null) _radioFood.value = (_currentActiveResource == ResourceType.Food);
-        if (_radioElectronics != null) _radioElectronics.value = (_currentActiveResource == ResourceType.Electronics);
-        if (_radioGold != null) _radioGold.value = (_currentActiveResource == ResourceType.Gold);
+        // Visual indication for the active resource can be added here
+        // E.g., modifying button colors based on _currentActiveResource
 
         _isUpdatingFromEvent = false;
     }
 
-    private void OnResourceRadioChanged(ChangeEvent<bool> evt, ResourceType resourceType)
+    private void OnResourceSelected(ResourceType resourceType)
     {
-        if (_isUpdatingFromEvent || !evt.newValue) return;
+        if (_isUpdatingFromEvent) return;
         
         _eventPublisher?.Publish(new Command_SetProductionResource(resourceType));
     }

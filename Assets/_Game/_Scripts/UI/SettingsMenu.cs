@@ -1,42 +1,41 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using VContainer; 
 
 public class SettingsMenu : MonoBehaviour
 {
-    [SerializeField] private UIDocument document;
-
-    private VisualElement rootContainer;
-    private VisualElement backgroundOverlay;
-    private VisualElement settingsPanel;
-
-    private Button closeButton;
-    private Toggle volumeToggle;
-    private Slider masterVolumeSlider, musicVolumeSlider, sfxVolumeSlider, ambientVolumeSlider;
+    [Header("UI References")]
+    [SerializeField] private Button closeButton;
+    [SerializeField] private Slider masterVolumeSlider;
+    [SerializeField] private Slider musicVolumeSlider;
+    [SerializeField] private Slider sfxVolumeSlider;
+    [SerializeField] private Slider ambientVolumeSlider;
+    [SerializeField] private Toggle volumeToggle;
 
     private IEventPublisher _eventPublisher;
+    private IEventSubscriber _eventSubscriber;
 
     [Inject]
-    public void Construct(IEventPublisher eventPublisher)
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
     {
         _eventPublisher = eventPublisher;
+        _eventSubscriber = eventSubscriber;
     }
 
-    private void Awake()
+    private void Start()
     {
-        var root = document.rootVisualElement;
+        _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+    }
+    
+    private void OnDestroy()
+    {
+        _eventSubscriber?.Unsubscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+    }
 
-        rootContainer = root.Q<VisualElement>("root-container");
-        backgroundOverlay = root.Q<VisualElement>("background-overlay");
-        settingsPanel = root.Q<VisualElement>("settings-panel");
-        closeButton = root.Q<Button>("close-button");
-
-        volumeToggle = root.Q<Toggle>("volume-toggle");
-        masterVolumeSlider = root.Q<Slider>("master-volume");
-        musicVolumeSlider = root.Q<Slider>("music-volume");
-        sfxVolumeSlider = root.Q<Slider>("sfx-volume");
-        ambientVolumeSlider = root.Q<Slider>("ambient-volume");
+    private void OnCloseAllMenus(Command_CloseAllMenus cmd)
+    {
+        CloseSettingsMenu();
     }
 
     // Eventually we might want to replace this direct 
@@ -49,47 +48,47 @@ public class SettingsMenu : MonoBehaviour
     private void OnEnable()
     {
         // Register new close events
-        closeButton.clicked += CloseSettingsMenu;
-        backgroundOverlay.RegisterCallback<ClickEvent>(evt => CloseSettingsMenu());
+        if (closeButton != null) closeButton.onClick.AddListener(CloseSettingsMenu);
 
         // Register control events
-        volumeToggle.RegisterValueChangedCallback(OnMuteTogglePressed);
-        masterVolumeSlider.RegisterValueChangedCallback(OnMasterVolumeSliderChange);
-        musicVolumeSlider.RegisterValueChangedCallback(OnMusicVolumeSliderChange);
-        sfxVolumeSlider.RegisterValueChangedCallback(OnSFXSliderChange);
-        ambientVolumeSlider.RegisterValueChangedCallback(OnAmbientSliderChange);
-
-        // Ensure the menu is closed by default when this script enables
-        CloseSettingsMenu();
+        if (volumeToggle != null) volumeToggle.onValueChanged.AddListener(OnMuteTogglePressed);
+        if (masterVolumeSlider != null) masterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeSliderChange);
+        if (musicVolumeSlider != null) musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeSliderChange);
+        if (sfxVolumeSlider != null) sfxVolumeSlider.onValueChanged.AddListener(OnSFXSliderChange);
+        if (ambientVolumeSlider != null) ambientVolumeSlider.onValueChanged.AddListener(OnAmbientSliderChange);
     }
 
     private void OnDisable()
     {
-        closeButton.clicked -= CloseSettingsMenu;
-        backgroundOverlay.UnregisterCallback<ClickEvent>(evt => CloseSettingsMenu());
+        if (closeButton != null) closeButton.onClick.RemoveListener(CloseSettingsMenu);
 
-        volumeToggle.UnregisterValueChangedCallback(OnMuteTogglePressed);
-        masterVolumeSlider.UnregisterValueChangedCallback(OnMasterVolumeSliderChange);
-        musicVolumeSlider.UnregisterValueChangedCallback(OnMusicVolumeSliderChange);
-        sfxVolumeSlider.UnregisterValueChangedCallback(OnSFXSliderChange);
-        ambientVolumeSlider.UnregisterValueChangedCallback(OnAmbientSliderChange);
+        if (volumeToggle != null) volumeToggle.onValueChanged.RemoveListener(OnMuteTogglePressed);
+        if (masterVolumeSlider != null) masterVolumeSlider.onValueChanged.RemoveListener(OnMasterVolumeSliderChange);
+        if (musicVolumeSlider != null) musicVolumeSlider.onValueChanged.RemoveListener(OnMusicVolumeSliderChange);
+        if (sfxVolumeSlider != null) sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXSliderChange);
+        if (ambientVolumeSlider != null) ambientVolumeSlider.onValueChanged.RemoveListener(OnAmbientSliderChange);
     }
 
     public void OpenSettingsMenu()
     {
-        rootContainer.style.display = DisplayStyle.Flex;
+        if (gameObject.activeSelf) return;
+        _eventPublisher?.Publish(new Command_CloseAllMenus());
+        gameObject.SetActive(true);
+        _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
     }
 
     public void CloseSettingsMenu()
     {
-        rootContainer.style.display = DisplayStyle.None;
+        if (!gameObject.activeSelf) return;
+        gameObject.SetActive(false);
+        _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = false });
     }
 
-    private void OnMuteTogglePressed(ChangeEvent<bool> evt) => _eventPublisher?.Publish(new OnMuteTogglePressedEvent { newValue = evt.newValue });
-    private void OnMasterVolumeSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnMasterVolumeChangedEvent { newValue = evt.newValue });
-    private void OnMusicVolumeSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnMusicVolumeChangedEvent { newValue = evt.newValue });
-    private void OnSFXSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnSFXSliderChangeEvent { newValue = evt.newValue });
-    private void OnAmbientSliderChange(ChangeEvent<float> evt) => _eventPublisher?.Publish(new OnAmbientSliderChangeEvent { newValue = evt.newValue });
+    private void OnMuteTogglePressed(bool newValue) => _eventPublisher?.Publish(new OnMuteTogglePressedEvent { newValue = newValue });
+    private void OnMasterVolumeSliderChange(float newValue) => _eventPublisher?.Publish(new OnMasterVolumeChangedEvent { newValue = newValue });
+    private void OnMusicVolumeSliderChange(float newValue) => _eventPublisher?.Publish(new OnMusicVolumeChangedEvent { newValue = newValue });
+    private void OnSFXSliderChange(float newValue) => _eventPublisher?.Publish(new OnSFXSliderChangeEvent { newValue = newValue });
+    private void OnAmbientSliderChange(float newValue) => _eventPublisher?.Publish(new OnAmbientSliderChangeEvent { newValue = newValue });
 
 }
 
