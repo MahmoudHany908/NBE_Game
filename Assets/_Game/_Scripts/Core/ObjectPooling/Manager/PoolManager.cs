@@ -16,6 +16,7 @@ public class PoolManager : MonoBehaviour
         [Min(1)] public int maxSize = 100;
     }
 
+
     [SerializeField] private List<PrewarmEntry> prewarmPools = new();
 
     [SerializeField] private Transform poolParent;
@@ -32,6 +33,7 @@ public class PoolManager : MonoBehaviour
         public int version;
         public float expireTime;
     }
+
 
     private void OnEnable()
     {
@@ -60,6 +62,7 @@ public class PoolManager : MonoBehaviour
         }
         _activeObjects.Clear();
     }
+
 
     private void Awake()
     {
@@ -103,7 +106,7 @@ public class PoolManager : MonoBehaviour
     private GameObject CreateInstance(GameObject prefab, int prefabKey)
     {
         var instance = Instantiate(prefab, poolParent);
-        
+
         // Inject dependencies into the newly spawned object!
         if (_resolver != null)
         {
