@@ -11,16 +11,18 @@ public class Projectile : MonoBehaviour, IPoolable
 
     private Vector3 velocity = new Vector3(0, 0, 0);
     private bool hasHit = false;
+    private int damage;
 
     private void Awake()
     {
         pooledObject = GetComponent<PooledObject>();
     }
-    public void Initialize(Vector3 position, Vector3 vel, Quaternion rotation)
+    public void Initialize(Vector3 position, Vector3 vel, Quaternion rotation, int damageValue)
     {
         velocity = vel;
         transform.position = position;
         transform.rotation = rotation;
+        damage = damageValue;
     }
 
     public void OnDespawned()
@@ -46,14 +48,14 @@ public class Projectile : MonoBehaviour, IPoolable
 
         if (hasHit) return;
         hasHit = true;
-        
+
         // 2. Ignore collisions with the Player so it doesn't destroy itself on spawn
         if (other.GetComponentInParent<PlayerHealthComponent>() != null) return;
 
         IDamageable damageable = other.GetComponent<IDamageable>();
         if (damageable != null)
         {
-            damageable.TakeDamage(20);
+            damageable.TakeDamage(damage);
             Debug.Log("Projectile hit something: " + other.name);
         }
 

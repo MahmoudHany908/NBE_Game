@@ -11,6 +11,7 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<ExtractionUIController>();
         builder.RegisterComponentInHierarchy<WaveMilestoneController>();
         builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
+        builder.RegisterComponentInHierarchy<RookAbility>();
 
     }
 

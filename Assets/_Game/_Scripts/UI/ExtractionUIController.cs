@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VContainer;
@@ -10,6 +11,8 @@ using VContainer;
 [RequireComponent(typeof(UIDocument))]
 public class ExtractionUIController : MonoBehaviour
 {
+    [SerializeField] private HealthBar healthBar;
+
     private UIDocument document;
     private VisualElement root;
     private VisualElement panel;
@@ -30,6 +33,8 @@ public class ExtractionUIController : MonoBehaviour
         if (isActiveAndEnabled)
         {
             _eventSubscriber?.Subscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
+            _eventSubscriber?.Subscribe<PlayerTakeDamageEvent>(HandleHealthChangedTakeDamage);
+            _eventSubscriber?.Subscribe<PlayerHealedEvent>(HandleHealthChangedTakeHeal);
         }
     }
 
@@ -53,18 +58,42 @@ public class ExtractionUIController : MonoBehaviour
     private void OnEnable()
     {
         _eventSubscriber?.Subscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
+
+        _eventSubscriber?.Subscribe<PlayerTakeDamageEvent>(HandleHealthChangedTakeDamage);
+        _eventSubscriber?.Subscribe<PlayerHealedEvent>(HandleHealthChangedTakeHeal);
+
+        healthBar.SetHealth(1f); // Start with full health bar
     }
+
+
 
     private void OnDisable()
     {
         _eventSubscriber?.Unsubscribe<ExtractionAvailableEvent>(HandleExtractionAvailable);
+        _eventSubscriber?.Unsubscribe<PlayerTakeDamageEvent>(HandleHealthChangedTakeDamage);
+        _eventSubscriber?.Unsubscribe<PlayerHealedEvent>(HandleHealthChangedTakeHeal);
     }
+
 
     private void OnDestroy()
     {
         extractButton.clicked -= OnExtractClicked;
         continueButton.clicked -= OnContinueClicked;
     }
+
+    #region Health Bar Handling
+    private void HandleHealthChangedTakeDamage(PlayerTakeDamageEvent evt)
+    {
+        healthBar.SetHealth(evt.healthPercentage);
+        Debug.Log($"Player took damage. New health percentage: {evt.healthPercentage}");
+    }
+    private void HandleHealthChangedTakeHeal(PlayerHealedEvent evt)
+    {
+        Debug.Log($"Player HEALED. New health percentage: {evt.healthPercentage}");
+
+        healthBar.SetHealth(evt.healthPercentage);
+    }
+    #endregion
 
     private void HandleExtractionAvailable(ExtractionAvailableEvent evt)
     {
