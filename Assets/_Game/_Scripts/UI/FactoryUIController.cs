@@ -14,6 +14,7 @@ public class FactoryUIController : MonoBehaviour
     [SerializeField] private Button _closeBtn;
 
     [Header("Active Production Info")]
+    [SerializeField] private TMP_Text _factoryLevelLabel;
     [SerializeField] private TMP_Text _activeResourceNameLabel;
     [SerializeField] private TMP_Text _rateLabel;
     [SerializeField] private TMP_Text _capacityLabel;
@@ -140,6 +141,9 @@ public class FactoryUIController : MonoBehaviour
     private void OnStateUpdated(Event_FactoryStateUpdated evt)
     {
         _currentActiveResource = evt.ActiveResource;
+
+        if (_factoryLevelLabel != null)
+            _factoryLevelLabel.text = $"LV {evt.GlobalLevel}";
 
         if (_activeResourceNameLabel != null)
             _activeResourceNameLabel.text = $"{evt.ActiveResource} Production";
