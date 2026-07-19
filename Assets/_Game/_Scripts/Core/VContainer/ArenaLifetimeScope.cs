@@ -1,3 +1,4 @@
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -12,6 +13,8 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<WaveMilestoneController>();
         builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
         builder.RegisterComponentInHierarchy<RookAbility>();
+        builder.RegisterComponentInHierarchy<JessyAbility>();
+
 
     }
 
