@@ -1,0 +1,65 @@
+using UnityEngine;
+
+public class JessyDroneProjectile : MonoBehaviour, IPoolable
+{
+    [SerializeField] private float lifeTime;
+    [SerializeField] private float speed;
+
+
+
+    private PooledObject pooledObject;
+
+    private bool hasHit = false;
+    private int damage;
+
+    private void Awake()
+    {
+        pooledObject = GetComponent<PooledObject>();
+    }
+    public void Initialize(Vector3 position, Quaternion rotation, int damageValue)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
+        damage = damageValue;
+    }
+
+    public void OnDespawned()
+    {
+
+    }
+
+    public void OnSpawned()
+    {
+        hasHit = false;
+        pooledObject.ReturnToPool(lifeTime);
+    }
+
+    void Update()
+    {
+        transform.position += transform.forward * speed * Time.deltaTime;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        // 1. Ignore other triggers (like the player's ClosestTargeter radius or enemy aggro ranges)
+        if (other.isTrigger) return;
+
+        if (hasHit) return;
+        hasHit = true;
+
+        // 2. Ignore collisions with the Player so it doesn't destroy itself on spawn
+        if (other.GetComponentInParent<PlayerHealthComponent>() != null) return;
+
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null)
+        {
+            damageable.TakeDamage(damage);
+            Debug.Log("Projectile hit something: " + other.name);
+        }
+
+        // Destroy the projectile if it hits a solid object like a wall
+        pooledObject.ReturnToPool();
+    }
+
+
+}
