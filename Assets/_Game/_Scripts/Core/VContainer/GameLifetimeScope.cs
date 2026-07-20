@@ -24,10 +24,15 @@ public class GameLifetimeScope : LifetimeScope
         // Register Save System
         builder.Register<SaveManager>(Lifetime.Singleton).As<ISaveSystem>();
 
+        // Register Time System
+        builder.Register<VaultSurvivors.Core.Time.TimeManager>(Lifetime.Singleton)
+            .As<VaultSurvivors.Core.Time.ITimeManager>();
+
         // Force injection on components that are not resolved by others
         builder.RegisterBuildCallback(container => 
         {
             container.Resolve<IGameStateManager>();
+            container.Resolve<VaultSurvivors.Core.Time.ITimeManager>();
         });
     }
 }

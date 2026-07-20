@@ -8,6 +8,8 @@ public class GameData
     public StructureData structures = new StructureData();
     public ProductionData production = new ProductionData();
     public AudioData audio = new AudioData();
+    
+    public long lastSeenTimestamp = 0;
 }
 
 [System.Serializable]
