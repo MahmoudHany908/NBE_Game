@@ -63,7 +63,7 @@ public class RookAbility : MonoBehaviour, IAbility
 
     private void SpawnRocket(Transform target)
     {
-        Vector3 spawnPos = target.position + Vector3.up * spawnHeight;
+        Vector3 spawnPos = player.transform.position + Vector3.up * spawnHeight;
 
         GameObject rocket = poolManager.Spawn(rocketPrefab, spawnPos, Quaternion.identity);
 
