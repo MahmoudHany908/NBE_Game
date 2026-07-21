@@ -56,15 +56,7 @@ namespace VaultSurvivors.LoadingSystem
                 await Awaitable.NextFrameAsync();
             }
 
-            // 4. Fade out the fake loading bar UI
-            if (_loadingUIGroup != null)
-            {
-                await UIFadeUtility.FadeOut(_loadingUIGroup, _uiFadeDuration);
-                if (_loadingUIGroup != null)
-                    _loadingUIGroup.gameObject.SetActive(false);
-            }
-
-            // 5. Show "Tap to Continue"
+            // 4. Show "Tap to Continue"
             if (_tapController != null)
             {
                 _tapController.OnTapDetected += HandleTapDetected;
@@ -77,10 +69,21 @@ namespace VaultSurvivors.LoadingSystem
             }
         }
 
-        private void HandleTapDetected()
+        private async void HandleTapDetected()
         {
             if (_tapController != null)
                 _tapController.OnTapDetected -= HandleTapDetected;
+
+            if (_tapController != null)
+                _tapController.Disable();
+
+            // Fade out the fake loading bar UI before loading the next scene
+            if (_loadingUIGroup != null)
+            {
+                await UIFadeUtility.FadeOut(_loadingUIGroup, _uiFadeDuration);
+                if (_loadingUIGroup != null)
+                    _loadingUIGroup.gameObject.SetActive(false);
+            }
 
             Debug.Log("[TitleScreenController] Tap detected — loading Hub with loading screen (no hints).");
 
