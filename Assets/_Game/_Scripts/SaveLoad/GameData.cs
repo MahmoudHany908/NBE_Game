@@ -17,6 +17,7 @@ public class PlayerData
 {
     public int level = 1;
     public int xp = 0;
+    public bool hasCompletedTutorial = false;
 }
 
 [System.Serializable]
