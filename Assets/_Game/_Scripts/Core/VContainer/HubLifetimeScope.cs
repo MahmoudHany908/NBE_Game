@@ -11,6 +11,7 @@ public class HubLifetimeScope : LifetimeScope
 
     private FactoryControlPanel _factoryControlPanel;
     private FactoryUIController _factoryUIController;
+    private MaterialsHUDController _materialsHUDController;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -18,6 +19,7 @@ public class HubLifetimeScope : LifetimeScope
 
         _factoryControlPanel = FindAnyObjectByType<FactoryControlPanel>();
         _factoryUIController = FindAnyObjectByType<FactoryUIController>();
+        _materialsHUDController = FindAnyObjectByType<MaterialsHUDController>();
         var uiManager = FindAnyObjectByType<UIManager>();
 
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
@@ -26,6 +28,7 @@ public class HubLifetimeScope : LifetimeScope
 
         if (_factoryControlPanel != null) builder.RegisterComponent(_factoryControlPanel);
         if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
+        if (_materialsHUDController != null) builder.RegisterComponent(_materialsHUDController);
         if (uiManager != null) builder.RegisterComponent(uiManager);
 
         builder.RegisterBuildCallback(container =>
@@ -58,6 +61,12 @@ public class HubLifetimeScope : LifetimeScope
             {
                 container.Inject(uiManager);
                 Debug.Log("[UIManager] Successfully Injected!");
+            }
+
+            if (_materialsHUDController != null)
+            {
+                container.Inject(_materialsHUDController);
+                Debug.Log("[MaterialsHUDController] Successfully Injected!");
             }
         });
     }
