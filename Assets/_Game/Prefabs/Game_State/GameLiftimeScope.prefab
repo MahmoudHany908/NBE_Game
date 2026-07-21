@@ -144,6 +144,7 @@ MonoBehaviour:
   poolManager: {fileID: 4316611451314362406}
   audioManager: {fileID: 5560655403167124709}
   gameStateManager: {fileID: 356582293892264738}
+  loadingScreenController: {fileID: 926096665306617455, guid: 11c100080efd6a640aa32406df599dd5, type: 3}
 --- !u!1 &5617589594082216947
 GameObject:
   m_ObjectHideFlags: 0

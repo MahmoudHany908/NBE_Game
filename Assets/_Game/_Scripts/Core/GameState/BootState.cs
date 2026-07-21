@@ -21,17 +21,7 @@ public class BootState : IGameState
         if (_isBootComplete)
         {
             _isBootComplete = false;
-            
-            GameData data = _saveSystem != null ? _saveSystem.Load() : new GameData();
-
-            if (!data.player.hasCompletedTutorial)
-            {
-                manager.ChangeState(new TutorialState());
-            }
-            else
-            {
-                manager.ChangeState(new HideoutState());
-            }
+            manager.LoadSceneAndChangeState("TitleScene", new TitleScreenState());
         }
     }
 
