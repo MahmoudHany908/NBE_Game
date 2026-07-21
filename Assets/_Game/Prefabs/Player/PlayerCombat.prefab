@@ -547,6 +547,7 @@ Transform:
   - {fileID: 9001883763325176748}
   - {fileID: 8463350600375687902}
   - {fileID: 5472782836324521969}
+  - {fileID: 3914495950019734046}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &8055565802310306006
@@ -1055,7 +1056,7 @@ Transform:
   m_GameObject: {fileID: 4042092630278500971}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.745, z: -2.642}
+  m_LocalPosition: {x: 0, y: 2.522, z: -1.786}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1072,8 +1073,8 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 80.6
-  m_Range: 40.19
+  m_Intensity: 30
+  m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
