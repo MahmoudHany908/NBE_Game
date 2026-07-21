@@ -41,9 +41,10 @@ public class GameLifetimeScope : LifetimeScope
             .As<VaultSurvivors.Core.Time.ITimeManager>();
 
         // Force injection on components that are not resolved by others
-        builder.RegisterBuildCallback(container => 
+        builder.RegisterBuildCallback(container =>
         {
             container.Resolve<IGameStateManager>();
+            container.Resolve<VaultSurvivors.Core.Time.ITimeManager>();
             container.Inject(loadingScreenController);
         });
     }
