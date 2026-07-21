@@ -98,11 +98,7 @@ public class ExtractionUIController : MonoBehaviour
         HidePanel();
 
         _eventPublisher?.Publish(new ExtractionDecisionEvent(didExtract: true));
-        _eventPublisher?.Publish(new ChangeStateCommand
-        {
-            TargetSceneName = "HubScene",
-            TargetState = new HideoutState()
-        });
+        VaultSurvivors.LoadingSystem.SceneLoader.Load("HubScene", new HideoutState());
     }
 
     private void OnContinueClicked()

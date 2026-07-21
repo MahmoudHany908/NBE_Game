@@ -16,7 +16,7 @@ public class BootState : IGameState
         if (_isBootComplete)
         {
             _isBootComplete = false;
-            manager.ChangeState(new HideoutState());
+            manager.LoadSceneAndChangeState("TitleScene", new TitleScreenState());
         }
     }
 

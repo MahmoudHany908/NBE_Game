@@ -47,10 +47,6 @@ public class SceneTransitionView : MonoBehaviour
     {
         IGameState nextState = isTransitioningToArena ? new ArenaState() : new HideoutState();
 
-        _eventPublisher?.Publish(new ChangeStateCommand
-        {
-            TargetSceneName = targetSceneName,
-            TargetState = nextState
-        });
+        VaultSurvivors.LoadingSystem.SceneLoader.Load(targetSceneName, nextState);
     }
 }
