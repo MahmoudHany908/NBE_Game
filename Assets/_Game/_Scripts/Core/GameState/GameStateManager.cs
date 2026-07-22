@@ -8,13 +8,15 @@ public class GameStateManager : MonoBehaviour, IGameStateManager
     private IGameState _currentState;
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
+    private ISaveSystem _saveSystem;
 
     [Inject]
-    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, ISaveSystem saveSystem)
     {
         Debug.Log("[GameStateManager] Construct called! Injecting dependencies.");
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+        _saveSystem = saveSystem;
 
         // Subscribe to incoming UI commands immediately
         _eventSubscriber.Subscribe<ChangeStateCommand>(HandleChangeStateCommand);
@@ -29,7 +31,7 @@ public class GameStateManager : MonoBehaviour, IGameStateManager
 
     private void Start()
     {
-        ChangeState(new BootState());
+        ChangeState(new BootState(_saveSystem));
     }
 
     private void Update()

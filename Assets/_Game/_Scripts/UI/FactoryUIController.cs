@@ -11,31 +11,40 @@ public class FactoryUIController : MonoBehaviour
 
     [Header("Main Panel")]
     [SerializeField] private GameObject _panelContainer;
-
-    [Header("Text Fields")]
-    [SerializeField] private TMP_Text _headerLabel; // Equivalent to global factory title
-    [SerializeField] private TMP_Text _rateLabel;
-    [SerializeField] private TMP_Text _capacityLabel;
-
-    [Header("Resource Amounts")]
-    [SerializeField] private TMP_Text _goldAmount;
-    [SerializeField] private TMP_Text _foodAmount;
-    [SerializeField] private TMP_Text _energyAmount;
-    [SerializeField] private TMP_Text _electronicsAmount;
-
-    [Header("Buttons")]
-    [SerializeField] private Button _collectBtn;
-    [SerializeField] private Button _upgradeBtn;
     [SerializeField] private Button _closeBtn;
 
-    [Header("Resource Selection (Optional UGUI Buttons)")]
-    [SerializeField] private Button _selectEnergyBtn;
-    [SerializeField] private Button _selectFoodBtn;
-    [SerializeField] private Button _selectElectronicsBtn;
-    [SerializeField] private Button _selectGoldBtn;
+    [Header("Active Production Info")]
+    [SerializeField] private TMP_Text _factoryLevelLabel;
+    [SerializeField] private TMP_Text _activeResourceNameLabel;
+    [SerializeField] private TMP_Text _rateLabel;
+    [SerializeField] private TMP_Text _capacityLabel;
+    [SerializeField] private TMP_Text _accumulatedLabel;
+
+    [Header("Action Buttons")]
+    [SerializeField] private Button _collectBtn;
+    [SerializeField] private Button _upgradeBtn;
+    [SerializeField] private TMP_Text _collectBtnText;
+    [SerializeField] private TMP_Text _upgradeBtnText;
+
+    [Header("Switch Buttons (Phase 3)")]
+    [SerializeField] private Button _switchEnergyBtn;
+    [SerializeField] private Button _switchFoodBtn;
+    [SerializeField] private Button _switchElectronicsBtn;
+
+    [Header("Switch Icons To Dim")]
+    [SerializeField] private Image _energyIconImg;
+    [SerializeField] private Image _foodIconImg;
+    [SerializeField] private Image _electronicsIconImg;
+
+    [Header("Switch Popup Modal (Phase 3)")]
+    [SerializeField] private GameObject _switchPopup;
+    [SerializeField] private TMP_Text _switchPopupText;
+    [SerializeField] private Button _confirmSwitchBtn;
+    [SerializeField] private Button _cancelSwitchBtn;
 
     private ResourceType _currentActiveResource = ResourceType.Energy;
-    private bool _isUpdatingFromEvent = false;
+    private ResourceType _pendingSwitchResource;
+    private int _pendingCollectAmount;
 
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
@@ -48,8 +57,9 @@ public class FactoryUIController : MonoBehaviour
     {
         if (_panelContainer != null)
         {
-            _panelContainer.SetActive(false); // Hide initially
+            _panelContainer.SetActive(false);
         }
+        if (_switchPopup != null) _switchPopup.SetActive(false);
     }
 
     private void OnEnable()
@@ -58,10 +68,12 @@ public class FactoryUIController : MonoBehaviour
         if (_upgradeBtn != null) _upgradeBtn.onClick.AddListener(OnUpgradeClicked);
         if (_closeBtn != null) _closeBtn.onClick.AddListener(CloseUI);
 
-        if (_selectEnergyBtn != null) _selectEnergyBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Energy));
-        if (_selectFoodBtn != null) _selectFoodBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Food));
-        if (_selectElectronicsBtn != null) _selectElectronicsBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Electronics));
-        if (_selectGoldBtn != null) _selectGoldBtn.onClick.AddListener(() => OnResourceSelected(ResourceType.Gold));
+        if (_switchEnergyBtn != null) _switchEnergyBtn.onClick.AddListener(() => ShowSwitchPopup(ResourceType.Energy));
+        if (_switchFoodBtn != null) _switchFoodBtn.onClick.AddListener(() => ShowSwitchPopup(ResourceType.Food));
+        if (_switchElectronicsBtn != null) _switchElectronicsBtn.onClick.AddListener(() => ShowSwitchPopup(ResourceType.Electronics));
+
+        if (_confirmSwitchBtn != null) _confirmSwitchBtn.onClick.AddListener(OnConfirmSwitch);
+        if (_cancelSwitchBtn != null) _cancelSwitchBtn.onClick.AddListener(HideSwitchPopup);
     }
 
     private void OnDisable()
@@ -70,10 +82,12 @@ public class FactoryUIController : MonoBehaviour
         if (_upgradeBtn != null) _upgradeBtn.onClick.RemoveListener(OnUpgradeClicked);
         if (_closeBtn != null) _closeBtn.onClick.RemoveListener(CloseUI);
 
-        if (_selectEnergyBtn != null) _selectEnergyBtn.onClick.RemoveAllListeners();
-        if (_selectFoodBtn != null) _selectFoodBtn.onClick.RemoveAllListeners();
-        if (_selectElectronicsBtn != null) _selectElectronicsBtn.onClick.RemoveAllListeners();
-        if (_selectGoldBtn != null) _selectGoldBtn.onClick.RemoveAllListeners();
+        if (_switchEnergyBtn != null) _switchEnergyBtn.onClick.RemoveAllListeners();
+        if (_switchFoodBtn != null) _switchFoodBtn.onClick.RemoveAllListeners();
+        if (_switchElectronicsBtn != null) _switchElectronicsBtn.onClick.RemoveAllListeners();
+
+        if (_confirmSwitchBtn != null) _confirmSwitchBtn.onClick.RemoveListener(OnConfirmSwitch);
+        if (_cancelSwitchBtn != null) _cancelSwitchBtn.onClick.RemoveListener(HideSwitchPopup);
     }
 
     private void Start()
@@ -99,12 +113,14 @@ public class FactoryUIController : MonoBehaviour
 
     private void OnOpenUI(Command_OpenFactoryUI cmd)
     {
-        Debug.Log("[FactoryUIController] Received Command_OpenFactoryUI.");
         if (_panelContainer != null && !_panelContainer.activeSelf)
         {
             _eventPublisher?.Publish(new Command_CloseAllMenus());
             _panelContainer.SetActive(true);
             _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
+            
+            // Ask for immediate data so the UI doesn't say "New Text"
+            _eventPublisher?.Publish(new Command_RequestFactoryState());
         }
     }
 
@@ -124,50 +140,79 @@ public class FactoryUIController : MonoBehaviour
 
     private void OnStateUpdated(Event_FactoryStateUpdated evt)
     {
-        _isUpdatingFromEvent = true;
+        _currentActiveResource = evt.ActiveResource;
 
-        if (_headerLabel != null)
-            _headerLabel.text = $"GLOBAL FACTORY (LEVEL {evt.GlobalLevel})";
+        if (_factoryLevelLabel != null)
+            _factoryLevelLabel.text = $"LV {evt.GlobalLevel}";
+
+        if (_activeResourceNameLabel != null)
+            _activeResourceNameLabel.text = $"{evt.ActiveResource} Production";
 
         if (_rateLabel != null)
-            _rateLabel.text = $"Production Rate: {evt.ProductionRate:F1}/s";
+            _rateLabel.text = $"Rate: {evt.ProductionRate:F1}/s";
 
         if (_capacityLabel != null)
-            _capacityLabel.text = $"Max Storage: {Mathf.FloorToInt(evt.MaxCapacity)}";
+            _capacityLabel.text = $"Max Capacity: {Mathf.FloorToInt(evt.MaxCapacity)}";
 
-        if (_goldAmount != null) _goldAmount.text = Mathf.FloorToInt(evt.WalletGold).ToString();
-        if (_foodAmount != null) _foodAmount.text = Mathf.FloorToInt(evt.WalletFood).ToString();
-        if (_energyAmount != null) _energyAmount.text = Mathf.FloorToInt(evt.WalletEnergy).ToString();
-        if (_electronicsAmount != null) _electronicsAmount.text = Mathf.FloorToInt(evt.WalletElectronics).ToString();
+        int amount = Mathf.FloorToInt(evt.CurrentAccumulation);
+        _pendingCollectAmount = amount;
+
+        if (_accumulatedLabel != null)
+            _accumulatedLabel.text = $"{amount} Collected";
 
         if (_collectBtn != null)
         {
-            int amount = Mathf.FloorToInt(evt.CurrentAccumulation);
-            var collectText = _collectBtn.GetComponentInChildren<TMP_Text>();
-            if (collectText != null) collectText.text = $"Collect ({amount} {evt.ActiveResource})";
+            if (_collectBtnText != null) _collectBtnText.text = $"Collect";
             _collectBtn.interactable = amount > 0;
         }
 
         if (_upgradeBtn != null)
         {
-            var upgradeText = _upgradeBtn.GetComponentInChildren<TMP_Text>();
-            if (upgradeText != null) upgradeText.text = $"Upgrade Factory (Cost: {evt.UpgradeCost} Gold)";
+            if (_upgradeBtnText != null) _upgradeBtnText.text = $"Upgrade (Cost: {evt.UpgradeCost})";
             _upgradeBtn.interactable = evt.WalletGold >= evt.UpgradeCost;
         }
 
-        _currentActiveResource = evt.ActiveResource;
-        
-        // Visual indication for the active resource can be added here
-        // E.g., modifying button colors based on _currentActiveResource
+        // Phase 3: Icons and Switch Buttons
+        Color dimmedColor = new Color(0.4f, 0.4f, 0.4f, 1f); // 40% brightness for the active (un-switchable) one
 
-        _isUpdatingFromEvent = false;
+        if (_energyIconImg != null) 
+            _energyIconImg.color = (evt.ActiveResource == ResourceType.Energy) ? dimmedColor : Color.white;
+        if (_foodIconImg != null) 
+            _foodIconImg.color = (evt.ActiveResource == ResourceType.Food) ? dimmedColor : Color.white;
+        if (_electronicsIconImg != null) 
+            _electronicsIconImg.color = (evt.ActiveResource == ResourceType.Electronics) ? dimmedColor : Color.white;
+
+        if (_switchEnergyBtn != null) 
+            _switchEnergyBtn.interactable = (evt.ActiveResource != ResourceType.Energy);
+        if (_switchFoodBtn != null) 
+            _switchFoodBtn.interactable = (evt.ActiveResource != ResourceType.Food);
+        if (_switchElectronicsBtn != null) 
+            _switchElectronicsBtn.interactable = (evt.ActiveResource != ResourceType.Electronics);
     }
 
-    private void OnResourceSelected(ResourceType resourceType)
+    // Phase 3 Modal Logic
+    private void ShowSwitchPopup(ResourceType target)
     {
-        if (_isUpdatingFromEvent) return;
+        if (_switchPopup == null) return;
         
-        _eventPublisher?.Publish(new Command_SetProductionResource(resourceType));
+        _pendingSwitchResource = target;
+        if (_switchPopupText != null)
+        {
+            _switchPopupText.text = $"Collect {_pendingCollectAmount} {_currentActiveResource} and switch production to {target}?";
+        }
+        _switchPopup.SetActive(true);
+    }
+
+    private void HideSwitchPopup()
+    {
+        if (_switchPopup != null) _switchPopup.SetActive(false);
+    }
+
+    private void OnConfirmSwitch()
+    {
+        _eventPublisher?.Publish(new Command_CollectFactory());
+        _eventPublisher?.Publish(new Command_SetProductionResource(_pendingSwitchResource));
+        HideSwitchPopup();
     }
 
     private void OnCollectClicked()

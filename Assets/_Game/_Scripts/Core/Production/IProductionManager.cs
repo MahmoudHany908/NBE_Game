@@ -6,7 +6,7 @@ namespace VaultSurvivors.Core.Production
     {
         float CalculateYield(float currentAccumulated, float ratePerSecond, float maxCapacity, float deltaTime);
         int GetUpgradeCost();
-        float GetProductionRate();
+        float GetProductionRate(ResourceType type);
         float GetMaxCapacity();
         void TryUpgrade();
         void SetActiveResource(ResourceType newType);
