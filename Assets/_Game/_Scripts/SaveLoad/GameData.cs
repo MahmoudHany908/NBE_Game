@@ -8,8 +8,6 @@ public class GameData
     public StructureData structures = new StructureData();
     public ProductionData production = new ProductionData();
     public AudioData audio = new AudioData();
-    
-    public long lastSeenTimestamp = 0;
 }
 
 [System.Serializable]
@@ -17,7 +15,6 @@ public class PlayerData
 {
     public int level = 1;
     public int xp = 0;
-    public bool hasCompletedTutorial = false;
 }
 
 [System.Serializable]

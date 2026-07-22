@@ -78,5 +78,3 @@ crashlytics-build.properties
 /.agent
 /Assets/Plugins
 Assets/Plugins.meta
-workspace_index.json
-ProjectSummary.md

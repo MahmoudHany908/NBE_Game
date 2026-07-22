@@ -58,14 +58,19 @@ public class DeathUIController : MonoBehaviour
     {
         HidePanel();
         Scene scene = SceneManager.GetActiveScene();
-        VaultSurvivors.LoadingSystem.SceneLoader.Load(scene.name, new ArenaState());
+        SceneManager.LoadScene(scene.name);
+
     }
 
     private void OnReturnToHubClicked()
     {
         HidePanel();
 
-        VaultSurvivors.LoadingSystem.SceneLoader.Load("HubScene", new HideoutState());
+        _eventPublisher?.Publish(new ChangeStateCommand
+        {
+            TargetSceneName = "HubScene",
+            TargetState = new HideoutState()
+        });
     }
 
     private void ShowPanel()

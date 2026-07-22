@@ -21,8 +21,20 @@ public class GateTrigger : MonoBehaviour
         {
             Debug.Log($"[GateTrigger] Player entered gate. Requesting transition to {targetSceneName}...");
 
-            VaultSurvivors.LoadingSystem.SceneLoader.Load(targetSceneName, new ArenaState());
-            Debug.Log("[GateTrigger] SceneLoader requested transition.");
+            if (_eventPublisher == null)
+            {
+                Debug.LogError("[GateTrigger] CRITICAL ERROR: _eventPublisher is NULL! VContainer injection failed.");
+            }
+            else
+            {
+                Debug.Log("[GateTrigger] _eventPublisher is valid. Publishing ChangeStateCommand...");
+                _eventPublisher.Publish(new ChangeStateCommand
+                {
+                    TargetSceneName = targetSceneName,
+                    TargetState = new ArenaState()
+                });
+                Debug.Log("[GateTrigger] ChangeStateCommand published.");
+            }
         }
     }
 }

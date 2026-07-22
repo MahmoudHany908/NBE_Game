@@ -5,6 +5,8 @@ public class Projectile : MonoBehaviour, IPoolable
     [SerializeField] private float lifeTime;
     [SerializeField] private float speed;
 
+
+
     private PooledObject pooledObject;
 
     private Vector3 velocity = new Vector3(0, 0, 0);

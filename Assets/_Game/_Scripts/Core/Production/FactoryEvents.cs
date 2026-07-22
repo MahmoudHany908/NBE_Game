@@ -15,8 +15,6 @@ namespace VaultSurvivors.Core.Production
     public class Command_UpgradeFactory : IGameEvent { }
 
     public class Command_CollectFactory : IGameEvent { }
-    
-    public class Command_RequestFactoryState : IGameEvent { }
 
     public class Event_FactoryStateUpdated : IGameEvent
     {

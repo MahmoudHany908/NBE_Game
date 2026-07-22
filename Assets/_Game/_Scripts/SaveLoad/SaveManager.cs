@@ -6,23 +6,16 @@ public class SaveManager : ISaveSystem
 {
     private readonly string _savePath;
     private readonly IEventPublisher _eventPublisher;
-    private readonly VaultSurvivors.Core.Time.ITimeManager _timeManager;
 
-    public SaveManager(IEventPublisher eventPublisher, VaultSurvivors.Core.Time.ITimeManager timeManager)
+    public SaveManager(IEventPublisher eventPublisher)
     {
         _eventPublisher = eventPublisher;
-        _timeManager = timeManager;
         _savePath = Path.Combine(Application.persistentDataPath, "save.json");
     }
 
     public void Save(GameData explicitData = null)
     {
         GameData data = explicitData != null ? explicitData : (HasSaveFile() ? Load() : new GameData());
-
-        if (_timeManager != null)
-        {
-            data.lastSeenTimestamp = _timeManager.GetCurrentUnixTimestamp();
-        }
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(_savePath, json);

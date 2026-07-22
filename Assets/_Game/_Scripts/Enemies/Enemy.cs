@@ -16,10 +16,6 @@ public class Enemy : MonoBehaviour, IPoolable
 
     private ITargetProvider targetProvider;
     private Transform target;
-    [SerializeField] private Animator animator;
-
-    private bool isStunned;
-    private float stunTimer;
 
     public float TargetHeight { get; set; }
     public float AttackTimer { get; set; }
@@ -39,7 +35,6 @@ public class Enemy : MonoBehaviour, IPoolable
         pooledObject = GetComponent<PooledObject>();
         enemyHealthComponent = GetComponent<EnemyHealthComponent>();
         targetProvider = GetComponentInChildren<ITargetProvider>();
-        animator = GetComponentInChildren<Animator>();
 
         if (targetProvider == null)
             Debug.LogError($"[Enemy] Missing ITargetProvider on {gameObject.name}!", this);
@@ -71,20 +66,7 @@ public class Enemy : MonoBehaviour, IPoolable
 
     private void Update()
     {
-
-
-        if (isStunned)
-        {
-            stunTimer -= Time.deltaTime;
-            if (stunTimer <= 0f)
-            {
-                EndStun();
-            }
-            return;
-        }
-
         if (target == null || enemyData == null) return;
-        if (isStunned) return;
 
         FaceTarget();
 
@@ -142,30 +124,4 @@ public class Enemy : MonoBehaviour, IPoolable
         Debug.Log($"{obj.gameObject.name} died at {obj.DeathPosition}");
         pooledObject.ReturnToPool(0.1f);
     }
-
-
-
-    #region Stun Logic
-
-    public void TakeStun(float duration)
-    {
-        stunTimer = Mathf.Max(stunTimer, duration);
-
-        if (!isStunned)
-            BeginStun();
-    }
-
-    private void BeginStun()
-    {
-        isStunned = true;
-        if (animator != null) animator.SetBool("IsStunned", true);
-    }
-
-    private void EndStun()
-    {
-        isStunned = false;
-        if (animator != null) animator.SetBool("IsStunned", false);
-    }
-
-    #endregion
 }
