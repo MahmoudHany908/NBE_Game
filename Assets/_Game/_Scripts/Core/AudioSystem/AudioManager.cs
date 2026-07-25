@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -35,6 +35,30 @@ public class AudioManager : MonoBehaviour
     {
         musicAudioSource = new GameObject("MusicAudioSource").AddComponent<AudioSource>();
         musicAudioSource.transform.SetParent(transform);
+
+        EnsureSoundSourcePrefab();
+    }
+
+    private void EnsureSoundSourcePrefab()
+    {
+        if (soundSourcePrefab == null)
+        {
+            Debug.LogWarning("AudioManager: soundSourcePrefab was null. Creating a fallback 3D AudioSource prefab dynamically.");
+            
+            // Create a hidden GameObject to act as the prefab for PoolManager
+            GameObject fallbackPrefab = new GameObject("FallbackSoundSourcePrefab");
+            fallbackPrefab.SetActive(false);
+            
+            // Parent it to AudioManager so it persists and cleans up with it
+            fallbackPrefab.transform.SetParent(transform);
+
+            AudioSource audioSource = fallbackPrefab.AddComponent<AudioSource>();
+            audioSource.spatialBlend = 1f; // 3D sound by default
+            audioSource.playOnAwake = false;
+
+            fallbackPrefab.AddComponent<PooledObject>();
+            soundSourcePrefab = fallbackPrefab.AddComponent<PooledAudioSource>();
+        }
     }
 
     #region SFX
@@ -48,14 +72,29 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
+        if (poolManager == null)
+        {
+            Debug.LogError("AudioManager.PlaySoundAtPosition: poolManager is null! VContainer injection might have failed on AudioManager.", this);
+            return;
+        }
+
+        if (soundSourcePrefab == null)
+        {
+            Debug.LogError("AudioManager.PlaySoundAtPosition: soundSourcePrefab is not assigned in the Inspector!", this);
+            return;
+        }
+
         // 2. Use the injected poolManager
         PooledAudioSource pooled = poolManager.Spawn<PooledAudioSource>(
             soundSourcePrefab.gameObject, position, Quaternion.identity);
 
-        pooled.Source.pitch = RandomizePitch(data.pitchRange);
-        pooled.Source.PlayOneShot(clip, GetFinalVolume(data.volume, sfxVolume));
+        if (pooled != null)
+        {
+            pooled.Source.pitch = RandomizePitch(data.pitchRange);
+            pooled.Source.PlayOneShot(clip, GetFinalVolume(data.volume, sfxVolume));
 
-        pooled.ReturnToPool(clip.length + 0.1f);
+            pooled.ReturnToPool(clip.length + 0.1f);
+        }
     }
 
     #endregion
@@ -71,19 +110,33 @@ public class AudioManager : MonoBehaviour
             return null;
         }
 
+        if (poolManager == null)
+        {
+            Debug.LogError("AudioManager.PlayAmbientAtPosition: poolManager is null! VContainer injection might have failed.", this);
+            return null;
+        }
+
+        if (soundSourcePrefab == null)
+        {
+            Debug.LogError("AudioManager.PlayAmbientAtPosition: soundSourcePrefab is not assigned in the Inspector!", this);
+            return null;
+        }
+
         PooledAudioSource pooled = poolManager.Spawn<PooledAudioSource>(
             soundSourcePrefab.gameObject, position, Quaternion.identity);
 
-        pooled.Source.clip = clip;
-        pooled.Source.volume = GetFinalVolume(data.volume, ambientVolume);
-        pooled.Source.loop = data.loop;
-        pooled.Source.pitch = RandomizePitch(data.pitchRange);
-        pooled.Source.Play();
+        if (pooled != null)
+        {
+            pooled.Source.clip = clip;
+            pooled.Source.volume = GetFinalVolume(data.volume, ambientVolume);
+            pooled.Source.loop = data.loop;
+            pooled.Source.pitch = RandomizePitch(data.pitchRange);
+            pooled.Source.Play();
 
-        activeAmbientSources.Add(pooled);
+            activeAmbientSources.Add(pooled);
 
-        // Your original lambda is perfectly fine and correctly captures the specific instance!
-        pooled.OnReturnedToPool += () => activeAmbientSources.Remove(pooled);
+            pooled.OnReturnedToPool += () => activeAmbientSources.Remove(pooled);
+        }
 
         return pooled;
     }
