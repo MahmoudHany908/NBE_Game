@@ -14,6 +14,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponent(audioManager);
         builder.RegisterComponent(gameStateManager).As<IGameStateManager>();
         builder.RegisterEntryPoint<VaultSurvivors.Core.Production.ProductionManager>().As<VaultSurvivors.Core.Production.IProductionManager>();
+        builder.RegisterEntryPoint<CombatWorkshopManager>().As<ICombatWorkshopManager>();
 
         // Register PoolManager as a singleton so it persists globally
         builder.RegisterComponent(poolManager).AsSelf();

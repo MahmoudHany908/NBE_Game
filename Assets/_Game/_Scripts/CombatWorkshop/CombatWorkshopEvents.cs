@@ -46,6 +46,9 @@ public class Command_OpenGateLoadoutUI : IGameEvent
 {
 }
 
+public class Command_CloseGateLoadoutUI : IGameEvent
+{
+}
 
 public class Event_WorkshopStateUpdated : IGameEvent
 {

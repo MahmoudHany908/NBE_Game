@@ -25,8 +25,10 @@ public class ResourceData
     public float food = 0f;
     public float energy = 0f;
     public float electronics = 0f;
+    
+    // enum resources
+    // hashtable values
 }
-
 
 [System.Serializable]
 public class StructureData
