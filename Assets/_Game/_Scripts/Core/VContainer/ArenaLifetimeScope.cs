@@ -14,6 +14,8 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
         builder.RegisterComponentInHierarchy<RookAbility>();
         builder.RegisterComponentInHierarchy<JessyAbility>();
+        builder.RegisterComponentInHierarchy<DoctorAbility>();
+        builder.RegisterComponentInHierarchy<SeeleAbility>();
 
 
     }

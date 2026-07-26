@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 public class SeeleAbility : MonoBehaviour, IAbility
 {
     [Header("Ability Settings")]
     [SerializeField] private float stunDuration = 2f;
     [SerializeField] private int effectCount = 3;
+    [SerializeField] private GameObject shockVFX;
+    [SerializeField] private SoundData soundData;
 
     [SerializeField] private float detectionRadius = 15f;
     [SerializeField] private LayerMask enemyLayer;
 
     private GameObject player;
-
+    [Inject] private AudioManager audioManager;
 
     private void Awake()
     {
@@ -25,6 +28,9 @@ public class SeeleAbility : MonoBehaviour, IAbility
         foreach (Transform target in selectedTargets)
         {
             target.GetComponent<Enemy>()?.TakeStun(stunDuration);
+            audioManager.PlaySoundAtPosition(soundData, target.position);
+            Vector3 offset = new Vector3(0, 1, 0);
+            Instantiate(shockVFX, target.position, Quaternion.identity);
         }
     }
 
