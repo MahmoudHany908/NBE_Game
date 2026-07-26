@@ -12,10 +12,22 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<ExtractionUIController>();
         builder.RegisterComponentInHierarchy<WaveMilestoneController>();
         builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
-        builder.RegisterComponentInHierarchy<RookAbility>();
-        builder.RegisterComponentInHierarchy<JessyAbility>();
-
-
+        builder.RegisterBuildCallback(container =>
+        {
+            var workshopManager = container.Resolve<ICombatWorkshopManager>();
+            if (workshopManager != null)
+            {
+                var equipped = workshopManager.GetEquippedCharacters();
+                foreach (var character in equipped)
+                {
+                    if (character != null && character.AbilityRef != null && character.AbilityRef.abilityPrefab != null)
+                    {
+                        var abilityInstance = Instantiate(character.AbilityRef.abilityPrefab);
+                        container.InjectGameObject(abilityInstance);
+                    }
+                }
+            }
+        });
     }
 
     private void Start()

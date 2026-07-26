@@ -26,6 +26,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponent(loadingScreenController);
 
         builder.RegisterEntryPoint<VaultSurvivors.Core.Production.ProductionManager>().As<VaultSurvivors.Core.Production.IProductionManager>();
+        builder.RegisterEntryPoint<CombatWorkshopManager>().As<ICombatWorkshopManager>();
 
         // Register PoolManager as a singleton so it persists globally
         builder.RegisterComponent(poolManager).AsSelf();
