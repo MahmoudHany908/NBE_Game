@@ -14,7 +14,7 @@ public class RookAbility : MonoBehaviour, IAbility
     private List<Transform> targets = new List<Transform>();
     private GameObject player;
     [Inject] private PoolManager poolManager;
-
+    [Inject] private AudioManager audioManager;
 
 
     private void Awake()
@@ -49,7 +49,6 @@ public class RookAbility : MonoBehaviour, IAbility
 
     private List<Transform> PickRandomTargets(List<Transform> pool, int count)
     {
-        // Shuffle a copy (Fisher-Yates), then take however many we can afford
         List<Transform> shuffled = new List<Transform>(pool);
         for (int i = shuffled.Count - 1; i > 0; i--)
         {
@@ -69,7 +68,7 @@ public class RookAbility : MonoBehaviour, IAbility
 
         if (rocket.TryGetComponent<Rocket>(out var rocketComponent))
         {
-            rocketComponent.Init(target);
+            rocketComponent.Init(target, audioManager);
         }
     }
 }
