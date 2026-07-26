@@ -1,24 +1,48 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VContainer;
 
+[Serializable]
+public class CharacterUIMapping
+{
+    public string CharacterId; // e.g. "Doctor", "Seele", etc.
+    
+    [Header("Phase 1: Selection Lists")]
+    public GameObject UnlockedGameObject;
+    public GameObject LockedGameObject;
+
+    [Header("Phase 2: Details Screen")]
+    public GameObject DetailArtGameObject;
+    public GameObject DetailDescriptionGameObject;
+}
+
 public class CombatWorkshopUIController : MonoBehaviour
 {
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
 
-    [Header("Main Panel")]
+    [Header("Main Canvas")]
     [SerializeField] private GameObject _panelContainer;
-    [SerializeField] private Button _closeBtn;
+    [SerializeField] private Button _backBtn;
 
     [Header("Data")]
     [SerializeField] private SupportCharacterRegistrySO _registry;
 
-    [Header("UI Element Instantiation")]
-    [SerializeField] private Transform _characterListContainer;
-    [SerializeField] private GameObject _characterElementPrefab; // Prefab with a script to handle individual character display
+    [Header("Phase 1: Character Selection")]
+    [SerializeField] private GameObject _characterSelectionPanel;
+    [Tooltip("Map each character ID to its specific hand-made GameObjects in your scene")]
+    [SerializeField] private List<CharacterUIMapping> _characterMappings = new List<CharacterUIMapping>();
+
+    [Header("Phase 2: Character Unlock / Details")]
+    [SerializeField] private GameObject _characterDetailsPanel;
+    [SerializeField] private TMP_Text _detailCost;
+    [SerializeField] private Button _unlockBtn;
+
+    private Event_WorkshopStateUpdated _lastState;
+    private SupportCharacterSO _currentlyViewedCharacter;
 
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
@@ -29,20 +53,19 @@ public class CombatWorkshopUIController : MonoBehaviour
 
     private void Awake()
     {
-        if (_panelContainer != null)
-        {
-            _panelContainer.SetActive(false);
-        }
+        if (_panelContainer != null) _panelContainer.SetActive(false);
     }
 
     private void OnEnable()
     {
-        if (_closeBtn != null) _closeBtn.onClick.AddListener(CloseUI);
+        if (_backBtn != null) _backBtn.onClick.AddListener(OnBackClicked);
+        if (_unlockBtn != null) _unlockBtn.onClick.AddListener(OnUnlockClicked);
     }
 
     private void OnDisable()
     {
-        if (_closeBtn != null) _closeBtn.onClick.RemoveListener(CloseUI);
+        if (_backBtn != null) _backBtn.onClick.RemoveListener(OnBackClicked);
+        if (_unlockBtn != null) _unlockBtn.onClick.RemoveListener(OnUnlockClicked);
     }
 
     private void Start()
@@ -51,6 +74,30 @@ public class CombatWorkshopUIController : MonoBehaviour
         _eventSubscriber?.Subscribe<Command_OpenCombatWorkshopUI>(OnOpenUI);
         _eventSubscriber?.Subscribe<Command_CloseCombatWorkshopUI>(OnCloseUI);
         _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+
+        // Wire up all the buttons dynamically based on the mapping
+        foreach (var mapping in _characterMappings)
+        {
+            if (mapping.UnlockedGameObject != null)
+            {
+                Button btn = mapping.UnlockedGameObject.GetComponent<Button>();
+                if (btn != null)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    btn.onClick.AddListener(() => OpenDetailsPhase(mapping.CharacterId));
+                }
+            }
+
+            if (mapping.LockedGameObject != null)
+            {
+                Button btn = mapping.LockedGameObject.GetComponent<Button>();
+                if (btn != null)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    btn.onClick.AddListener(() => OpenDetailsPhase(mapping.CharacterId));
+                }
+            }
+        }
     }
 
     private void OnDestroy()
@@ -74,6 +121,8 @@ public class CombatWorkshopUIController : MonoBehaviour
             _panelContainer.SetActive(true);
             _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
 
+            OpenSelectionPhase();
+
             // Ask for immediate data
             _eventPublisher?.Publish(new Command_RequestWorkshopState());
         }
@@ -88,39 +137,107 @@ public class CombatWorkshopUIController : MonoBehaviour
         }
     }
 
-    private void CloseUI()
+    private void OnBackClicked()
     {
-        OnCloseUI(null);
+        if (_characterDetailsPanel != null && _characterDetailsPanel.activeSelf)
+        {
+            // We are in details phase, go back to selection
+            OpenSelectionPhase();
+        }
+        else
+        {
+            // We are in selection phase, close entirely
+            OnCloseUI(null);
+        }
+    }
+
+    private void OpenSelectionPhase()
+    {
+        if (_characterSelectionPanel != null) _characterSelectionPanel.SetActive(true);
+        if (_characterDetailsPanel != null) _characterDetailsPanel.SetActive(false);
+        _currentlyViewedCharacter = null;
+    }
+
+    private void OpenDetailsPhase(string characterId)
+    {
+        _currentlyViewedCharacter = _registry.Characters.Find(c => c.CharacterId == characterId);
+        if (_currentlyViewedCharacter == null) return;
+
+        if (_characterSelectionPanel != null) _characterSelectionPanel.SetActive(false);
+        if (_characterDetailsPanel != null) _characterDetailsPanel.SetActive(true);
+
+        // Turn on the correct Art & Description GameObjects
+        foreach (var mapping in _characterMappings)
+        {
+            bool isCurrent = (mapping.CharacterId == characterId);
+            
+            if (mapping.DetailArtGameObject != null) 
+                mapping.DetailArtGameObject.SetActive(isCurrent);
+                
+            if (mapping.DetailDescriptionGameObject != null)
+                mapping.DetailDescriptionGameObject.SetActive(isCurrent);
+        }
+
+        RefreshDetailsView();
+    }
+
+    private void RefreshDetailsView()
+    {
+        if (_currentlyViewedCharacter == null || _lastState == null) return;
+
+        bool isUnlocked = _lastState.UnlockedIds.Contains(_currentlyViewedCharacter.CharacterId);
+
+        if (_detailCost != null)
+        {
+            if (isUnlocked)
+            {
+                _detailCost.text = "Unlocked";
+            }
+            else if (_currentlyViewedCharacter.UnlockCost != null && _currentlyViewedCharacter.UnlockCost.Count > 0)
+            {
+                _detailCost.text = $"Requires: {_currentlyViewedCharacter.UnlockCost[0].Amount} {_currentlyViewedCharacter.UnlockCost[0].Type}";
+            }
+            else
+            {
+                _detailCost.text = "Free to Unlock";
+            }
+        }
+
+        if (_unlockBtn != null) _unlockBtn.gameObject.SetActive(!isUnlocked);
+    }
+
+    private void OnUnlockClicked()
+    {
+        if (_currentlyViewedCharacter != null)
+        {
+            _eventPublisher?.Publish(new Command_UnlockCharacter(_currentlyViewedCharacter.CharacterId));
+        }
     }
 
     private void OnStateUpdated(Event_WorkshopStateUpdated evt)
     {
-        if (_registry == null || _characterListContainer == null || _characterElementPrefab == null)
-        {
-            Debug.LogWarning("[CombatWorkshopUIController] Missing UI references for generating character list.");
-            return;
-        }
+        _lastState = evt;
 
-        // Clear existing elements
-        foreach (Transform child in _characterListContainer)
+        // Toggle the hand-built UI game objects based on the mapping
+        foreach (var mapping in _characterMappings)
         {
-            Destroy(child.gameObject);
-        }
-
-        // Generate UI for each character
-        foreach (var characterData in _registry.Characters)
-        {
-            var go = Instantiate(_characterElementPrefab, _characterListContainer);
-            // Assuming the prefab has a script like CombatWorkshopCharacterUIElement
-            var element = go.GetComponent<CombatWorkshopCharacterUIElement>();
-            if (element != null)
+            bool isUnlocked = evt.UnlockedIds.Contains(mapping.CharacterId);
+            
+            if (mapping.UnlockedGameObject != null)
             {
-                bool isUnlocked = evt.UnlockedIds.Contains(characterData.CharacterId);
-                bool isEquipped = evt.EquippedIds.Contains(characterData.CharacterId);
-                bool canEquipMore = evt.EquippedIds.Count < _registry.MaxLoadoutSlots;
-
-                element.Setup(characterData, isUnlocked, isEquipped, canEquipMore, _eventPublisher);
+                mapping.UnlockedGameObject.SetActive(isUnlocked);
             }
+            
+            if (mapping.LockedGameObject != null)
+            {
+                mapping.LockedGameObject.SetActive(!isUnlocked);
+            }
+        }
+
+        // If we are currently viewing details, refresh the button states (e.g. it just unlocked)
+        if (_characterDetailsPanel != null && _characterDetailsPanel.activeSelf)
+        {
+            RefreshDetailsView();
         }
     }
 }

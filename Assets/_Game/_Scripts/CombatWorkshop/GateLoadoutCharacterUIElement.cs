@@ -9,7 +9,7 @@ public class GateLoadoutCharacterUIElement : MonoBehaviour
 
     public void Setup(SupportCharacterSO data)
     {
-        if (_characterIcon != null) _characterIcon.sprite = data.Icon;
+        if (_characterIcon != null) _characterIcon.sprite = data.UnlockedIcon;
         if (_characterName != null) _characterName.text = data.DisplayName;
     }
 }

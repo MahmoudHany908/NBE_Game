@@ -8,7 +8,7 @@ public class SupportCharacterSO : ScriptableObject
     [Header("Identity")] 
     public string CharacterId;
     public string DisplayName;
-    public Sprite Icon;
+    [TextArea] public string Description;
 
     [Header("Ability Link")]
     [Tooltip("Points at the existing IAbility implementation this character grants (Doctor/Rook/Seele/Jessy)")]
