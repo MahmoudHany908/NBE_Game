@@ -35,7 +35,7 @@ Material:
     m_Floats:
     - _Cull: 2
     - _Cutoff: 0.538
-    - _DissolveAmount: 0.601
+    - _DissolveAmount: 0.178
     - _EdgeEmissionStrength: 6.85
     - _EdgeWidth: 0.157
     m_Colors:

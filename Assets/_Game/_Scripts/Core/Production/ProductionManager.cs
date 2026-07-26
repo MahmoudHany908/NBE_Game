@@ -38,6 +38,7 @@ namespace VaultSurvivors.Core.Production
             _eventSubscriber.Subscribe<Command_UpgradeFactory>(OnUpgradeFactory);
             _eventSubscriber.Subscribe<Command_CollectFactory>(OnCollectFactory);
             _eventSubscriber.Subscribe<Command_RequestFactoryState>(OnRequestState);
+            _eventSubscriber.Subscribe<VaultSurvivors.Core.Time.AppReturnedOnlineEvent>(OnAppReturnedOnline);
 
             BroadcastState();
         }
@@ -48,6 +49,7 @@ namespace VaultSurvivors.Core.Production
             _eventSubscriber.Unsubscribe<Command_UpgradeFactory>(OnUpgradeFactory);
             _eventSubscriber.Unsubscribe<Command_CollectFactory>(OnCollectFactory);
             _eventSubscriber.Unsubscribe<Command_RequestFactoryState>(OnRequestState);
+            _eventSubscriber.Unsubscribe<VaultSurvivors.Core.Time.AppReturnedOnlineEvent>(OnAppReturnedOnline);
         }
 
         private void LoadState()
@@ -56,18 +58,18 @@ namespace VaultSurvivors.Core.Production
             {
                 GameData gameData = _saveSystem.Load();
                 _globalLevel = gameData.production.globalFactoryLevel > 0 ? gameData.production.globalFactoryLevel : 1;
-                
+
                 if (Enum.TryParse(gameData.production.activeResourceType, out ResourceType res))
                 {
                     _activeResource = res;
                     if (_activeResource == ResourceType.Gold) _activeResource = ResourceType.Energy;
                 }
-                
+
                 _currentAccumulated = gameData.production.accumulatedAmount;
-                
+
                 long currentUnixTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 long elapsedSeconds = currentUnixTime - gameData.production.lastCollectionTimeUnix;
-                
+
                 if (elapsedSeconds > 0 && gameData.production.lastCollectionTimeUnix > 0)
                 {
                     _currentAccumulated = CalculateYield(_currentAccumulated, GetProductionRate(_activeResource), GetMaxCapacity(), elapsedSeconds);
@@ -87,7 +89,7 @@ namespace VaultSurvivors.Core.Production
 
         public void Tick()
         {
-            float newAccumulated = CalculateYield(_currentAccumulated, GetProductionRate(_activeResource), GetMaxCapacity(), Time.deltaTime);
+            float newAccumulated = CalculateYield(_currentAccumulated, GetProductionRate(_activeResource), GetMaxCapacity(), UnityEngine.Time.deltaTime);
             if (Mathf.Abs(newAccumulated - _currentAccumulated) > 0.001f)
             {
                 _currentAccumulated = newAccumulated;
@@ -142,6 +144,21 @@ namespace VaultSurvivors.Core.Production
         private void OnRequestState(Command_RequestFactoryState cmd)
         {
             BroadcastState();
+        }
+
+        private void OnAppReturnedOnline(VaultSurvivors.Core.Time.AppReturnedOnlineEvent evt)
+        {
+            if (evt.SecondsElapsedOffline > 0)
+            {
+                float newAccumulated = CalculateYield(_currentAccumulated, GetProductionRate(_activeResource), GetMaxCapacity(), evt.SecondsElapsedOffline);
+
+                if (newAccumulated > _currentAccumulated)
+                {
+                    _currentAccumulated = newAccumulated;
+                    UnityEngine.Debug.Log($"[ProductionManager] Offline progression granted for {evt.SecondsElapsedOffline} seconds.");
+                    BroadcastState();
+                }
+            }
         }
 
         public void SetActiveResource(ResourceType newType)
@@ -204,7 +221,7 @@ namespace VaultSurvivors.Core.Production
             float food = gameData.resources.food;
             float energy = gameData.resources.energy;
             float electronics = gameData.resources.electronics;
-            
+
             _eventPublisher.Publish(new Event_FactoryStateUpdated(
                 _globalLevel,
                 _activeResource,

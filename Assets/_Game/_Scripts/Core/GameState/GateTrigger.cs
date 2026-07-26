@@ -29,6 +29,8 @@ public class GateTrigger : MonoBehaviour
             {
                 _eventPublisher.Publish(new Command_OpenGateLoadoutUI());
             }
+            VaultSurvivors.LoadingSystem.SceneLoader.Load(targetSceneName, new ArenaState());
+            Debug.Log("[GateTrigger] SceneLoader requested transition.");
         }
     }
 }

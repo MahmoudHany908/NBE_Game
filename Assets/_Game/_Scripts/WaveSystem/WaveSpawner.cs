@@ -79,7 +79,7 @@ public class WaveSpawner : MonoBehaviour
                 }
 
                 Vector3 spawnPos = GetGroundedSpawnPosition();
-                Vector3 offset = new Vector3(0f, prefab.transform.localScale.y, 0f);
+                Vector3 offset = new Vector3(0f, prefab.transform.localScale.y - 1, 0f); //HERE IS A Problem
                 GameObject enemy = poolManager.Spawn(prefab, spawnPos + offset, Quaternion.identity);
                 if (enemy != null)
                 {
