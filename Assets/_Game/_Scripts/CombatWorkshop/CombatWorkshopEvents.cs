@@ -54,11 +54,13 @@ public class Event_WorkshopStateUpdated : IGameEvent
 {
     public List<string> UnlockedIds;
     public List<string> EquippedIds;
+    public int PlayerLevel;
 
-    public Event_WorkshopStateUpdated(List<string> unlockedIds, List<string> equippedIds)
+    public Event_WorkshopStateUpdated(List<string> unlockedIds, List<string> equippedIds, int playerLevel)
     {
         UnlockedIds = unlockedIds;
         EquippedIds = equippedIds;
+        PlayerLevel = playerLevel;
     }
 }
 

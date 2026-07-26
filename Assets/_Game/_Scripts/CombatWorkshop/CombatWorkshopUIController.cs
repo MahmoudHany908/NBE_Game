@@ -13,6 +13,9 @@ public class CharacterUIMapping
     [Header("Phase 1: Selection Lists")]
     public GameObject UnlockedGameObject;
     public GameObject LockedGameObject;
+    [Tooltip("The 'LVL X REQUIRED' texts inside the Locked card")]
+    public TextMeshProUGUI LevelRequiredText1;
+    public TextMeshProUGUI LevelRequiredText2;
 
     [Header("Phase 2: Details Screen")]
     public GameObject DetailArtGameObject;
@@ -75,7 +78,7 @@ public class CombatWorkshopUIController : MonoBehaviour
         _eventSubscriber?.Subscribe<Command_CloseCombatWorkshopUI>(OnCloseUI);
         _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
 
-        // Wire up all the buttons dynamically based on the mapping
+        // Wire up buttons and set static level text from the registry immediately
         foreach (var mapping in _characterMappings)
         {
             if (mapping.UnlockedGameObject != null)
@@ -97,6 +100,18 @@ public class CombatWorkshopUIController : MonoBehaviour
                     btn.onClick.AddListener(() => OpenDetailsPhase(mapping.CharacterId));
                 }
             }
+
+            // Set the level text immediately from the SO — no need to wait for state event
+            if (_registry != null)
+            {
+                var charData = _registry.Characters.Find(c => c.CharacterId == mapping.CharacterId);
+                if (charData != null)
+                {
+                    string reqText = $"LVL {charData.RequiredHideoutLevel} REQUIRED";
+                    if (mapping.LevelRequiredText1 != null) mapping.LevelRequiredText1.text = reqText;
+                    if (mapping.LevelRequiredText2 != null) mapping.LevelRequiredText2.text = reqText;
+                }
+            }
         }
     }
 
@@ -110,7 +125,12 @@ public class CombatWorkshopUIController : MonoBehaviour
 
     private void OnCloseAllMenus(Command_CloseAllMenus cmd)
     {
-        OnCloseUI(new Command_CloseCombatWorkshopUI());
+        // If a global close (like ESC) happens, we just act like a back button press
+        // which will either go back a step, or close the UI completely.
+        if (_panelContainer != null && _panelContainer.activeSelf)
+        {
+            OnBackClicked();
+        }
     }
 
     private void OnOpenUI(Command_OpenCombatWorkshopUI cmd)
@@ -137,7 +157,7 @@ public class CombatWorkshopUIController : MonoBehaviour
         }
     }
 
-    private void OnBackClicked()
+    public void OnBackClicked()
     {
         if (_characterDetailsPanel != null && _characterDetailsPanel.activeSelf)
         {
@@ -221,17 +241,19 @@ public class CombatWorkshopUIController : MonoBehaviour
         // Toggle the hand-built UI game objects based on the mapping
         foreach (var mapping in _characterMappings)
         {
-            bool isUnlocked = evt.UnlockedIds.Contains(mapping.CharacterId);
+            bool isAvailableToView = false;
             
-            if (mapping.UnlockedGameObject != null)
+            var charData = _registry?.Characters.Find(c => c.CharacterId == mapping.CharacterId);
+            if (charData != null)
             {
-                mapping.UnlockedGameObject.SetActive(isUnlocked);
+                isAvailableToView = evt.PlayerLevel >= charData.RequiredHideoutLevel;
             }
+
+            if (mapping.UnlockedGameObject != null)
+                mapping.UnlockedGameObject.SetActive(isAvailableToView);
             
             if (mapping.LockedGameObject != null)
-            {
-                mapping.LockedGameObject.SetActive(!isUnlocked);
-            }
+                mapping.LockedGameObject.SetActive(!isAvailableToView);
         }
 
         // If we are currently viewing details, refresh the button states (e.g. it just unlocked)

@@ -234,7 +234,8 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
     {
         _publisher.Publish(new Event_WorkshopStateUpdated(
             _unlockedIds.ToList(),
-            new List<string>(_equippedIds)));
+            new List<string>(_equippedIds),
+            _cachedPlayerLevel));
     }
 
     private SupportCharacterSO FindCharacter(string characterId)
