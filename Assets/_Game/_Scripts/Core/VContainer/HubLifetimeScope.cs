@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using VaultSurvivors.UI;
 
 public class HubLifetimeScope : LifetimeScope
 {
@@ -12,9 +13,11 @@ public class HubLifetimeScope : LifetimeScope
     private FactoryControlPanel _factoryControlPanel;
     private FactoryUIController _factoryUIController;
     private MaterialsHUDController _materialsHUDController;
-    
+
     private CombatWorkshopControlPanel _combatWorkshopControlPanel;
     private CombatWorkshopUIController _combatWorkshopUIController;
+
+    private MarketUIController _marketUIController;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -28,6 +31,8 @@ public class HubLifetimeScope : LifetimeScope
         _combatWorkshopControlPanel = FindAnyObjectByType<CombatWorkshopControlPanel>();
         _combatWorkshopUIController = FindAnyObjectByType<CombatWorkshopUIController>();
 
+        _marketUIController = FindAnyObjectByType<MarketUIController>();
+
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
         if (factoryBehavior != null) builder.RegisterComponent(factoryBehavior);
@@ -36,9 +41,11 @@ public class HubLifetimeScope : LifetimeScope
         if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
         if (_materialsHUDController != null) builder.RegisterComponent(_materialsHUDController);
         if (uiManager != null) builder.RegisterComponent(uiManager);
-        
+
         if (_combatWorkshopControlPanel != null) builder.RegisterComponent(_combatWorkshopControlPanel);
         if (_combatWorkshopUIController != null) builder.RegisterComponent(_combatWorkshopUIController);
+
+        if (_marketUIController != null) builder.RegisterComponent(_marketUIController);
 
         builder.RegisterBuildCallback(container =>
         {
@@ -77,17 +84,23 @@ public class HubLifetimeScope : LifetimeScope
                 container.Inject(_materialsHUDController);
                 Debug.Log("[MaterialsHUDController] Successfully Injected!");
             }
-            
+
             if (_combatWorkshopControlPanel != null)
             {
                 container.Inject(_combatWorkshopControlPanel);
                 Debug.Log("[CombatWorkshopControlPanel] Successfully Injected!");
             }
-            
+
             if (_combatWorkshopUIController != null)
             {
                 container.Inject(_combatWorkshopUIController);
                 Debug.Log("[CombatWorkshopUIController] Successfully Injected!");
+            }
+
+            if (_marketUIController != null)
+            {
+                container.Inject(_marketUIController);
+                Debug.Log("[MarketUIController] Successfully Injected!");
             }
         });
     }
