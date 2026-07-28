@@ -12,7 +12,7 @@ public class BootState : IGameState
 
     public void EnterState(GameStateManager manager)
     {
-        Debug.Log("Initializing App... Loading Save Files...");
+        Debug.Log("Initializing App...");
         _isBootComplete = true;
     }
 
@@ -21,7 +21,9 @@ public class BootState : IGameState
         if (_isBootComplete)
         {
             _isBootComplete = false;
-            manager.LoadSceneAndChangeState("TitleScene", new TitleScreenState(_saveSystem));
+            
+            // Loads HubScene directly without needing a Title or Hub state script
+            manager.LoadSceneAndChangeState("HubScene", null);
         }
     }
 
