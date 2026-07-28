@@ -47,6 +47,7 @@ namespace VaultSurvivors.Core.Market
             _previousElectronicsPrice = _baseElectronicsPrice;
 
             _eventSubscriber.Subscribe<Command_SellResource>(OnSellResource);
+            _eventSubscriber.Subscribe<Command_RequestMarketPrices>(OnRequestPrices);
 
             RandomizePrices(); // initial randomization
         }
@@ -54,6 +55,7 @@ namespace VaultSurvivors.Core.Market
         public void Dispose()
         {
             _eventSubscriber.Unsubscribe<Command_SellResource>(OnSellResource);
+            _eventSubscriber.Unsubscribe<Command_RequestMarketPrices>(OnRequestPrices);
         }
 
         public void Tick()
@@ -117,21 +119,25 @@ namespace VaultSurvivors.Core.Market
             if (success)
             {
                 gameData.resources.gold += goldGained;
+                
+                // EXPLICIT SAVE VERIFICATION
+                // This ensures the transaction is written to disk immediately
                 _saveSystem.Save(gameData);
                 
-                // Fire an event if other systems need to know immediately, 
-                // but the UI typically polls or listens to a global event. 
-                // We'll leave it as saved for now.
                 Debug.Log($"[MarketManager] Sold {cmd.Amount} {cmd.Resource} for {goldGained} Gold.");
                 
-                // Let's broadcast the factory state update so Production UI updates if open
-                // In a full implementation, there might be a separate wallet update event.
+                // Broadcast state update so Production UI updates if open
                 _eventPublisher.Publish(new Command_RequestFactoryState()); 
             }
             else
             {
                 Debug.LogWarning($"[MarketManager] Not enough {cmd.Resource} to sell {cmd.Amount}.");
             }
+        }
+
+        private void OnRequestPrices(Command_RequestMarketPrices cmd)
+        {
+            BroadcastPrices();
         }
 
         private void BroadcastPrices()

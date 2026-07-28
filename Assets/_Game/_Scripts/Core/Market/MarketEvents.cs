@@ -35,4 +35,8 @@ namespace VaultSurvivors.Core.Market
             PreviousElectronicsPrice = prevElectronics;
         }
     }
+
+    public class Command_RequestMarketPrices : IGameEvent { }
+    public class Command_OpenMarketUI : IGameEvent { }
+    public class Command_CloseMarketUI : IGameEvent { }
 }
