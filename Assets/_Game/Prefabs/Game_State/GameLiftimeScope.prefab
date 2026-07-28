@@ -145,6 +145,7 @@ MonoBehaviour:
   audioManager: {fileID: 5560655403167124709}
   gameStateManager: {fileID: 356582293892264738}
   loadingScreenController: {fileID: 926096665306617455, guid: 11c100080efd6a640aa32406df599dd5, type: 3}
+  supportCharacterRegistry: {fileID: 11400000, guid: a6313fb562a74cb42a93bd2e4ad704f9, type: 2}
 --- !u!1 &5617589594082216947
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private AudioManager audioManager;
     [SerializeField] private GameStateManager gameStateManager;
     [SerializeField] private VaultSurvivors.LoadingSystem.LoadingScreenController loadingScreenController;
+    [SerializeField] private SupportCharacterRegistrySO supportCharacterRegistry;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -25,7 +26,17 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponent(gameStateManager).As<IGameStateManager>();
         builder.RegisterComponent(loadingScreenController);
 
+        if (supportCharacterRegistry != null)
+        {
+            builder.RegisterInstance(supportCharacterRegistry);
+        }
+        else
+        {
+            Debug.LogWarning("[GameLifetimeScope] SupportCharacterRegistrySO is not assigned in the inspector!");
+        }
+
         builder.RegisterEntryPoint<VaultSurvivors.Core.Production.ProductionManager>().As<VaultSurvivors.Core.Production.IProductionManager>();
+        builder.RegisterEntryPoint<CombatWorkshopManager>().As<ICombatWorkshopManager>();
 
         // Register PoolManager as a singleton so it persists globally
         builder.RegisterComponent(poolManager).AsSelf();

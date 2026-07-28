@@ -7,6 +7,7 @@ public class GameData
     public ResourceData resources = new ResourceData();
     public StructureData structures = new StructureData();
     public ProductionData production = new ProductionData();
+    public WorkshopData workshop = new WorkshopData();
     public AudioData audio = new AudioData();
     
     public long lastSeenTimestamp = 0;
@@ -27,8 +28,10 @@ public class ResourceData
     public float food = 0f;
     public float energy = 0f;
     public float electronics = 0f;
+    
+    // enum resources
+    // hashtable values
 }
-
 
 [System.Serializable]
 public class StructureData
@@ -54,9 +57,14 @@ public class ProductionData
     public long lastCollectionTimeUnix = 0;
 }
 
-// add market later in its sprint 
-// add researchHub later in its sprint
+[System.Serializable]
+public class WorkshopData
+{
+    public List<string> unlockedCharacterIds = new List<string>();
+    public List<string> equippedCharacterIds = new List<string>();
+}
 
+// add market later in its sprint 
 
 [System.Serializable]
 public class AudioData

@@ -19,8 +19,16 @@ public class GateTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log($"[GateTrigger] Player entered gate. Requesting transition to {targetSceneName}...");
+            Debug.Log($"[GateTrigger] Player entered gate. Opening Loadout UI...");
 
+            if (_eventPublisher == null)
+            {
+                Debug.LogError("[GateTrigger] CRITICAL ERROR: _eventPublisher is NULL! VContainer injection failed.");
+            }
+            else
+            {
+                _eventPublisher.Publish(new Command_OpenGateLoadoutUI());
+            }
             VaultSurvivors.LoadingSystem.SceneLoader.Load(targetSceneName, new ArenaState());
             Debug.Log("[GateTrigger] SceneLoader requested transition.");
         }
