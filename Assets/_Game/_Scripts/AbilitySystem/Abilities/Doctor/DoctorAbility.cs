@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
+using VContainer;
 
 public class DoctorAbility : MonoBehaviour, IAbility
 {
     [SerializeField] private GameObject healingAreaPrefab;
     [SerializeField] private float spawnRadius = 5f;
     private GameObject player;
-
+    [Inject] private AudioManager AudioManager;
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -19,7 +20,8 @@ public class DoctorAbility : MonoBehaviour, IAbility
 
 
 
-        Instantiate(healingAreaPrefab, randomPosition, Quaternion.identity);
+        GameObject go = Instantiate(healingAreaPrefab, randomPosition, Quaternion.identity);
+        go.GetComponent<HealthArea>().Init(AudioManager);
 
 
     }

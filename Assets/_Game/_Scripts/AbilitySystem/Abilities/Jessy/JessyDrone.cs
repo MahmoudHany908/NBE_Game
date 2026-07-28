@@ -6,6 +6,14 @@ public class JessyDrone : MonoBehaviour
     [SerializeField] private float lifeTime = 5f;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform attackPos;
+    [SerializeField] private GameObject shootEffectPrefab;
+
+    [Header("Visuals & Animation")]
+    [SerializeField] private Transform visualTransform;
+    [SerializeField] private float swaySpeed = 2f;
+    [SerializeField] private float swayAmount = 0.5f;
+    [SerializeField] private float attackRecoilDistance = 0.5f;
+    [SerializeField] private float attackRecoilDuration = 0.15f;
 
     [Header("Movement")]
     [SerializeField] private float speed = 5f;
@@ -16,13 +24,35 @@ public class JessyDrone : MonoBehaviour
     [SerializeField] private int attackDamage = 10;
     [SerializeField] private float attackCooldown = 1f;
 
+    [Header("Audio")]
+    [SerializeField] private SoundData shootSound;
+
     private ITargetProvider targetProvider;
     private Transform target;
     private float lastAttackTime;
 
     private PoolManager poolManager;
+    private AudioManager audioManager;
 
-    public void Initialize(PoolManager pm) => poolManager = pm;
+    // Animation state
+    private Vector3 visualDefaultLocalPos;
+    private float currentRecoilTime;
+    private bool isRecoiling;
+
+    public void Initialize(PoolManager pm, AudioManager am)
+    {
+        poolManager = pm;
+        audioManager = am;
+    }
+
+    private void Awake()
+    {
+        targetProvider = GetComponentInChildren<ITargetProvider>();
+        if (visualTransform != null)
+        {
+            visualDefaultLocalPos = visualTransform.localPosition;
+        }
+    }
 
     private void OnEnable()
     {
@@ -39,16 +69,43 @@ public class JessyDrone : MonoBehaviour
     private void Start()
     {
         Destroy(gameObject, lifeTime);
-        targetProvider = GetComponentInChildren<ITargetProvider>();
-
-        if (targetProvider != null)
-            targetProvider.TargetChanged += SetTarget;
     }
 
     private void Update()
     {
         HandleMovement();
         HandleAttack();
+        HandleAnimation();
+    }
+
+    private void HandleAnimation()
+    {
+        if (visualTransform == null) return;
+
+        // Idle Sway (Vertical)
+        float swayY = Mathf.Sin(Time.time * swaySpeed) * swayAmount;
+        Vector3 targetLocalPos = visualDefaultLocalPos + new Vector3(0, swayY, 0);
+
+        // Attack Recoil (Backward in local space)
+        if (isRecoiling)
+        {
+            currentRecoilTime += Time.deltaTime;
+            float recoilProgress = currentRecoilTime / attackRecoilDuration;
+            
+            if (recoilProgress >= 1f)
+            {
+                isRecoiling = false;
+                currentRecoilTime = 0f;
+            }
+            else
+            {
+                // PingPong effect for recoil: go back, then return
+                float recoilFactor = Mathf.PingPong(recoilProgress * 2f, 1f);
+                targetLocalPos -= Vector3.forward * (recoilFactor * attackRecoilDistance);
+            }
+        }
+
+        visualTransform.localPosition = Vector3.Lerp(visualTransform.localPosition, targetLocalPos, Time.deltaTime * 10f);
     }
 
     private void SetTarget(GameObject newTarget)
@@ -120,13 +177,30 @@ public class JessyDrone : MonoBehaviour
 
         Quaternion rotation = Quaternion.LookRotation(dir);
 
-        JessyDroneProjectile projectile = poolManager.Spawn<JessyDroneProjectile>(
-            projectilePrefab,
-            attackPos.position,
-            rotation
-        );
+        if (poolManager != null)
+        {
+            JessyDroneProjectile projectile = poolManager.Spawn<JessyDroneProjectile>(
+                projectilePrefab,
+                attackPos.position,
+                rotation
+            );
 
-        projectile?.Initialize(attackPos.position, rotation, attackDamage);
+            projectile?.Initialize(attackPos.position, rotation, attackDamage);
+
+            if (shootEffectPrefab != null)
+            {
+                poolManager.Spawn(shootEffectPrefab, attackPos.position, rotation);
+            }
+        }
+
+        if (audioManager != null && shootSound != null)
+        {
+            audioManager.PlaySoundAtPosition(shootSound, attackPos.position);
+        }
+
+        // Trigger recoil
+        isRecoiling = true;
+        currentRecoilTime = 0f;
     }
 
     public void SetSpeed(float newSpeed) => speed = Mathf.Max(0f, newSpeed);

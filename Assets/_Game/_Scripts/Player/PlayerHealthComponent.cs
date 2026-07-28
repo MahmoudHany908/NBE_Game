@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
@@ -5,6 +6,7 @@ using VContainer;
 public class PlayerHealthComponent : MonoBehaviour, IDamageable
 {
     [SerializeField] private int maxHealth = 100;
+    [SerializeField] private Animator animator;
 
     private int currentHealth;
     private bool isDead;
@@ -51,6 +53,7 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         currentHealth -= amount;
+        animator.SetTrigger("GetHit");
 
         _eventPublisher?.Publish(new PlayerTakeDamageEvent(damage: amount, healthPercentage: GetHealthPercentage()));
 
@@ -61,6 +64,7 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
     private void Die()
     {
         if (isDead) return;
+        animator.SetBool("IsDead", isDead);
         isDead = true;
         _eventPublisher?.Publish(new PlayerDiedEvent(position: transform.position));
     }

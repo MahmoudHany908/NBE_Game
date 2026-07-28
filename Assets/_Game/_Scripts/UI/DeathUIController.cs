@@ -1,17 +1,16 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using VContainer;
 
-[RequireComponent(typeof(UIDocument))]
 public class DeathUIController : MonoBehaviour
 {
-    private UIDocument document;
-    private VisualElement root;
-    private VisualElement panel;
-    private Label waveReachedLabel;
-    private Button retryButton;
-    private Button hubButton;
+    [Header("References")]
+    [SerializeField] private GameObject deathPanel;
+    [SerializeField] private TMP_Text waveReachedLabel;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Button hubButton;
 
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
@@ -26,25 +25,17 @@ public class DeathUIController : MonoBehaviour
 
     private void Awake()
     {
-        document = GetComponent<UIDocument>();
-        root = document.rootVisualElement;
-
-        panel = root.Q<VisualElement>("death-panel");
-        waveReachedLabel = root.Q<Label>("wave-reached-label");
-        retryButton = root.Q<Button>("retry-button");
-        hubButton = root.Q<Button>("hub-button");
-
-        retryButton.clicked += OnRetryClicked;
-        hubButton.clicked += OnReturnToHubClicked;
+        retryButton.onClick.AddListener(OnRetryClicked);
+        hubButton.onClick.AddListener(OnReturnToHubClicked);
 
         HidePanel();
     }
 
-
     private void OnDestroy()
     {
-        retryButton.clicked -= OnRetryClicked;
-        hubButton.clicked -= OnReturnToHubClicked;
+        retryButton.onClick.RemoveListener(OnRetryClicked);
+        hubButton.onClick.RemoveListener(OnReturnToHubClicked);
+
         _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
@@ -57,6 +48,7 @@ public class DeathUIController : MonoBehaviour
     private void OnRetryClicked()
     {
         HidePanel();
+
         Scene scene = SceneManager.GetActiveScene();
         VaultSurvivors.LoadingSystem.SceneLoader.Load(scene.name, new ArenaState());
     }
@@ -70,16 +62,13 @@ public class DeathUIController : MonoBehaviour
 
     private void ShowPanel()
     {
-        panel.RemoveFromClassList("hidden");
-        panel.style.display = DisplayStyle.Flex;
+        deathPanel.SetActive(true);
         Time.timeScale = 0f;
     }
 
     private void HidePanel()
     {
-        if (!panel.ClassListContains("hidden"))
-            panel.AddToClassList("hidden");
-        panel.style.display = DisplayStyle.None;
+        deathPanel.SetActive(false);
         Time.timeScale = 1f;
     }
 }

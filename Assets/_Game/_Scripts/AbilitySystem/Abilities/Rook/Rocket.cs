@@ -4,6 +4,7 @@
 public class Rocket : MonoBehaviour, IPoolable
 {
     [SerializeField] private float speed = 20f;
+
     [SerializeField] private int damage = 20;
     [SerializeField] private float lifetimeFailsafe = 3f;
     [SerializeField] private float turnSpeed = 5f;
@@ -11,7 +12,9 @@ public class Rocket : MonoBehaviour, IPoolable
     [SerializeField] private float retargetRadius = 8f;
     [SerializeField] private float retargetCheckInterval = 0.15f;
     [SerializeField] private LayerMask enemySearchLayer;
-
+    [Header("Effects")]
+    [SerializeField] private GameObject Effect;
+    [SerializeField] private SoundData ExlodeSound;
     private PooledObject pooledObject;
     private Transform target;
     private bool hasHit;
@@ -21,6 +24,7 @@ public class Rocket : MonoBehaviour, IPoolable
     private int enemyLayer;
     private int groundLayer;
 
+    private AudioManager audioManager;
     private void Awake()
     {
         pooledObject = GetComponent<PooledObject>();
@@ -28,9 +32,11 @@ public class Rocket : MonoBehaviour, IPoolable
         groundLayer = LayerMask.NameToLayer("Ground");
     }
 
-    public void Init(Transform targetTransform)
+    public void Init(Transform targetTransform, AudioManager audioManager)
     {
         target = targetTransform;
+        this.audioManager = audioManager;
+        if (!this.audioManager) Debug.Log("audio null");
         isFalling = false;
 
         if (target != null)
@@ -115,6 +121,8 @@ public class Rocket : MonoBehaviour, IPoolable
         hasHit = false;
         isFalling = false;
         retargetTimer = 0f;
+
+
         pooledObject.ReturnToPool(lifetimeFailsafe);
     }
 
@@ -139,12 +147,15 @@ public class Rocket : MonoBehaviour, IPoolable
             {
                 damageable.TakeDamage(damage);
             }
-
+            audioManager.PlaySoundAtPosition(ExlodeSound, transform.position);
+            Instantiate(Effect, transform.position, Effect.transform.rotation);
             pooledObject.ReturnToPool();
         }
         else if (otherLayer == groundLayer)
         {
             hasHit = true;
+            audioManager.PlaySoundAtPosition(ExlodeSound, transform.position);
+            Instantiate(Effect, transform.position, Effect.transform.rotation);
             pooledObject.ReturnToPool();
         }
     }

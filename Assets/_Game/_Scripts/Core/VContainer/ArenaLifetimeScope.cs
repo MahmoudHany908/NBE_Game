@@ -12,6 +12,12 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<ExtractionUIController>();
         builder.RegisterComponentInHierarchy<WaveMilestoneController>();
         builder.RegisterComponentInHierarchy<PlayerHealthComponent>();
+        builder.RegisterComponentInHierarchy<RookAbility>();
+        builder.RegisterComponentInHierarchy<JessyAbility>();
+        builder.RegisterComponentInHierarchy<DoctorAbility>();
+        builder.RegisterComponentInHierarchy<SeeleAbility>();
+
+
         builder.RegisterBuildCallback(container =>
         {
             var workshopManager = container.Resolve<ICombatWorkshopManager>();

@@ -12,6 +12,7 @@ public class JessyAbility : MonoBehaviour, IAbility
     private Transform player;
 
     [Inject] private PoolManager poolManager;
+    [Inject] private AudioManager audioManager;
 
     private void Awake()
     {
@@ -28,7 +29,7 @@ public class JessyAbility : MonoBehaviour, IAbility
             Vector3 spawnPos = player.position + randomOffset;
 
             JessyDrone drone = Object.Instantiate(dronePrefab, spawnPos, Quaternion.identity);
-            drone.Initialize(poolManager);
+            drone.Initialize(poolManager, audioManager);
         }
     }
 }

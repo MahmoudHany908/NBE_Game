@@ -172,11 +172,18 @@ MonoBehaviour:
   lifeTime: 10
   projectilePrefab: {fileID: 4604808887283385158, guid: e31fe55a76bd49940ae42407c72add2c, type: 3}
   attackPos: {fileID: 2363351062188033558}
+  shootEffectPrefab: {fileID: 3308481738283451627, guid: 84e55d11a95e0bf4b9cd1ced213de3e0, type: 3}
+  visualTransform: {fileID: 494563299768556851}
+  swaySpeed: 2
+  swayAmount: 0.5
+  attackRecoilDistance: 0.5
+  attackRecoilDuration: 0.15
   speed: 5
   followDistance: 3
   attackRange: 7
   attackDamage: 10
   attackCooldown: 0.2
+  shootSound: {fileID: 11400000, guid: 43a71bc583aed00499d2ae8ba3334097, type: 2}
 --- !u!1001 &96743614744050392
 PrefabInstance:
   m_ObjectHideFlags: 0

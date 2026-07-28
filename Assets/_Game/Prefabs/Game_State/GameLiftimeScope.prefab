@@ -190,7 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c17a79bf435206409a93b08ca49b1bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  soundSourcePrefab: {fileID: 0}
+  soundSourcePrefab: {fileID: 3918823172850486915, guid: dfa804355d30d39439708c48f52c9db3, type: 3}
   masterVolume: 1
   musicVolume: 1
   sfxVolume: 1

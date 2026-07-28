@@ -7,10 +7,13 @@ public class IronRevolver : MonoBehaviour, IAttack
     [SerializeField] private Transform attackPos;
     [SerializeField] private float fireRate = 1f;
     [SerializeField] private int damage = 20;
+    [SerializeField] private GameObject shootEffectPrefab;
+    [SerializeField] private SoundData shootSound;
 
     private ITargetProvider targetProvider;
     private float timer;
     [Inject] private PoolManager poolManager;
+    [Inject] private AudioManager audioManager;
 
     private void Awake()
     {
@@ -65,6 +68,16 @@ public class IronRevolver : MonoBehaviour, IAttack
                 rotation,
                 damage
             );
+        }
+
+        if (poolManager != null && shootEffectPrefab != null)
+        {
+            poolManager.Spawn(shootEffectPrefab, attackPos.position, rotation);
+        }
+
+        if (audioManager != null && shootSound != null)
+        {
+            audioManager.PlaySoundAtPosition(shootSound, attackPos.position);
         }
     }
 }
