@@ -29,8 +29,8 @@ namespace VaultSurvivors.UI
         [SerializeField] private MarketResourceUI energyUI;
         [SerializeField] private MarketResourceUI electronicsUI;
         
-        [SerializeField] private Color priceUpColor = Color.green;
-        [SerializeField] private Color priceDownColor = Color.red;
+        [SerializeField] private Color priceUpColor = new Color(13, 249, 108);
+        [SerializeField] private Color priceDownColor = new Color(255, 71, 47);
 
         [Header("Modals")]
         [SerializeField] private MarketQuantityModal quantityModal;
