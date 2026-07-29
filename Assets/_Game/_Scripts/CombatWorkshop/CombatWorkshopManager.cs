@@ -23,6 +23,7 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
     private Action<Command_UnlockCharacter> _onUnlockCharacter;
     private Action<Command_EquipCharacter> _onEquipCharacter;
     private Action<Command_UnequipCharacter> _onUnequipCharacter;
+    private Action<Command_SetLoadout> _onSetLoadout;
     private Action<Command_RequestWorkshopState> _onRequestWorkshopState;
 
     public CombatWorkshopManager(
@@ -43,12 +44,14 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
         _onUnlockCharacter         = evt => TryUnlock(evt.CharacterId);
         _onEquipCharacter          = evt => TryEquip(evt.CharacterId);
         _onUnequipCharacter        = evt => TryUnequip(evt.CharacterId);
+        _onSetLoadout              = evt => TrySetLoadout(evt.CharacterIds);
         _onRequestWorkshopState    = _ => PublishStateUpdated();
 
         _subscriber.Subscribe(_onSaveDataLoaded);
         _subscriber.Subscribe(_onUnlockCharacter);
         _subscriber.Subscribe(_onEquipCharacter);
         _subscriber.Subscribe(_onUnequipCharacter);
+        _subscriber.Subscribe(_onSetLoadout);
         _subscriber.Subscribe(_onRequestWorkshopState);
 
         LoadState();
@@ -60,6 +63,7 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
         _subscriber.Unsubscribe(_onUnlockCharacter);
         _subscriber.Unsubscribe(_onEquipCharacter);
         _subscriber.Unsubscribe(_onUnequipCharacter);
+        _subscriber.Unsubscribe(_onSetLoadout);
         _subscriber.Unsubscribe(_onRequestWorkshopState);
     }
     
@@ -166,6 +170,25 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
     public bool TryUnequip(string characterId)
     {
         if (!_equippedIds.Remove(characterId)) return false;
+
+        GameData gameData = LoadGameDataInternal();
+        PersistState(gameData);
+        
+        _publisher.Publish(new Event_LoadoutChanged(new List<string>(_equippedIds)));
+        PublishStateUpdated();
+        return true;
+    }
+
+    public bool TrySetLoadout(List<string> characterIds)
+    {
+        _equippedIds.Clear();
+        foreach (var id in characterIds)
+        {
+            if (IsUnlocked(id) && _equippedIds.Count < _registry.MaxLoadoutSlots)
+            {
+                _equippedIds.Add(id);
+            }
+        }
 
         GameData gameData = LoadGameDataInternal();
         PersistState(gameData);

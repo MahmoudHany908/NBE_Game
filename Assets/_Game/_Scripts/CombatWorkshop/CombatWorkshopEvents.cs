@@ -38,6 +38,16 @@ public class Command_UnequipCharacter : IGameEvent
     }
 }
 
+public class Command_SetLoadout : IGameEvent
+{
+    public List<string> CharacterIds;
+    
+    public Command_SetLoadout(List<string> characterIds)
+    {
+        CharacterIds = characterIds;
+    }
+}
+
 public class Command_RequestWorkshopState : IGameEvent
 {
 }

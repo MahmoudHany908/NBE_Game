@@ -9,6 +9,12 @@ public class SupportCharacterSO : ScriptableObject
     public string CharacterId;
     public string DisplayName;
     [TextArea] public string Description;
+    
+    [Header("Gate Loadout Profile")]
+    public Sprite CharacterPortrait; // The image shown in the empty slot
+    public string AbilityTitle;      // e.g. "Healing Wave"
+    [TextArea(4, 10)]
+    public string CharacterStats;    // e.g. "Damage: 20 Sec\nCooldown: 5 Sec..."
 
     [Header("Ability Link")]
     [Tooltip("Points at the existing IAbility implementation this character grants (Doctor/Rook/Seele/Jessy)")]

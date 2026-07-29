@@ -17,6 +17,8 @@ public class GateTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"[GateTrigger] Trigger entered by: {other.gameObject.name} with tag: {other.tag}");
+
         if (other.CompareTag("Player"))
         {
             Debug.Log($"[GateTrigger] Player entered gate. Opening Loadout UI...");
@@ -29,8 +31,14 @@ public class GateTrigger : MonoBehaviour
             {
                 _eventPublisher.Publish(new Command_OpenGateLoadoutUI());
             }
-            VaultSurvivors.LoadingSystem.SceneLoader.Load(targetSceneName, new ArenaState());
-            Debug.Log("[GateTrigger] SceneLoader requested transition.");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            _eventPublisher?.Publish(new Command_CloseGateLoadoutUI());
         }
     }
 }
