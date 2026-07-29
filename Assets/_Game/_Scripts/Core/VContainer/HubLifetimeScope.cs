@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using VaultSurvivors.UI;
 
 public class HubLifetimeScope : LifetimeScope
 {
@@ -12,11 +13,16 @@ public class HubLifetimeScope : LifetimeScope
     private FactoryControlPanel _factoryControlPanel;
     private FactoryUIController _factoryUIController;
     private MaterialsHUDController _materialsHUDController;
-    
+
     private CombatWorkshopControlPanel _combatWorkshopControlPanel;
     private CombatWorkshopUIController _combatWorkshopUIController;
     
     [SerializeField] private GateLoadoutUIController _gateLoadoutUIController;
+
+    private MarketUIController _marketUIController;
+    private MarketQuantityModal _marketQuantityModal;
+    private MarketConfirmModal _marketConfirmModal;
+    private MarketControlPanel _marketControlPanel;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -32,6 +38,11 @@ public class HubLifetimeScope : LifetimeScope
         
         gateTrigger = FindAnyObjectByType<GateTrigger>(FindObjectsInactive.Include);
 
+        _marketUIController = FindAnyObjectByType<MarketUIController>(FindObjectsInactive.Include);
+        _marketQuantityModal = FindAnyObjectByType<MarketQuantityModal>(FindObjectsInactive.Include);
+        _marketConfirmModal = FindAnyObjectByType<MarketConfirmModal>(FindObjectsInactive.Include);
+        _marketControlPanel = FindAnyObjectByType<MarketControlPanel>(FindObjectsInactive.Include);
+
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
         if (factoryBehavior != null) builder.RegisterComponent(factoryBehavior);
@@ -40,10 +51,15 @@ public class HubLifetimeScope : LifetimeScope
         if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
         if (_materialsHUDController != null) builder.RegisterComponent(_materialsHUDController);
         if (uiManager != null) builder.RegisterComponent(uiManager);
-        
+
         if (_combatWorkshopControlPanel != null) builder.RegisterComponent(_combatWorkshopControlPanel);
         if (_combatWorkshopUIController != null) builder.RegisterComponent(_combatWorkshopUIController);
         if (_gateLoadoutUIController != null) builder.RegisterComponent(_gateLoadoutUIController);
+
+        if (_marketUIController != null) builder.RegisterComponent(_marketUIController);
+        if (_marketQuantityModal != null) builder.RegisterComponent(_marketQuantityModal);
+        if (_marketConfirmModal != null) builder.RegisterComponent(_marketConfirmModal);
+        if (_marketControlPanel != null) builder.RegisterComponent(_marketControlPanel);
 
         builder.RegisterBuildCallback(container =>
         {
@@ -82,13 +98,13 @@ public class HubLifetimeScope : LifetimeScope
                 container.Inject(_materialsHUDController);
                 Debug.Log("[MaterialsHUDController] Successfully Injected!");
             }
-            
+
             if (_combatWorkshopControlPanel != null)
             {
                 container.Inject(_combatWorkshopControlPanel);
                 Debug.Log("[CombatWorkshopControlPanel] Successfully Injected!");
             }
-            
+
             if (_combatWorkshopUIController != null)
             {
                 container.Inject(_combatWorkshopUIController);
@@ -99,6 +115,29 @@ public class HubLifetimeScope : LifetimeScope
             {
                 container.Inject(_gateLoadoutUIController);
                 Debug.Log("[GateLoadoutUIController] Successfully Injected!");
+
+            if (_marketUIController != null)
+            {
+                container.Inject(_marketUIController);
+                Debug.Log("[MarketUIController] Successfully Injected!");
+            }
+
+            if (_marketQuantityModal != null)
+            {
+                container.Inject(_marketQuantityModal);
+                Debug.Log("[MarketQuantityModal] Successfully Injected!");
+            }
+
+            if (_marketConfirmModal != null)
+            {
+                container.Inject(_marketConfirmModal);
+                Debug.Log("[MarketConfirmModal] Successfully Injected!");
+            }
+
+            if (_marketControlPanel != null)
+            {
+                container.Inject(_marketControlPanel);
+                Debug.Log("[MarketControlPanel] Successfully Injected!");
             }
         });
     }

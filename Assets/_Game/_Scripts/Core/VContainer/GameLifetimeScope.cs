@@ -36,6 +36,7 @@ public class GameLifetimeScope : LifetimeScope
         }
 
         builder.RegisterEntryPoint<VaultSurvivors.Core.Production.ProductionManager>().As<VaultSurvivors.Core.Production.IProductionManager>();
+        builder.RegisterEntryPoint<VaultSurvivors.Core.Market.MarketManager>().As<VaultSurvivors.Core.Market.IMarketManager>();
         builder.RegisterEntryPoint<CombatWorkshopManager>().As<ICombatWorkshopManager>();
 
         // Register PoolManager as a singleton so it persists globally
