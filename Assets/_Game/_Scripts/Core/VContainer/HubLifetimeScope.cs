@@ -15,18 +15,22 @@ public class HubLifetimeScope : LifetimeScope
     
     private CombatWorkshopControlPanel _combatWorkshopControlPanel;
     private CombatWorkshopUIController _combatWorkshopUIController;
+    
+    [SerializeField] private GateLoadoutUIController _gateLoadoutUIController;
 
     protected override void Configure(IContainerBuilder builder)
     {
         Debug.Log("[HubLifetimeScope] Configuring scope...");
 
-        _factoryControlPanel = FindAnyObjectByType<FactoryControlPanel>();
-        _factoryUIController = FindAnyObjectByType<FactoryUIController>();
-        _materialsHUDController = FindAnyObjectByType<MaterialsHUDController>();
-        var uiManager = FindAnyObjectByType<UIManager>();
+        _factoryControlPanel = FindAnyObjectByType<FactoryControlPanel>(FindObjectsInactive.Include);
+        _factoryUIController = FindAnyObjectByType<FactoryUIController>(FindObjectsInactive.Include);
+        _materialsHUDController = FindAnyObjectByType<MaterialsHUDController>(FindObjectsInactive.Include);
+        var uiManager = FindAnyObjectByType<UIManager>(FindObjectsInactive.Include);
 
-        _combatWorkshopControlPanel = FindAnyObjectByType<CombatWorkshopControlPanel>();
-        _combatWorkshopUIController = FindAnyObjectByType<CombatWorkshopUIController>();
+        _combatWorkshopControlPanel = FindAnyObjectByType<CombatWorkshopControlPanel>(FindObjectsInactive.Include);
+        _combatWorkshopUIController = FindAnyObjectByType<CombatWorkshopUIController>(FindObjectsInactive.Include);
+        
+        gateTrigger = FindAnyObjectByType<GateTrigger>(FindObjectsInactive.Include);
 
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
@@ -39,6 +43,7 @@ public class HubLifetimeScope : LifetimeScope
         
         if (_combatWorkshopControlPanel != null) builder.RegisterComponent(_combatWorkshopControlPanel);
         if (_combatWorkshopUIController != null) builder.RegisterComponent(_combatWorkshopUIController);
+        if (_gateLoadoutUIController != null) builder.RegisterComponent(_gateLoadoutUIController);
 
         builder.RegisterBuildCallback(container =>
         {
@@ -88,6 +93,12 @@ public class HubLifetimeScope : LifetimeScope
             {
                 container.Inject(_combatWorkshopUIController);
                 Debug.Log("[CombatWorkshopUIController] Successfully Injected!");
+            }
+            
+            if (_gateLoadoutUIController != null)
+            {
+                container.Inject(_gateLoadoutUIController);
+                Debug.Log("[GateLoadoutUIController] Successfully Injected!");
             }
         });
     }
