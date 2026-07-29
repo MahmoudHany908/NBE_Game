@@ -13,6 +13,10 @@ public class FactoryUIController : MonoBehaviour
     [SerializeField] private GameObject _panelContainer;
     [SerializeField] private Button _closeBtn;
 
+    [Header("HUD Buttons To Hide")]
+    [SerializeField] private GameObject _hudButton1;
+    [SerializeField] private GameObject _hudButton2;
+
     [Header("Active Production Info")]
     [SerializeField] private TMP_Text _factoryLevelLabel;
     [SerializeField] private TMP_Text _activeResourceNameLabel;
@@ -118,6 +122,9 @@ public class FactoryUIController : MonoBehaviour
             _eventPublisher?.Publish(new Command_CloseAllMenus());
             _panelContainer.SetActive(true);
             _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
+
+            if (_hudButton1 != null) _hudButton1.SetActive(false);
+            if (_hudButton2 != null) _hudButton2.SetActive(false);
             
             // Ask for immediate data so the UI doesn't say "New Text"
             _eventPublisher?.Publish(new Command_RequestFactoryState());
@@ -130,6 +137,9 @@ public class FactoryUIController : MonoBehaviour
         {
             _panelContainer.SetActive(false);
             _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = false });
+
+            if (_hudButton1 != null) _hudButton1.SetActive(true);
+            if (_hudButton2 != null) _hudButton2.SetActive(true);
         }
     }
 

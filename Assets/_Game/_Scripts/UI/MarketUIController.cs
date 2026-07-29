@@ -24,6 +24,10 @@ namespace VaultSurvivors.UI
         [SerializeField] private GameObject _panelContainer;
         [SerializeField] private Button _closeBtn;
 
+        [Header("HUD Buttons To Hide")]
+        [SerializeField] private GameObject _hudButton1;
+        [SerializeField] private GameObject _hudButton2;
+
         [Header("Resource UI")]
         [SerializeField] private MarketResourceUI foodUI;
         [SerializeField] private MarketResourceUI energyUI;
@@ -136,6 +140,9 @@ namespace VaultSurvivors.UI
                 _eventPublisher?.Publish(new Command_CloseAllMenus());
                 _panelContainer.SetActive(true);
                 _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
+
+                if (_hudButton1 != null) _hudButton1.SetActive(false);
+                if (_hudButton2 != null) _hudButton2.SetActive(false);
                 
                 // Request prices to populate immediately
                 _eventPublisher?.Publish(new Command_RequestMarketPrices());
@@ -149,6 +156,9 @@ namespace VaultSurvivors.UI
                 CloseAllModals();
                 _panelContainer.SetActive(false);
                 _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = false });
+
+                if (_hudButton1 != null) _hudButton1.SetActive(true);
+                if (_hudButton2 != null) _hudButton2.SetActive(true);
             }
 
             // Optional: turn the whole GameObject back off if you want it fully inactive

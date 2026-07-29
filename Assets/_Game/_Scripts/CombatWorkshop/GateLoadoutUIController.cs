@@ -26,6 +26,7 @@ public class GateLoadoutUIController : MonoBehaviour
     
     [Header("Phase 1: Character Selection")]
     [SerializeField] private GameObject _characterSelectionPanel;
+    [SerializeField] private Sprite EmptyImage;
     [SerializeField] private Button _emptyCard1Btn;
     [SerializeField] private Image _emptyCard1Image;
     [SerializeField] private Button _emptyCard2Btn;
@@ -36,6 +37,7 @@ public class GateLoadoutUIController : MonoBehaviour
 
     [Header("Phase 2: Roster Selection")]
     [SerializeField] private GameObject _characterRosterPanel;
+    [SerializeField] private GameObject _characterDescriptionPanel;
     [SerializeField] private Button _backBtn;
     [SerializeField] private Button _confirmBtn;
     [SerializeField] private List<RosterUIMapping> _rosterMappings;
@@ -204,8 +206,8 @@ public class GateLoadoutUIController : MonoBehaviour
             }
             else
             {
-                _emptyCard1Image.sprite = null;
-                _emptyCard1Image.color = new Color(1, 1, 1, 0); // Hide if empty
+                _emptyCard1Image.sprite = EmptyImage;
+                // _emptyCard1Image.color = new Color(1, 1, 1, 0); // Hide if empty
             }
         }
 
@@ -219,8 +221,8 @@ public class GateLoadoutUIController : MonoBehaviour
             }
             else
             {
-                _emptyCard2Image.sprite = null;
-                _emptyCard2Image.color = new Color(1, 1, 1, 0); // Hide if empty
+                _emptyCard2Image.sprite = EmptyImage;
+                // _emptyCard2Image.color = new Color(1, 1, 1, 0); // Hide if empty
             }
         }
     }
@@ -259,6 +261,8 @@ public class GateLoadoutUIController : MonoBehaviour
         {
             if (mapping.CharacterArt != null) mapping.CharacterArt.SetActive(false);
         }
+
+        if (_characterDescriptionPanel != null) _characterDescriptionPanel.SetActive(false);
 
         RefreshRosterView();
 
@@ -325,6 +329,8 @@ public class GateLoadoutUIController : MonoBehaviour
                 mapping.CharacterArt.SetActive(mapping.CharacterId == characterId);
             }
         }
+
+        if (_characterDescriptionPanel != null) _characterDescriptionPanel.SetActive(true);
     }
 
     private void OnConfirmClicked()

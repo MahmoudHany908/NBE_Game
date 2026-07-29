@@ -36,6 +36,10 @@ public class CombatWorkshopUIController : MonoBehaviour
 
     [Header("Phase 1: Character Selection")]
     [SerializeField] private GameObject _characterSelectionPanel;
+    [Tooltip("Parent container for all unlockable character cards (must always be active).")]
+    [SerializeField] private GameObject _unlockedHerosContainer;
+    [Tooltip("Parent container for all locked character cards (must always be active).")]
+    [SerializeField] private GameObject _lockedHerosContainer;
     [Tooltip("Map each character ID to its specific hand-made GameObjects in your scene")]
     [SerializeField] private List<CharacterUIMapping> _characterMappings = new List<CharacterUIMapping>();
 
@@ -238,22 +242,28 @@ public class CombatWorkshopUIController : MonoBehaviour
     {
         _lastState = evt;
 
-        // Toggle the hand-built UI game objects based on the mapping
+        // Guarantee the two parent containers are always on — only the individual cards inside toggle.
+        if (_unlockedHerosContainer != null) _unlockedHerosContainer.SetActive(true);
+        if (_lockedHerosContainer   != null) _lockedHerosContainer.SetActive(true);
+
+        // Toggle individual cards based on player level vs required level.
+        // UnlockedGameObject = player meets level requirement (can view/interact with this character)
+        // LockedGameObject   = player is too low level to even see this character yet
         foreach (var mapping in _characterMappings)
         {
-            bool isAvailableToView = false;
-            
+            bool meetsLevelReq = true; // default: always show unless a level requirement blocks it
+
             var charData = _registry?.Characters.Find(c => c.CharacterId == mapping.CharacterId);
             if (charData != null)
             {
-                isAvailableToView = evt.PlayerLevel >= charData.RequiredHideoutLevel;
+                meetsLevelReq = evt.PlayerLevel >= charData.RequiredHideoutLevel;
             }
 
             if (mapping.UnlockedGameObject != null)
-                mapping.UnlockedGameObject.SetActive(isAvailableToView);
-            
+                mapping.UnlockedGameObject.SetActive(meetsLevelReq);
+
             if (mapping.LockedGameObject != null)
-                mapping.LockedGameObject.SetActive(!isAvailableToView);
+                mapping.LockedGameObject.SetActive(!meetsLevelReq);
         }
 
         // If we are currently viewing details, refresh the button states (e.g. it just unlocked)

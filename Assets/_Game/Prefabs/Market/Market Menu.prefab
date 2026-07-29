@@ -1460,7 +1460,6 @@ RectTransform:
   - {fileID: 1659392431831062588}
   - {fileID: 5438240520805447583}
   - {fileID: 4618753663099907915}
-  - {fileID: 8376521879453547636}
   - {fileID: 2771097072779216294}
   - {fileID: 1900723589458602161}
   - {fileID: 6152894726433203226}
@@ -4233,13 +4232,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7373139029263435647}
-  m_Father: {fileID: 5279568568033262392}
+  m_Father: {fileID: 981521313735281491}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 759.9, y: -441.67163}
-  m_SizeDelta: {x: 349, y: 156}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 200, y: -77.84003}
+  m_SizeDelta: {x: 349, y: 155.68005}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2004974122900526245
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4612,6 +4611,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5279568568033262392}
+  - {fileID: 8376521879453547636}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4671,6 +4671,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VaultSurvivors.UI.MarketUIController
   _panelContainer: {fileID: 2226156731085847943}
   _closeBtn: {fileID: 3187199629086424883}
+  _hudButton1: {fileID: 0}
+  _hudButton2: {fileID: 0}
   foodUI:
     resourceType: 0
     nameText: {fileID: 2664873578173277188}

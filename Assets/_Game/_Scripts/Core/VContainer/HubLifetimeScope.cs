@@ -9,10 +9,10 @@ public class HubLifetimeScope : LifetimeScope
     [SerializeField] private UnityEngine.UI.Button settingsButton;
     [SerializeField] private GateTrigger gateTrigger;
     [SerializeField] private FactoryBehavior factoryBehavior;
+    [SerializeField] private MaterialsHUDController _materialsHUDController;
 
     private FactoryControlPanel _factoryControlPanel;
     private FactoryUIController _factoryUIController;
-    private MaterialsHUDController _materialsHUDController;
 
     private CombatWorkshopControlPanel _combatWorkshopControlPanel;
     private CombatWorkshopUIController _combatWorkshopUIController;
@@ -30,7 +30,6 @@ public class HubLifetimeScope : LifetimeScope
 
         _factoryControlPanel = FindAnyObjectByType<FactoryControlPanel>(FindObjectsInactive.Include);
         _factoryUIController = FindAnyObjectByType<FactoryUIController>(FindObjectsInactive.Include);
-        _materialsHUDController = FindAnyObjectByType<MaterialsHUDController>(FindObjectsInactive.Include);
         var uiManager = FindAnyObjectByType<UIManager>(FindObjectsInactive.Include);
 
         _combatWorkshopControlPanel = FindAnyObjectByType<CombatWorkshopControlPanel>(FindObjectsInactive.Include);

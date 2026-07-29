@@ -26,7 +26,7 @@ public class TitleScreenState : IGameState
 
         if (!data.player.hasCompletedTutorial)
         {
-            manager.LoadSceneAndChangeState("HubScene", new TutorialState());
+            manager.LoadSceneAndChangeState("HubScene", new HideoutState());
         }
         else
         {
