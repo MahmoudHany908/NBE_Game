@@ -115,6 +115,7 @@ public class HubLifetimeScope : LifetimeScope
             {
                 container.Inject(_gateLoadoutUIController);
                 Debug.Log("[GateLoadoutUIController] Successfully Injected!");
+            }
 
             if (_marketUIController != null)
             {
