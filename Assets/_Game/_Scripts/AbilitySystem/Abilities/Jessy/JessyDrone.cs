@@ -120,8 +120,12 @@ public class JessyDrone : MonoBehaviour
     {
         if (target == null || !target.gameObject.activeInHierarchy)
         {
-            target = null;
-            return;
+            target = targetProvider?.GetTarget()?.transform;
+            if (target == null)
+            {
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.identity, Time.deltaTime * 5f);
+                return;
+            }
         }
 
         Vector3 direction = target.position - transform.position;
