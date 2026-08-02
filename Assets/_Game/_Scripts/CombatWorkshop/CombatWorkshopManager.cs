@@ -222,7 +222,7 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
             };
             if (wallet < entry.Amount)
             {
-                _publisher.Publish(new Event_ShowWorkshopPopup("You don't have enough resources"));
+                _publisher.Publish(new Event_ShowWorkshopPopup("Not Enough Resources !!"));
                 return false;
             }
         }
