@@ -220,7 +220,11 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
                 ResourceType.Electronics => gameData.resources.electronics,
                 _                        => 0f
             };
-            if (wallet < entry.Amount) return false;
+            if (wallet < entry.Amount)
+            {
+                _publisher.Publish(new Event_ShowWorkshopPopup("You don't have enough resources"));
+                return false;
+            }
         }
         return true;
     }
