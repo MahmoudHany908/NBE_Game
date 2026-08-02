@@ -16,6 +16,7 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<JessyAbility>();
         builder.RegisterComponentInHierarchy<DoctorAbility>();
         builder.RegisterComponentInHierarchy<SeeleAbility>();
+        builder.RegisterComponentInHierarchy<ArenaLoadoutController>();
 
 
         builder.RegisterBuildCallback(container =>
