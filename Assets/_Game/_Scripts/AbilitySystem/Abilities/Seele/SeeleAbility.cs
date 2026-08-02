@@ -13,16 +13,43 @@ public class SeeleAbility : MonoBehaviour, IAbility
     [SerializeField] private float detectionRadius = 15f;
     [SerializeField] private LayerMask enemyLayer;
 
+    [Header("Cooldown")]
+    [SerializeField] private float cooldownTime = 5f;
+    [SerializeField] private UnityEngine.UI.Image cooldownImage;
+
     private GameObject player;
+    private float currentCooldown = 0f;
+
     [Inject] private AudioManager audioManager;
+
+    public bool IsOnCooldown => currentCooldown > 0f;
 
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
+    private void Update()
+    {
+        if (currentCooldown > 0f)
+        {
+            currentCooldown -= Time.deltaTime;
+            if (cooldownImage != null)
+            {
+                cooldownImage.fillAmount = currentCooldown / cooldownTime;
+            }
+        }
+    }
+
     public void ActivateAbility()
     {
+        if (IsOnCooldown) return;
+
+        currentCooldown = cooldownTime;
+        if (cooldownImage != null)
+        {
+            cooldownImage.fillAmount = 1f;
+        }
         List<Transform> enemiesInRange = GetEnemiesInRange();
         List<Transform> selectedTargets = PickRandomTargets(enemiesInRange, effectCount);
         foreach (Transform target in selectedTargets)

@@ -10,19 +10,47 @@ public class RookAbility : MonoBehaviour, IAbility
     [SerializeField] private float spawnHeight = 20f;
     [SerializeField] private LayerMask enemyLayer;
 
+    [Header("Cooldown")]
+    [SerializeField] private float cooldownTime = 5f;
+    [SerializeField] private UnityEngine.UI.Image cooldownImage;
+
     private Vector3 castOrigin => transform.position;
     private List<Transform> targets = new List<Transform>();
     private GameObject player;
+    private float currentCooldown = 0f;
+
     [Inject] private PoolManager poolManager;
     [Inject] private AudioManager audioManager;
 
+    public bool IsOnCooldown => currentCooldown > 0f;
 
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
     }
+
+    private void Update()
+    {
+        if (currentCooldown > 0f)
+        {
+            currentCooldown -= Time.deltaTime;
+            if (cooldownImage != null)
+            {
+                cooldownImage.fillAmount = currentCooldown / cooldownTime;
+            }
+        }
+    }
+
     public void ActivateAbility()
     {
+        if (IsOnCooldown) return;
+
+        currentCooldown = cooldownTime;
+        if (cooldownImage != null)
+        {
+            cooldownImage.fillAmount = 1f;
+        }
+
         List<Transform> enemiesInRange = GetEnemiesInRange();
         List<Transform> selectedTargets = PickRandomTargets(enemiesInRange, rocketCount);
 

@@ -182,7 +182,7 @@ MonoBehaviour:
   followDistance: 3
   attackRange: 7
   attackDamage: 10
-  attackCooldown: 0.2
+  attackCooldown: 0.5
   shootSound: {fileID: 11400000, guid: 43a71bc583aed00499d2ae8ba3334097, type: 2}
 --- !u!1001 &96743614744050392
 PrefabInstance:
