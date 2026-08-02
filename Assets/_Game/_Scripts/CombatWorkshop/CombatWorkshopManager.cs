@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VaultSurvivors.Core.Production;
+using VContainer;
 using VContainer.Unity;
 
 public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDisposable
@@ -26,6 +27,7 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
     private Action<Command_SetLoadout> _onSetLoadout;
     private Action<Command_RequestWorkshopState> _onRequestWorkshopState;
 
+    [Inject]
     public CombatWorkshopManager(
         SupportCharacterRegistrySO registry,
         IEventPublisher publisher,
@@ -146,6 +148,7 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
 
         PersistState(gameData);
         _publisher.Publish(new Event_CharacterUnlocked(characterId));
+        _publisher.Publish(new Command_RequestFactoryState());
         PublishStateUpdated();
         return true;
     }
