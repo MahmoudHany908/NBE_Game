@@ -6,7 +6,34 @@ using VContainer.Unity;
 
 public class PoolManager : MonoBehaviour
 {
-    [Inject] private IObjectResolver _resolver;
+    private IObjectResolver _resolver;
+    private IEventSubscriber _eventSubscriber;
+
+    [Inject]
+    public void Construct(IObjectResolver resolver, IEventSubscriber eventSubscriber = null)
+    {
+        _resolver = resolver;
+        _eventSubscriber = eventSubscriber;
+
+        _eventSubscriber?.Subscribe<PlayerDiedEvent>(OnPlayerDied);
+        _eventSubscriber?.Subscribe<ExtractionAvailableEvent>(OnExtractionAvailable);
+    }
+
+    private void OnDestroy()
+    {
+        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(OnPlayerDied);
+        _eventSubscriber?.Unsubscribe<ExtractionAvailableEvent>(OnExtractionAvailable);
+    }
+
+    private void OnPlayerDied(PlayerDiedEvent evt)
+    {
+        DespawnAllActive();
+    }
+
+    private void OnExtractionAvailable(ExtractionAvailableEvent evt)
+    {
+        DespawnAllActive();
+    }
 
     [System.Serializable]
     public class PrewarmEntry
