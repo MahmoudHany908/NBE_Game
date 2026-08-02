@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VContainer;
+using System.Collections;
 
 [Serializable]
 public class CharacterUIMapping
@@ -19,7 +21,6 @@ public class CharacterUIMapping
 
     [Header("Phase 2: Details Screen")]
     public GameObject DetailArtGameObject;
-    public GameObject DetailDescriptionGameObject;
 }
 
 public class CombatWorkshopUIController : MonoBehaviour
@@ -40,16 +41,28 @@ public class CombatWorkshopUIController : MonoBehaviour
     [SerializeField] private GameObject _unlockedHerosContainer;
     [Tooltip("Parent container for all locked character cards (must always be active).")]
     [SerializeField] private GameObject _lockedHerosContainer;
+    [SerializeField] private TextMeshProUGUI _popupText;
     [Tooltip("Map each character ID to its specific hand-made GameObjects in your scene")]
     [SerializeField] private List<CharacterUIMapping> _characterMappings = new List<CharacterUIMapping>();
-
+    
     [Header("Phase 2: Character Unlock / Details")]
     [SerializeField] private GameObject _characterDetailsPanel;
+    [SerializeField] private GameObject _CharacterArtContainer;
+    [SerializeField] private GameObject _DescriptionContainer;
+    [SerializeField] private GameObject _MaterialsRequiredContainer;
+    [SerializeField] private GameObject _MaterialTitleContainer;
+
+    [Header("Character Description")]
+    [SerializeField] private TextMeshProUGUI _txtAbilityTitle;
+    [SerializeField] private TextMeshProUGUI _txtCharacterDescription;
+    [SerializeField] private TextMeshProUGUI _txtCharacterStats;
+    
     [SerializeField] private TMP_Text _detailCost;
     [SerializeField] private Button _unlockBtn;
 
     private Event_WorkshopStateUpdated _lastState;
     private SupportCharacterSO _currentlyViewedCharacter;
+    private Dictionary<string, SupportCharacterSO> _characterLookup;
 
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
@@ -60,7 +73,21 @@ public class CombatWorkshopUIController : MonoBehaviour
 
     private void Awake()
     {
-        if (_panelContainer != null) _panelContainer.SetActive(false);
+        if (_panelContainer != null) _panelContainer.SetActive(false);        
+        if (_popupText != null) _popupText.gameObject.SetActive(false);
+        if (_backBtn != null) _backBtn.gameObject.SetActive(true);
+        if (_CharacterArtContainer != null) _CharacterArtContainer.SetActive(true);
+        if (_DescriptionContainer != null) _DescriptionContainer.SetActive(true);
+        if (_MaterialsRequiredContainer != null) _MaterialsRequiredContainer.SetActive(true);
+        if (_MaterialTitleContainer != null) _MaterialTitleContainer.SetActive(true);
+
+
+        _characterLookup = new Dictionary<string, SupportCharacterSO>();
+
+        foreach (var character in _registry.Characters)
+        {
+            _characterLookup[character.CharacterId] = character;
+        }
     }
 
     private void OnEnable()
@@ -81,7 +108,8 @@ public class CombatWorkshopUIController : MonoBehaviour
         _eventSubscriber?.Subscribe<Command_OpenCombatWorkshopUI>(OnOpenUI);
         _eventSubscriber?.Subscribe<Command_CloseCombatWorkshopUI>(OnCloseUI);
         _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
-
+        _eventSubscriber?.Subscribe<Event_ShowWorkshopPopup>(OnShowWorkshopPopup);
+        
         // Wire up buttons and set static level text from the registry immediately
         foreach (var mapping in _characterMappings)
         {
@@ -101,15 +129,14 @@ public class CombatWorkshopUIController : MonoBehaviour
                 if (btn != null)
                 {
                     btn.onClick.RemoveAllListeners();
-                    btn.onClick.AddListener(() => OpenDetailsPhase(mapping.CharacterId));
+                    btn.onClick.AddListener(() => ShowPopup("You haven't reached the required Level yet!"));
                 }
             }
 
             // Set the level text immediately from the SO — no need to wait for state event
             if (_registry != null)
             {
-                var charData = _registry.Characters.Find(c => c.CharacterId == mapping.CharacterId);
-                if (charData != null)
+                if(_characterLookup.TryGetValue(mapping.CharacterId, out SupportCharacterSO charData))
                 {
                     string reqText = $"LVL {charData.RequiredHideoutLevel} REQUIRED";
                     if (mapping.LevelRequiredText1 != null) mapping.LevelRequiredText1.text = reqText;
@@ -125,6 +152,12 @@ public class CombatWorkshopUIController : MonoBehaviour
         _eventSubscriber?.Unsubscribe<Command_OpenCombatWorkshopUI>(OnOpenUI);
         _eventSubscriber?.Unsubscribe<Command_CloseCombatWorkshopUI>(OnCloseUI);
         _eventSubscriber?.Unsubscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+        _eventSubscriber?.Unsubscribe<Event_ShowWorkshopPopup>(OnShowWorkshopPopup);
+    }
+
+    private void OnShowWorkshopPopup(Event_ShowWorkshopPopup evt)
+    {
+        ShowPopup(evt.Message);
     }
 
     private void OnCloseAllMenus(Command_CloseAllMenus cmd)
@@ -147,7 +180,6 @@ public class CombatWorkshopUIController : MonoBehaviour
 
             OpenSelectionPhase();
 
-            // Ask for immediate data
             _eventPublisher?.Publish(new Command_RequestWorkshopState());
         }
     }
@@ -184,22 +216,19 @@ public class CombatWorkshopUIController : MonoBehaviour
 
     private void OpenDetailsPhase(string characterId)
     {
-        _currentlyViewedCharacter = _registry.Characters.Find(c => c.CharacterId == characterId);
+        _characterLookup.TryGetValue(characterId, out _currentlyViewedCharacter);
         if (_currentlyViewedCharacter == null) return;
 
         if (_characterSelectionPanel != null) _characterSelectionPanel.SetActive(false);
         if (_characterDetailsPanel != null) _characterDetailsPanel.SetActive(true);
 
-        // Turn on the correct Art & Description GameObjects
+        // Turn on the correct Art GameObjects
         foreach (var mapping in _characterMappings)
         {
             bool isCurrent = (mapping.CharacterId == characterId);
             
             if (mapping.DetailArtGameObject != null) 
                 mapping.DetailArtGameObject.SetActive(isCurrent);
-                
-            if (mapping.DetailDescriptionGameObject != null)
-                mapping.DetailDescriptionGameObject.SetActive(isCurrent);
         }
 
         RefreshDetailsView();
@@ -211,6 +240,10 @@ public class CombatWorkshopUIController : MonoBehaviour
 
         bool isUnlocked = _lastState.UnlockedIds.Contains(_currentlyViewedCharacter.CharacterId);
 
+        if (_txtAbilityTitle != null) _txtAbilityTitle.text = _currentlyViewedCharacter.AbilityTitle;
+        if (_txtCharacterDescription != null) _txtCharacterDescription.text = _currentlyViewedCharacter.Description;
+        if (_txtCharacterStats != null) _txtCharacterStats.text = _currentlyViewedCharacter.CharacterStats;
+        
         if (_detailCost != null)
         {
             if (isUnlocked)
@@ -219,7 +252,9 @@ public class CombatWorkshopUIController : MonoBehaviour
             }
             else if (_currentlyViewedCharacter.UnlockCost != null && _currentlyViewedCharacter.UnlockCost.Count > 0)
             {
-                _detailCost.text = $"Requires: {_currentlyViewedCharacter.UnlockCost[0].Amount} {_currentlyViewedCharacter.UnlockCost[0].Type}";
+                _detailCost.text = string.Join("\n",
+                    _currentlyViewedCharacter.UnlockCost.Select(cost =>
+                        $"{cost.Amount} {cost.ResourceName}"));
             }
             else
             {
@@ -252,9 +287,8 @@ public class CombatWorkshopUIController : MonoBehaviour
         foreach (var mapping in _characterMappings)
         {
             bool meetsLevelReq = true; // default: always show unless a level requirement blocks it
-
-            var charData = _registry?.Characters.Find(c => c.CharacterId == mapping.CharacterId);
-            if (charData != null)
+            
+            if (_characterLookup.TryGetValue(mapping.CharacterId, out SupportCharacterSO charData))
             {
                 meetsLevelReq = evt.PlayerLevel >= charData.RequiredHideoutLevel;
             }
@@ -266,10 +300,34 @@ public class CombatWorkshopUIController : MonoBehaviour
                 mapping.LockedGameObject.SetActive(!meetsLevelReq);
         }
 
+
+
         // If we are currently viewing details, refresh the button states (e.g. it just unlocked)
         if (_characterDetailsPanel != null && _characterDetailsPanel.activeSelf)
         {
             RefreshDetailsView();
         }
+    }
+
+    private Coroutine _popupCoroutine;
+
+    public void ShowPopup(string message)
+    {
+        if (_popupText == null) return;
+
+        if (_popupCoroutine != null) StopCoroutine(_popupCoroutine);
+
+        _popupText.text = message;
+        
+        _popupText.gameObject.SetActive(true);
+        
+        _popupCoroutine = StartCoroutine(HidePopupRoutine());
+    }
+
+    private IEnumerator HidePopupRoutine()
+    {
+        yield return new WaitForSeconds(2.5f);
+        
+        if (_popupText != null) _popupText.gameObject.SetActive(false);
     }
 }

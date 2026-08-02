@@ -33,7 +33,6 @@ public class GateLoadoutUIController : MonoBehaviour
     [SerializeField] private Image _emptyCard2Image;
     [SerializeField] private Button _arenaBtn;
     [SerializeField] private TextMeshProUGUI _popupText; 
-    [SerializeField] private GameObject _popupPanel; 
 
     [Header("Phase 2: Roster Selection")]
     [SerializeField] private GameObject _characterRosterPanel;
@@ -56,6 +55,8 @@ public class GateLoadoutUIController : MonoBehaviour
     
     // Local copy of loadout while editing
     private List<string> _currentLoadout = new List<string> { null, null };
+    private Dictionary<string, SupportCharacterSO> _characterLookup;
+
 
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
@@ -68,7 +69,14 @@ public class GateLoadoutUIController : MonoBehaviour
     private void Awake()
     {
         if (_panelContainer != null) _panelContainer.SetActive(false);
-        if (_popupPanel != null) _popupPanel.SetActive(false);
+        if(_popupText != null) _popupText.gameObject.SetActive(false);
+
+        _characterLookup = new Dictionary<string, SupportCharacterSO>();
+
+        foreach (var character in _registry.Characters)
+        {
+            _characterLookup[character.CharacterId] = character;
+        }
     }
 
     private void OnEnable()
@@ -146,6 +154,8 @@ public class GateLoadoutUIController : MonoBehaviour
         {
             _eventPublisher?.Publish(new Command_CloseAllMenus());
             _panelContainer.SetActive(true);
+            if (_popupText != null) _popupText.gameObject.SetActive(false);
+            
             _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
 
             // Clear the equipped loadout so it starts fresh every time
@@ -198,8 +208,14 @@ public class GateLoadoutUIController : MonoBehaviour
     {
         if (_emptyCard1Image != null)
         {
-            var char1 = _registry?.Characters.Find(c => c.CharacterId == _currentLoadout[0]);
-            if (char1 != null && char1.CharacterPortrait != null)
+            SupportCharacterSO char1 = null;
+
+            if (!string.IsNullOrEmpty(_currentLoadout[0]))
+            {
+                _characterLookup.TryGetValue(_currentLoadout[0], out char1);
+            }
+
+            if (char1?.CharacterPortrait != null)
             {
                 _emptyCard1Image.sprite = char1.CharacterPortrait;
                 _emptyCard1Image.color = Color.white;
@@ -207,14 +223,19 @@ public class GateLoadoutUIController : MonoBehaviour
             else
             {
                 _emptyCard1Image.sprite = EmptyImage;
-                // _emptyCard1Image.color = new Color(1, 1, 1, 0); // Hide if empty
             }
         }
 
         if (_emptyCard2Image != null)
         {
-            var char2 = _registry?.Characters.Find(c => c.CharacterId == _currentLoadout[1]);
-            if (char2 != null && char2.CharacterPortrait != null)
+            SupportCharacterSO char2 = null;
+
+            if (!string.IsNullOrEmpty(_currentLoadout[1]))
+            {
+                _characterLookup.TryGetValue(_currentLoadout[1], out char2);
+            }
+
+            if (char2?.CharacterPortrait != null)
             {
                 _emptyCard2Image.sprite = char2.CharacterPortrait;
                 _emptyCard2Image.color = Color.white;
@@ -222,7 +243,6 @@ public class GateLoadoutUIController : MonoBehaviour
             else
             {
                 _emptyCard2Image.sprite = EmptyImage;
-                // _emptyCard2Image.color = new Color(1, 1, 1, 0); // Hide if empty
             }
         }
     }
@@ -313,8 +333,8 @@ public class GateLoadoutUIController : MonoBehaviour
     {
         if (_lastState == null || !_lastState.UnlockedIds.Contains(characterId)) return; // Don't allow selecting locked
 
-        _currentlyViewedCharacter = _registry?.Characters.Find(c => c.CharacterId == characterId);
-        
+        _characterLookup.TryGetValue(characterId, out _currentlyViewedCharacter);
+
         if (_currentlyViewedCharacter != null)
         {
             if (_txtAbilityTitle != null) _txtAbilityTitle.text = _currentlyViewedCharacter.AbilityTitle;
@@ -370,8 +390,7 @@ public class GateLoadoutUIController : MonoBehaviour
 
         _popupText.text = message;
         
-        if (_popupPanel != null) _popupPanel.SetActive(true);
-        else _popupText.gameObject.SetActive(true);
+        _popupText.gameObject.SetActive(true);
         
         _popupCoroutine = StartCoroutine(HidePopupRoutine());
     }
@@ -380,7 +399,6 @@ public class GateLoadoutUIController : MonoBehaviour
     {
         yield return new WaitForSeconds(2.5f);
         
-        if (_popupPanel != null) _popupPanel.SetActive(false);
-        else if (_popupText != null) _popupText.gameObject.SetActive(false);
+        if (_popupText != null) _popupText.gameObject.SetActive(false);
     }
 }

@@ -42,6 +42,7 @@ public class ResetSaveDataEditor
         {
             EditorUtility.DisplayDialog("Error", "No save file exists! Press Play and enter the game once to create a save file before adding gold.", "OK");
         }
+        
     }
 }
 #endif
