@@ -108,6 +108,7 @@ public class CombatWorkshopUIController : MonoBehaviour
         _eventSubscriber?.Subscribe<Command_OpenCombatWorkshopUI>(OnOpenUI);
         _eventSubscriber?.Subscribe<Command_CloseCombatWorkshopUI>(OnCloseUI);
         _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+        _eventSubscriber?.Subscribe<Event_ShowWorkshopPopup>(OnShowWorkshopPopup);
         
         // Wire up buttons and set static level text from the registry immediately
         foreach (var mapping in _characterMappings)
@@ -151,6 +152,12 @@ public class CombatWorkshopUIController : MonoBehaviour
         _eventSubscriber?.Unsubscribe<Command_OpenCombatWorkshopUI>(OnOpenUI);
         _eventSubscriber?.Unsubscribe<Command_CloseCombatWorkshopUI>(OnCloseUI);
         _eventSubscriber?.Unsubscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+        _eventSubscriber?.Unsubscribe<Event_ShowWorkshopPopup>(OnShowWorkshopPopup);
+    }
+
+    private void OnShowWorkshopPopup(Event_ShowWorkshopPopup evt)
+    {
+        ShowPopup(evt.Message);
     }
 
     private void OnCloseAllMenus(Command_CloseAllMenus cmd)
@@ -304,7 +311,7 @@ public class CombatWorkshopUIController : MonoBehaviour
 
     private Coroutine _popupCoroutine;
 
-    private void ShowPopup(string message)
+    public void ShowPopup(string message)
     {
         if (_popupText == null) return;
 

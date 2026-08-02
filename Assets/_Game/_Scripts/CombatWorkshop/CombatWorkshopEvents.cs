@@ -93,3 +93,13 @@ public class Event_LoadoutChanged : IGameEvent
         EquippedIds = equippedIds;
     }
 }
+
+public class Event_ShowWorkshopPopup : IGameEvent
+{
+    public string Message;
+
+    public Event_ShowWorkshopPopup(string message)
+    {
+        Message = message;
+    }
+}

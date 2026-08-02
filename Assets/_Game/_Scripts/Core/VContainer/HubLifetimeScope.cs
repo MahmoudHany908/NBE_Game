@@ -7,6 +7,8 @@ public class HubLifetimeScope : LifetimeScope
 {
     [SerializeField] private SettingsMenu settingsMenu;
     [SerializeField] private UnityEngine.UI.Button settingsButton;
+    [SerializeField] private StatsMenuUIController statsMenu;
+    [SerializeField] private UnityEngine.UI.Button statsButton;
     [SerializeField] private GateTrigger gateTrigger;
     [SerializeField] private FactoryBehavior factoryBehavior;
     [SerializeField] private MaterialsHUDController _materialsHUDController;
@@ -43,6 +45,7 @@ public class HubLifetimeScope : LifetimeScope
         _marketControlPanel = FindAnyObjectByType<MarketControlPanel>(FindObjectsInactive.Include);
 
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
+        if (statsMenu != null) builder.RegisterComponent(statsMenu);
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
         if (factoryBehavior != null) builder.RegisterComponent(factoryBehavior);
 
@@ -63,12 +66,16 @@ public class HubLifetimeScope : LifetimeScope
         builder.RegisterBuildCallback(container =>
         {
             if (settingsMenu != null) container.Inject(settingsMenu);
+            if (statsMenu != null) container.Inject(statsMenu);
             if (gateTrigger != null) container.Inject(gateTrigger);
             if (factoryBehavior != null) container.Inject(factoryBehavior);
 
             // Wire the settings button click to open the settings menu (no Inspector UnityEvents)
             if (settingsButton != null && settingsMenu != null)
                 settingsButton.onClick.AddListener(settingsMenu.OpenSettingsMenu);
+
+            if (statsButton != null && statsMenu != null)
+                statsButton.onClick.AddListener(statsMenu.OpenMenu);
 
             if (_factoryControlPanel != null)
             {
