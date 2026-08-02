@@ -31,7 +31,6 @@ namespace VaultSurvivors.LoadingSystem
             }
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
 
             if (_canvasGroup != null)
             {

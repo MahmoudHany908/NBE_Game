@@ -14,7 +14,7 @@ public class ExtractionUIController : MonoBehaviour
     // Fallback: Awake() will attempt to auto-find them by name to mimic UI Toolkit's Q<T>() behavior.
     [SerializeField] private PanelUI panel;
     [SerializeField] private TextMeshProUGUI waveLabel;
-    [SerializeField] private TextMeshProUGUI resourceLabel;
+    [SerializeField] private GameObject resourcesImage;
     [SerializeField] private Button extractButton;
     [SerializeField] private Button continueButton;
 
@@ -33,6 +33,11 @@ public class ExtractionUIController : MonoBehaviour
             _eventSubscriber?.Subscribe<PlayerTakeDamageEvent>(HandleHealthChangedTakeDamage);
             _eventSubscriber?.Subscribe<PlayerHealedEvent>(HandleHealthChangedTakeHeal);
         }
+        panel.gameObject.SetActive(true);
+        waveLabel.gameObject.SetActive(true);
+        resourcesImage.SetActive(true);
+        extractButton.gameObject.SetActive(true);
+        continueButton.gameObject.SetActive(true);
     }
 
     private void Awake()
@@ -88,7 +93,7 @@ public class ExtractionUIController : MonoBehaviour
     private void HandleExtractionAvailable(ExtractionAvailableEvent evt)
     {
         if (waveLabel != null) waveLabel.text = $"WAVE {evt.WaveNumber} CLEARED";
-        if (resourceLabel != null) resourceLabel.text = "RESOURCES EXTRACTED 10100";
+        
 
         ShowPanel();
     }

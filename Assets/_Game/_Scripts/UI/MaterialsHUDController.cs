@@ -5,6 +5,10 @@ using VaultSurvivors.Core.Production;
 
 public class MaterialsHUDController : MonoBehaviour
 {
+    [Header("UI Buttons")]
+    [SerializeField] private UnityEngine.UI.Button settingsButton;
+    [SerializeField] private UnityEngine.UI.Button statsButton;
+    
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI foodText;
