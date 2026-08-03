@@ -36,7 +36,7 @@ public class SeeleAbility : MonoBehaviour, IAbility
             currentCooldown -= Time.deltaTime;
             if (cooldownImage != null)
             {
-                cooldownImage.fillAmount = currentCooldown / cooldownTime;
+                cooldownImage.fillAmount = 1f - (currentCooldown / cooldownTime);
             }
         }
     }

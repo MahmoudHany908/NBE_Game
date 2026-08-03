@@ -1108,7 +1108,7 @@ MonoBehaviour:
   maxSlopeAngle: 45
   groundMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 65
   rayLength: 1.1
   rayOffset: 0.5
 --- !u!114 &4793838004238329081
