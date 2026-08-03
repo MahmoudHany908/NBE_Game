@@ -33,9 +33,9 @@ RectTransform:
   - {fileID: 5899696205117967979}
   m_Father: {fileID: 2290825693534766658}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 470.3867, y: -109}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 223, y: 218}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7741760542767829639
@@ -629,7 +629,7 @@ RectTransform:
   m_Father: {fileID: 6359117255478774440}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -955,7 +955,7 @@ RectTransform:
   m_GameObject: {fileID: 1199901837380418448}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3541818, y: 1.3541818, z: 1.3541818}
+  m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3528851650379496175}
@@ -1249,9 +1249,9 @@ RectTransform:
   - {fileID: 7831232455348555307}
   m_Father: {fileID: 2290825693534766658}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 829.2734, y: -109}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 223, y: 218}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3586086837376875130
@@ -1880,7 +1880,7 @@ RectTransform:
   m_Father: {fileID: 5656696228073961729}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2609,15 +2609,15 @@ RectTransform:
   m_GameObject: {fileID: 3981307236710191132}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3541818, y: 1.3541818, z: 1.3541818}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5466076584093171910}
   m_Father: {fileID: 2633639893858287283}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.4727592, y: 13.381775}
+  m_AnchoredPosition: {x: 2.4727592, y: 35.68}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4212331211870510793
@@ -3256,9 +3256,9 @@ RectTransform:
   - {fileID: 1581340316727234457}
   m_Father: {fileID: 2290825693534766658}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 111.5, y: -109}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 223, y: 218}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5977980548303844505
@@ -4600,7 +4600,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -794.4445, y: 463.5111}
+  m_AnchoredPosition: {x: -899, y: 403}
   m_SizeDelta: {x: 349, y: 155.68005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2004974122900526245
@@ -5038,21 +5038,27 @@ MonoBehaviour:
   _hudButton2: {fileID: 0}
   foodUI:
     resourceType: 0
+    resourceIcon: {fileID: 5620811929256941587}
     nameText: {fileID: 2664873578173277188}
     priceText: {fileID: 7350452269662838925}
     arrowImage: {fileID: 1536212232321543037}
+    priceFrameBg: {fileID: 8490927231863995460}
     sellButton: {fileID: 2939517317551623045}
   energyUI:
     resourceType: 0
+    resourceIcon: {fileID: 2427860218249508578}
     nameText: {fileID: 5250368963512101700}
     priceText: {fileID: 8543554277082577829}
     arrowImage: {fileID: 7580776365762250931}
+    priceFrameBg: {fileID: 7824547499418003668}
     sellButton: {fileID: 6018522868326832137}
   electronicsUI:
     resourceType: 0
+    resourceIcon: {fileID: 1646211249160375838}
     nameText: {fileID: 7391527722060399714}
     priceText: {fileID: 1759839227263426960}
     arrowImage: {fileID: 41035866649655229}
+    priceFrameBg: {fileID: 1276889930226342652}
     sellButton: {fileID: 2940533332826244123}
   priceUpColor: {r: 0, g: 1, b: 0, a: 1}
   priceDownColor: {r: 1, g: 0, b: 0, a: 1}
