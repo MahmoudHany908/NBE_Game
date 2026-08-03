@@ -101,7 +101,7 @@ public class FactoryUIController : MonoBehaviour
         _eventSubscriber?.Subscribe<Command_CloseFactoryUI>(OnCloseUI);
         _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
     }
-    
+
     private void OnDestroy()
     {
         _eventSubscriber?.Unsubscribe<Event_FactoryStateUpdated>(OnStateUpdated);
@@ -125,8 +125,7 @@ public class FactoryUIController : MonoBehaviour
 
             if (_hudButton1 != null) _hudButton1.SetActive(false);
             if (_hudButton2 != null) _hudButton2.SetActive(false);
-            
-            // Ask for immediate data so the UI doesn't say "New Text"
+
             _eventPublisher?.Publish(new Command_RequestFactoryState());
         }
     }
@@ -178,25 +177,24 @@ public class FactoryUIController : MonoBehaviour
 
         if (_upgradeBtn != null)
         {
-            if (_upgradeBtnText != null) _upgradeBtnText.text = $"Upgrade (Cost: {evt.UpgradeCost})";
+            if (_upgradeBtnText != null) _upgradeBtnText.text = $"Upgrade   [{evt.UpgradeCost}]";
             _upgradeBtn.interactable = evt.WalletGold >= evt.UpgradeCost;
         }
 
-        // Phase 3: Icons and Switch Buttons
-        Color dimmedColor = new Color(0.4f, 0.4f, 0.4f, 1f); // 40% brightness for the active (un-switchable) one
+        Color dimmedColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
-        if (_energyIconImg != null) 
+        if (_energyIconImg != null)
             _energyIconImg.color = (evt.ActiveResource == ResourceType.Energy) ? dimmedColor : Color.white;
-        if (_foodIconImg != null) 
+        if (_foodIconImg != null)
             _foodIconImg.color = (evt.ActiveResource == ResourceType.Food) ? dimmedColor : Color.white;
-        if (_electronicsIconImg != null) 
+        if (_electronicsIconImg != null)
             _electronicsIconImg.color = (evt.ActiveResource == ResourceType.Electronics) ? dimmedColor : Color.white;
 
-        if (_switchEnergyBtn != null) 
+        if (_switchEnergyBtn != null)
             _switchEnergyBtn.interactable = (evt.ActiveResource != ResourceType.Energy);
-        if (_switchFoodBtn != null) 
+        if (_switchFoodBtn != null)
             _switchFoodBtn.interactable = (evt.ActiveResource != ResourceType.Food);
-        if (_switchElectronicsBtn != null) 
+        if (_switchElectronicsBtn != null)
             _switchElectronicsBtn.interactable = (evt.ActiveResource != ResourceType.Electronics);
     }
 
@@ -204,7 +202,7 @@ public class FactoryUIController : MonoBehaviour
     private void ShowSwitchPopup(ResourceType target)
     {
         if (_switchPopup == null) return;
-        
+
         _pendingSwitchResource = target;
         if (_switchPopupText != null)
         {

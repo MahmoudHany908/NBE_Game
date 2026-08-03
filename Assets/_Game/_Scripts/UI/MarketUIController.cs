@@ -15,6 +15,7 @@ namespace VaultSurvivors.UI
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI priceText;
         public Image arrowImage;
+        public Image priceFrameBg;
         public Button sellButton;
     }
 
@@ -32,9 +33,9 @@ namespace VaultSurvivors.UI
         [SerializeField] private MarketResourceUI foodUI;
         [SerializeField] private MarketResourceUI energyUI;
         [SerializeField] private MarketResourceUI electronicsUI;
-        
-        [SerializeField] private Color priceUpColor = new Color(13, 249, 108);
-        [SerializeField] private Color priceDownColor = new Color(255, 71, 47);
+
+        [SerializeField] private Color priceUpColor = new Color32(13, 249, 108, 255);
+        [SerializeField] private Color priceDownColor = new Color32(255, 119, 71, 255);
 
         [Header("Modals")]
         [SerializeField] private MarketQuantityModal quantityModal;
@@ -130,7 +131,7 @@ namespace VaultSurvivors.UI
         private void OnOpenUI(Command_OpenMarketUI cmd)
         {
             // Even if the GameObject is inactive, VContainer will call this method!
-            if (!gameObject.activeSelf) 
+            if (!gameObject.activeSelf)
             {
                 gameObject.SetActive(true);
             }
@@ -143,7 +144,7 @@ namespace VaultSurvivors.UI
 
                 if (_hudButton1 != null) _hudButton1.SetActive(false);
                 if (_hudButton2 != null) _hudButton2.SetActive(false);
-                
+
                 // Request prices to populate immediately
                 _eventPublisher?.Publish(new Command_RequestMarketPrices());
             }
@@ -186,13 +187,13 @@ namespace VaultSurvivors.UI
         private void UpdateInteractability()
         {
             GameData data = _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
-            
+
             if (foodUI.sellButton != null)
                 foodUI.sellButton.interactable = Mathf.FloorToInt(data.resources.food) > 0;
-                
+
             if (energyUI.sellButton != null)
                 energyUI.sellButton.interactable = Mathf.FloorToInt(data.resources.energy) > 0;
-                
+
             if (electronicsUI.sellButton != null)
                 electronicsUI.sellButton.interactable = Mathf.FloorToInt(data.resources.electronics) > 0;
         }
@@ -201,14 +202,20 @@ namespace VaultSurvivors.UI
         {
             if (uiItem.priceText == null || uiItem.arrowImage == null) return;
 
-            uiItem.priceText.text = $"{currentPrice:F1} Gold";
+            uiItem.priceText.text = $"{currentPrice:F1}";
 
             if (currentPrice >= previousPrice)
             {
                 uiItem.priceText.color = priceUpColor;
                 uiItem.arrowImage.color = priceUpColor;
                 uiItem.arrowImage.gameObject.SetActive(true);
-                uiItem.arrowImage.transform.rotation = Quaternion.Euler(0, 0, 0); 
+                uiItem.arrowImage.transform.rotation = Quaternion.Euler(0, 0, 0);
+                if (uiItem.priceFrameBg != null)
+                {
+                    Color frameColor = priceUpColor;
+                    frameColor.a = 50f / 255f;
+                    uiItem.priceFrameBg.color = frameColor;
+                }
             }
             else
             {
@@ -216,6 +223,12 @@ namespace VaultSurvivors.UI
                 uiItem.arrowImage.color = priceDownColor;
                 uiItem.arrowImage.gameObject.SetActive(true);
                 uiItem.arrowImage.transform.rotation = Quaternion.Euler(0, 0, 180);
+                if (uiItem.priceFrameBg != null)
+                {
+                    Color frameColor = priceDownColor;
+                    frameColor.a = 50f / 255f;
+                    uiItem.priceFrameBg.color = frameColor;
+                }
             }
         }
 
