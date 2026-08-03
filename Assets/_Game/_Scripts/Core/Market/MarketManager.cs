@@ -78,14 +78,65 @@ namespace VaultSurvivors.Core.Market
             _currentEnergyPrice = GetRandomizedPrice(_baseEnergyPrice);
             _currentElectronicsPrice = GetRandomizedPrice(_baseElectronicsPrice);
 
+            // Guarantee at least 1 resource moves in a different direction.
+            // If all 3 went up (or stayed same) relative to their previous price,
+            // force one random resource to go below its previous price, and vice versa.
+            bool foodUp = _currentFoodPrice >= _previousFoodPrice;
+            bool energyUp = _currentEnergyPrice >= _previousEnergyPrice;
+            bool electronicsUp = _currentElectronicsPrice >= _previousElectronicsPrice;
+
+            if (foodUp == energyUp && energyUp == electronicsUp)
+            {
+                // All moved in the same direction — flip one at random
+                int flipIndex = UnityEngine.Random.Range(0, 3);
+                switch (flipIndex)
+                {
+                    case 0:
+                        _currentFoodPrice = ForceOppositeDirection(_baseFoodPrice, _previousFoodPrice, foodUp);
+                        break;
+                    case 1:
+                        _currentEnergyPrice = ForceOppositeDirection(_baseEnergyPrice, _previousEnergyPrice, energyUp);
+                        break;
+                    case 2:
+                        _currentElectronicsPrice = ForceOppositeDirection(_baseElectronicsPrice, _previousElectronicsPrice, electronicsUp);
+                        break;
+                }
+            }
+
             BroadcastPrices();
         }
 
         private float GetRandomizedPrice(float basePrice)
         {
-            // +/- 20%
-            float modifier = UnityEngine.Random.Range(0.8f, 1.2f);
-            return basePrice * modifier;
+            // ±12% swing, rounded to nearest whole integer
+            float modifier = UnityEngine.Random.Range(0.88f, 1.12f);
+            return Mathf.RoundToInt(basePrice * modifier);
+        }
+
+        /// <summary>
+        /// Forces a price to move in the opposite direction of its current trend.
+        /// If it went up, generate a price below the previous; if down, above it.
+        /// </summary>
+        private float ForceOppositeDirection(float basePrice, float previousPrice, bool wasUp)
+        {
+            float newPrice;
+            if (wasUp)
+            {
+                // Force down: generate in the lower portion of the range
+                float modifier = UnityEngine.Random.Range(0.88f, 0.99f);
+                newPrice = Mathf.RoundToInt(basePrice * modifier);
+                // Ensure it's actually below the previous price
+                if (newPrice >= previousPrice) newPrice = Mathf.Max(Mathf.RoundToInt(basePrice * 0.88f), 1f);
+            }
+            else
+            {
+                // Force up: generate in the upper portion of the range
+                float modifier = UnityEngine.Random.Range(1.01f, 1.12f);
+                newPrice = Mathf.RoundToInt(basePrice * modifier);
+                // Ensure it's actually above the previous price
+                if (newPrice <= previousPrice) newPrice = Mathf.RoundToInt(basePrice * 1.12f);
+            }
+            return newPrice;
         }
 
         private void OnSellResource(Command_SellResource cmd)

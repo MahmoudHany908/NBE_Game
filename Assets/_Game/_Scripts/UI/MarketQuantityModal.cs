@@ -19,6 +19,8 @@ namespace VaultSurvivors.UI
         private float _currentPrice;
         private int _maxAmount;
         private int _selectedAmount;
+        private int _sliderStep;
+        private bool _isUpdatingFromInput;
 
         public void Setup(MarketUIController uiController, ResourceType resource, float currentPrice, int maxAmount)
         {
@@ -26,12 +28,25 @@ namespace VaultSurvivors.UI
             _currentResource = resource;
             _currentPrice = currentPrice;
             _maxAmount = maxAmount;
+            _isUpdatingFromInput = false;
 
+            // Tiered step sizes based on max amount
+            if (_maxAmount <= 50)
+                _sliderStep = 1;
+            else if (_maxAmount <= 500)
+                _sliderStep = 5;
+            else if (_maxAmount <= 5000)
+                _sliderStep = 50;
+            else
+                _sliderStep = 100;
+
+            quantitySlider.wholeNumbers = true;
             quantitySlider.minValue = 0;
             quantitySlider.maxValue = _maxAmount;
             quantitySlider.value = 0;
 
             quantityInputField.text = "0";
+            quantityInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
 
             UpdateExpectedReturn(0);
 
@@ -39,7 +54,9 @@ namespace VaultSurvivors.UI
             quantitySlider.onValueChanged.AddListener(OnSliderValueChanged);
 
             quantityInputField.onValueChanged.RemoveAllListeners();
+            quantityInputField.onEndEdit.RemoveAllListeners();
             quantityInputField.onValueChanged.AddListener(OnInputFieldValueChanged);
+            quantityInputField.onEndEdit.AddListener(OnInputFieldEndEdit);
 
             nextButton.onClick.RemoveAllListeners();
             nextButton.onClick.AddListener(OnNextClicked);
@@ -55,23 +72,64 @@ namespace VaultSurvivors.UI
 
         private void OnSliderValueChanged(float value)
         {
-            _selectedAmount = Mathf.FloorToInt(value);
+            // Don't overwrite the input field while the user is typing
+            if (_isUpdatingFromInput) return;
+
+            // Snap to nearest step boundary
+            int rawValue = Mathf.RoundToInt(value);
+            int snapped = Mathf.RoundToInt((float)rawValue / _sliderStep) * _sliderStep;
+            _selectedAmount = Mathf.Clamp(snapped, 0, _maxAmount);
+
+            // Update slider position without re-triggering
+            quantitySlider.onValueChanged.RemoveListener(OnSliderValueChanged);
+            quantitySlider.value = _selectedAmount;
+            quantitySlider.onValueChanged.AddListener(OnSliderValueChanged);
+
             quantityInputField.text = _selectedAmount.ToString();
             UpdateExpectedReturn(_selectedAmount);
         }
 
+        /// <summary>
+        /// While typing, update the selected amount and expected return live,
+        /// but don't clamp or overwrite the text so the user can type freely.
+        /// </summary>
         private void OnInputFieldValueChanged(string value)
         {
             if (int.TryParse(value, out int parsedValue))
             {
                 _selectedAmount = Mathf.Clamp(parsedValue, 0, _maxAmount);
-                if (parsedValue != _selectedAmount)
-                {
-                    quantityInputField.text = _selectedAmount.ToString();
-                }
+
+                // Move the slider without it overwriting the input field
+                _isUpdatingFromInput = true;
                 quantitySlider.value = _selectedAmount;
+                _isUpdatingFromInput = false;
+
                 UpdateExpectedReturn(_selectedAmount);
             }
+        }
+
+        /// <summary>
+        /// When the user finishes typing (clicks away or presses Enter),
+        /// clamp the value and finalize the input field text.
+        /// </summary>
+        private void OnInputFieldEndEdit(string value)
+        {
+            if (int.TryParse(value, out int parsedValue))
+            {
+                _selectedAmount = Mathf.Clamp(parsedValue, 0, _maxAmount);
+            }
+            else
+            {
+                _selectedAmount = 0;
+            }
+
+            quantityInputField.text = _selectedAmount.ToString();
+
+            _isUpdatingFromInput = true;
+            quantitySlider.value = _selectedAmount;
+            _isUpdatingFromInput = false;
+
+            UpdateExpectedReturn(_selectedAmount);
         }
 
         private void UpdateExpectedReturn(int amount)

@@ -177,25 +177,23 @@ public class FactoryUIController : MonoBehaviour
 
         if (_upgradeBtn != null)
         {
-            if (_upgradeBtnText != null) _upgradeBtnText.text = $"Upgrade   [{evt.UpgradeCost}]";
-            _upgradeBtn.interactable = evt.WalletGold >= evt.UpgradeCost;
+            if (evt.IsMaxLevel)
+            {
+                if (_upgradeBtnText != null) _upgradeBtnText.text = "MAX LEVEL";
+                _upgradeBtn.interactable = false;
+            }
+            else
+            {
+                if (_upgradeBtnText != null) _upgradeBtnText.text = $"Upgrade   [{evt.UpgradeCost}]";
+                _upgradeBtn.interactable = evt.WalletGold >= evt.UpgradeCost;
+            }
         }
 
-        Color dimmedColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+        Color dimmedColor = new Color32(102, 102, 102, 255);
 
-        if (_energyIconImg != null)
-            _energyIconImg.color = (evt.ActiveResource == ResourceType.Energy) ? dimmedColor : Color.white;
-        if (_foodIconImg != null)
-            _foodIconImg.color = (evt.ActiveResource == ResourceType.Food) ? dimmedColor : Color.white;
-        if (_electronicsIconImg != null)
-            _electronicsIconImg.color = (evt.ActiveResource == ResourceType.Electronics) ? dimmedColor : Color.white;
-
-        if (_switchEnergyBtn != null)
-            _switchEnergyBtn.interactable = (evt.ActiveResource != ResourceType.Energy);
-        if (_switchFoodBtn != null)
-            _switchFoodBtn.interactable = (evt.ActiveResource != ResourceType.Food);
-        if (_switchElectronicsBtn != null)
-            _switchElectronicsBtn.interactable = (evt.ActiveResource != ResourceType.Electronics);
+        ApplyResourceSwitchColor(_energyIconImg, _switchEnergyBtn, evt.ActiveResource == ResourceType.Energy, dimmedColor);
+        ApplyResourceSwitchColor(_foodIconImg, _switchFoodBtn, evt.ActiveResource == ResourceType.Food, dimmedColor);
+        ApplyResourceSwitchColor(_electronicsIconImg, _switchElectronicsBtn, evt.ActiveResource == ResourceType.Electronics, dimmedColor);
     }
 
     // Phase 3 Modal Logic
@@ -231,5 +229,28 @@ public class FactoryUIController : MonoBehaviour
     private void OnUpgradeClicked()
     {
         _eventPublisher?.Publish(new Command_UpgradeFactory());
+    }
+
+    private void ApplyResourceSwitchColor(Image icon, Button button, bool isActive, Color dimmedColor)
+    {
+        Color activeColor = new Color32(13, 249, 108, 255);
+
+        if (icon != null)
+            icon.color = isActive ? dimmedColor : activeColor;
+
+        if (button != null)
+        {
+            button.interactable = !isActive;
+
+            // Dim the button background image
+            Image btnImage = button.GetComponent<Image>();
+            if (btnImage != null)
+                btnImage.color = isActive ? dimmedColor : activeColor;
+
+            // Dim the button text
+            TMP_Text btnText = button.GetComponentInChildren<TMP_Text>();
+            if (btnText != null)
+                btnText.color = isActive ? dimmedColor : activeColor;
+        }
     }
 }

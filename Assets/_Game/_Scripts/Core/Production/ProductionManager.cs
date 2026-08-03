@@ -16,7 +16,9 @@ namespace VaultSurvivors.Core.Production
         private float _baseElectronicsRate = 1.5f;
         private float _baseMaxCapacity = 100f;
         private int _baseUpgradeCost = 100;
-        private float _costMultiplierPerLevel = 1.5f;
+        private float _costMultiplierPerLevel = 1.8f;
+        private const int MaxLevel = 10;
+        private const int VisualUpgradeLevel = 5;
 
         private int _globalLevel = 1;
         private ResourceType _activeResource = ResourceType.Energy;
@@ -106,7 +108,9 @@ namespace VaultSurvivors.Core.Production
 
         public int GetUpgradeCost()
         {
-            return Mathf.FloorToInt(_baseUpgradeCost * Mathf.Pow(_costMultiplierPerLevel, _globalLevel - 1));
+            // Round to nearest 10 for clean UI display
+            int raw = Mathf.RoundToInt(_baseUpgradeCost * Mathf.Pow(_costMultiplierPerLevel, _globalLevel - 1));
+            return Mathf.Max(10, (raw / 10) * 10);
         }
 
         public float GetProductionRate(ResourceType type)
@@ -118,12 +122,14 @@ namespace VaultSurvivors.Core.Production
                 ResourceType.Electronics => _baseElectronicsRate,
                 _ => 0f
             };
-            return baseRate * Mathf.Pow(1.5f, _globalLevel - 1);
+            return baseRate * Mathf.Pow(1.15f, _globalLevel - 1);
         }
 
         public float GetMaxCapacity()
         {
-            return _baseMaxCapacity * Mathf.Pow(1.25f, _globalLevel - 1);
+            // Round to nearest 10 for clean UI display
+            int raw = Mathf.RoundToInt(_baseMaxCapacity * Mathf.Pow(1.3f, _globalLevel - 1));
+            return Mathf.Max(10, (raw / 10) * 10);
         }
 
         private void OnSetProductionResource(Command_SetProductionResource cmd)
@@ -175,6 +181,12 @@ namespace VaultSurvivors.Core.Production
 
         public void TryUpgrade()
         {
+            if (_globalLevel >= MaxLevel)
+            {
+                Debug.Log("[ProductionManager] Factory is already at max level.");
+                return;
+            }
+
             int cost = GetUpgradeCost();
             GameData gameData = _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
 
@@ -184,6 +196,13 @@ namespace VaultSurvivors.Core.Production
                 _saveSystem.Save(gameData);
 
                 _globalLevel++;
+
+                // Fire visual upgrade event when hitting the visual upgrade threshold
+                if (_globalLevel == VisualUpgradeLevel)
+                {
+                    _eventPublisher.Publish(new Event_FactoryVisualUpgrade(_globalLevel));
+                }
+
                 SaveState();
                 BroadcastState();
             }
@@ -229,6 +248,7 @@ namespace VaultSurvivors.Core.Production
                 GetMaxCapacity(),
                 GetProductionRate(_activeResource),
                 GetUpgradeCost(),
+                _globalLevel >= MaxLevel,
                 gold,
                 food,
                 energy,

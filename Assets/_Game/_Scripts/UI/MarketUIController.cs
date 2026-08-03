@@ -12,6 +12,7 @@ namespace VaultSurvivors.UI
     public class MarketResourceUI
     {
         public ResourceType resourceType;
+        public Image resourceIcon;
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI priceText;
         public Image arrowImage;
@@ -130,15 +131,17 @@ namespace VaultSurvivors.UI
 
         private void OnOpenUI(Command_OpenMarketUI cmd)
         {
-            // Even if the GameObject is inactive, VContainer will call this method!
-            if (!gameObject.activeSelf)
-            {
-                gameObject.SetActive(true);
-            }
-
             if (_panelContainer != null && !_panelContainer.activeSelf)
             {
+                // First close any other open menus (this will call OnCloseUI)
                 _eventPublisher?.Publish(new Command_CloseAllMenus());
+
+                // Now ensure the root object is active BEFORE turning on the panel
+                if (!gameObject.activeSelf)
+                {
+                    gameObject.SetActive(true);
+                }
+
                 _panelContainer.SetActive(true);
                 _eventPublisher?.Publish(new Event_MenuStateChanged { isOpen = true });
 
@@ -162,8 +165,8 @@ namespace VaultSurvivors.UI
                 if (_hudButton2 != null) _hudButton2.SetActive(true);
             }
 
-            // Optional: turn the whole GameObject back off if you want it fully inactive
-            // gameObject.SetActive(false);
+            // Turn the whole GameObject back off to prevent invisible raycast blockers
+            gameObject.SetActive(false);
         }
 
         private void OnCloseAllMenus(Command_CloseAllMenus cmd)
@@ -187,15 +190,56 @@ namespace VaultSurvivors.UI
         private void UpdateInteractability()
         {
             GameData data = _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
+            Color dimmedColor = new Color32(102, 102, 102, 255);
 
-            if (foodUI.sellButton != null)
-                foodUI.sellButton.interactable = Mathf.FloorToInt(data.resources.food) > 0;
+            ApplyRowInteractability(foodUI, Mathf.FloorToInt(data.resources.food) > 0, dimmedColor);
+            ApplyRowInteractability(energyUI, Mathf.FloorToInt(data.resources.energy) > 0, dimmedColor);
+            ApplyRowInteractability(electronicsUI, Mathf.FloorToInt(data.resources.electronics) > 0, dimmedColor);
+        }
 
-            if (energyUI.sellButton != null)
-                energyUI.sellButton.interactable = Mathf.FloorToInt(data.resources.energy) > 0;
+        private void ApplyRowInteractability(MarketResourceUI uiItem, bool canSell, Color dimmedColor)
+        {
+            Color activeGreen = new Color32(13, 249, 108, 255);
 
-            if (electronicsUI.sellButton != null)
-                electronicsUI.sellButton.interactable = Mathf.FloorToInt(data.resources.electronics) > 0;
+            if (uiItem.sellButton != null)
+            {
+                uiItem.sellButton.interactable = canSell;
+
+                Image btnImage = uiItem.sellButton.GetComponent<Image>();
+                if (btnImage != null)
+                    btnImage.color = canSell ? activeGreen : dimmedColor;
+
+                TMP_Text btnText = uiItem.sellButton.GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                    btnText.color = canSell ? activeGreen : dimmedColor;
+            }
+
+            if (!canSell)
+            {
+                // Dim the entire row
+                if (uiItem.resourceIcon != null)
+                    uiItem.resourceIcon.color = dimmedColor;
+                if (uiItem.nameText != null)
+                    uiItem.nameText.color = dimmedColor;
+                if (uiItem.priceText != null)
+                    uiItem.priceText.color = dimmedColor;
+                if (uiItem.arrowImage != null)
+                    uiItem.arrowImage.color = dimmedColor;
+                if (uiItem.priceFrameBg != null)
+                {
+                    Color frameDimmed = dimmedColor;
+                    frameDimmed.a = 50f / 255f;
+                    uiItem.priceFrameBg.color = frameDimmed;
+                }
+            }
+            else
+            {
+                // Restore sellable row
+                if (uiItem.resourceIcon != null)
+                    uiItem.resourceIcon.color = activeGreen;
+                if (uiItem.nameText != null)
+                    uiItem.nameText.color = activeGreen;
+            }
         }
 
         private void UpdateUIItem(MarketResourceUI uiItem, float currentPrice, float previousPrice)
