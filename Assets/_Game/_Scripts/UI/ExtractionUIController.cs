@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
+using VaultSurvivors.Core.Production;
 
 
 public class ExtractionUIController : MonoBehaviour
@@ -18,14 +21,22 @@ public class ExtractionUIController : MonoBehaviour
     [SerializeField] private Button extractButton;
     [SerializeField] private Button continueButton;
 
+    [Header("Reward Preview")]
+    [SerializeField] private TextMeshProUGUI noLootLabel;
+    [SerializeField] private Transform rewardsContainer;
+    [SerializeField] private ExtractionRewardEntry rewardEntryPrefab;
+    [SerializeField] private ResourceIconConfigSO iconConfig;
+
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
+    private ArenaRewardTracker _rewardTracker;
 
     [Inject]
-    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, ArenaRewardTracker rewardTracker)
     {
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+        _rewardTracker = rewardTracker;
 
         if (isActiveAndEnabled)
         {
@@ -93,9 +104,54 @@ public class ExtractionUIController : MonoBehaviour
     private void HandleExtractionAvailable(ExtractionAvailableEvent evt)
     {
         if (waveLabel != null) waveLabel.text = $"WAVE {evt.WaveNumber} CLEARED";
-        
 
+        UpdateRewardPreview();
         ShowPanel();
+    }
+
+    private void UpdateRewardPreview()
+    {
+        if (rewardsContainer == null || _rewardTracker == null) return;
+
+        // Clear previous entries
+        foreach (Transform child in rewardsContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        if (!_rewardTracker.HasAnyRewards())
+        {
+            if (noLootLabel != null) noLootLabel.gameObject.SetActive(true);
+            return;
+        }
+        else
+        {
+            if (noLootLabel != null) noLootLabel.gameObject.SetActive(false);
+        }
+
+        if (rewardEntryPrefab == null)
+        {
+            Debug.LogWarning("[ExtractionUIController] rewardEntryPrefab is missing!");
+            return;
+        }
+
+        int xp = _rewardTracker.GetAccumulatedXP();
+        if (xp > 0)
+        {
+            ExtractionRewardEntry entry = Instantiate(rewardEntryPrefab, rewardsContainer);
+            entry.Initialize($"+{xp} XP", null);
+        }
+
+        Dictionary<ResourceType, int> resources = _rewardTracker.GetAccumulatedResources();
+        foreach (var kvp in resources)
+        {
+            if (kvp.Value > 0)
+            {
+                ExtractionRewardEntry entry = Instantiate(rewardEntryPrefab, rewardsContainer);
+                Sprite icon = iconConfig != null ? iconConfig.GetSprite(kvp.Key) : null;
+                entry.Initialize($"+{kvp.Value}", icon);
+            }
+        }
     }
 
     private void OnExtractClicked()
