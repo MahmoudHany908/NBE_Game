@@ -1,4 +1,5 @@
 using UnityEngine;
+using VaultSurvivors.Core.Production;
 
 public readonly struct WaveClearedEvent : IGameEvent
 {
@@ -47,4 +48,30 @@ public readonly struct PlayerHealedEvent : IGameEvent
         this.healAmount = healAmount;
         this.healthPercentage = healthPercentage;
     }
+}
+
+/// <summary>
+/// Fired once per resource drop when an enemy is killed.
+/// Used by the loot popup UI to show individual drop notifications.
+/// </summary>
+public readonly struct LootGainedEvent : IGameEvent
+{
+    public readonly ResourceType ResourceType;
+    public readonly int Amount;
+
+    public LootGainedEvent(ResourceType resourceType, int amount)
+    {
+        ResourceType = resourceType;
+        Amount = amount;
+    }
+}
+
+/// <summary>
+/// Fired when XP is gained from killing an enemy.
+/// Used by the loot popup UI to show XP notifications.
+/// </summary>
+public readonly struct XpGainedEvent : IGameEvent
+{
+    public readonly int Amount;
+    public XpGainedEvent(int amount) => Amount = amount;
 }

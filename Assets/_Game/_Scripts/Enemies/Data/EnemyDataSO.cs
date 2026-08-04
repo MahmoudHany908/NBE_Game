@@ -21,4 +21,8 @@ public class EnemyDataSO : ScriptableObject
     [Header("Behaviors")]
     [SerializeReference] public IMovementStrategy movementStrategy;
     [SerializeReference] public IAttackStrategy attackStrategy;
+
+    [Header("Loot")]
+    [Tooltip("Loot table defining XP and resource drops on kill. Leave null for no drops.")]
+    public EnemyLootTableSO lootTable;
 }

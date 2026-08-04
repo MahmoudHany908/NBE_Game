@@ -6,6 +6,11 @@ public class ArenaLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
+        // --- Arena Reward System ---
+        builder.Register<ArenaRewardTracker>(Lifetime.Scoped);
+        builder.RegisterComponentInHierarchy<LootPopupUI>();
+
+        // --- Existing Registrations ---
         builder.RegisterComponentInHierarchy<WaveSpawner>();
         builder.RegisterComponentInHierarchy<IronRevolver>();
         builder.RegisterComponentInHierarchy<DeathUIController>();
