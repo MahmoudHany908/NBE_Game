@@ -17,9 +17,11 @@ public class GateTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"[GateTrigger] Trigger entered by: {other.gameObject.name} with tag: {other.tag}");
+
         if (other.CompareTag("Player"))
         {
-            Debug.Log($"[GateTrigger] Player entered gate. Requesting transition to {targetSceneName}...");
+            Debug.Log($"[GateTrigger] Player entered gate. Opening Loadout UI...");
 
             if (_eventPublisher == null)
             {
@@ -27,14 +29,16 @@ public class GateTrigger : MonoBehaviour
             }
             else
             {
-                Debug.Log("[GateTrigger] _eventPublisher is valid. Publishing ChangeStateCommand...");
-                _eventPublisher.Publish(new ChangeStateCommand
-                {
-                    TargetSceneName = targetSceneName,
-                    TargetState = new ArenaState()
-                });
-                Debug.Log("[GateTrigger] ChangeStateCommand published.");
+                _eventPublisher.Publish(new Command_OpenGateLoadoutUI());
             }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            _eventPublisher?.Publish(new Command_CloseGateLoadoutUI());
         }
     }
 }
