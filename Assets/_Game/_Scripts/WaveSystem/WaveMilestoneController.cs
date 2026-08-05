@@ -33,6 +33,7 @@ public class WaveMilestoneController : MonoBehaviour
         if (isActiveAndEnabled)
         {
             _eventSubscriber?.Subscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
+            _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
         }
     }
 
@@ -48,7 +49,7 @@ public class WaveMilestoneController : MonoBehaviour
             waveSpawner.OnAllSquadsSpawned += HandleAllSquadsSpawned;
 
         _eventSubscriber?.Subscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
-
+        _eventSubscriber?.Subscribe<PlayerDiedEvent>(HandlePlayerDied);
     }
 
     private void OnDisable()
@@ -57,6 +58,7 @@ public class WaveMilestoneController : MonoBehaviour
             waveSpawner.OnAllSquadsSpawned -= HandleAllSquadsSpawned;
 
         _eventSubscriber?.Unsubscribe<ExtractionDecisionEvent>(HandleExtractionDecision);
+        _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(HandlePlayerDied);
         StopAllCoroutines();
     }
 
@@ -144,5 +146,10 @@ public class WaveMilestoneController : MonoBehaviour
         {
             AdvanceToNextWave();
         }
+    }
+
+    private void HandlePlayerDied(PlayerDiedEvent evt)
+    {
+        StopAllCoroutines();
     }
 }
