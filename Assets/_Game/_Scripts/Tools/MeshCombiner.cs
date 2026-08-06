@@ -1,4 +1,4 @@
-﻿using Alchemy.Inspector;
+using Alchemy.Inspector;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -44,6 +44,12 @@ public class MeshCombiner : MonoBehaviour
             for (int sub = 0; sub < mf.sharedMesh.subMeshCount; sub++)
             {
                 Material mat = (mats != null && sub < mats.Length) ? mats[sub] : null;
+
+                if (mat == null)
+                {
+                    Debug.LogWarning($"[MeshCombiner] '{mf.gameObject.name}' submesh {sub} has no material (or no MeshRenderer). Skipping.", mf.gameObject);
+                    continue;
+                }
 
                 if (!materialMap.ContainsKey(mat))
                     materialMap[mat] = new List<CombineInstance>();
