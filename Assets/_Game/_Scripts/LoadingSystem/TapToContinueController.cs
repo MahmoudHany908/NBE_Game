@@ -16,16 +16,28 @@ namespace VaultSurvivors.LoadingSystem
 
         private bool _isEnabled = false;
 
+        private float _currentAnimationTime = 0f;
+
         private void Awake()
         {
+            if (_canvasGroup == null)
+            {
+                _canvasGroup = GetComponent<CanvasGroup>();
+                if (_canvasGroup == null)
+                {
+                    _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+                }
+            }
             Disable();
         }
 
         public void Enable()
         {
             _isEnabled = true;
+            _currentAnimationTime = 0f;
             if (_canvasGroup != null)
             {
+                _canvasGroup.alpha = 0f;
                 _canvasGroup.gameObject.SetActive(true);
             }
         }
@@ -36,6 +48,7 @@ namespace VaultSurvivors.LoadingSystem
             if (_canvasGroup != null)
             {
                 _canvasGroup.gameObject.SetActive(false);
+                _canvasGroup.alpha = 0f;
             }
         }
 
@@ -51,11 +64,9 @@ namespace VaultSurvivors.LoadingSystem
         {
             if (_canvasGroup != null)
             {
+                _currentAnimationTime += Time.unscaledDeltaTime;
                 // Smoothly ping-pong alpha between 0 and 1
-                float alpha = Mathf.PingPong(Time.unscaledTime * _fadeSpeed, 1f);
-                
-                // Add a small offset to prevent it from going completely invisible for too long
-                _canvasGroup.alpha = Mathf.Lerp(0.2f, 1f, alpha);
+                _canvasGroup.alpha = Mathf.PingPong(_currentAnimationTime * _fadeSpeed, 1f);
             }
         }
 
