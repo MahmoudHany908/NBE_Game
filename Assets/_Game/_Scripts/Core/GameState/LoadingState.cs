@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LoadingState : IGameState
 {
     public void EnterState(GameStateManager manager)
     {
-        Debug.Log("[LoadingState] Entered Loading State.");
+        //Debug.Log("[LoadingState] Entered Loading State.");
     }
 
     public void UpdateState(GameStateManager manager)
@@ -14,6 +14,6 @@ public class LoadingState : IGameState
 
     public void ExitState(GameStateManager manager)
     {
-        Debug.Log("[LoadingState] Exited Loading State.");
+        //Debug.Log("[LoadingState] Exited Loading State.");
     }
 }

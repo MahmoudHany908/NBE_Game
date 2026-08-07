@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,26 +28,26 @@ public class WaveSpawner : MonoBehaviour
     private void Awake()
     {
         budgetCalculator = GetComponent<BudgetCalculator>();
-        if (budgetCalculator == null)
-            Debug.LogError($"[{nameof(WaveSpawner)}] Missing required BudgetCalculator component on {gameObject.name}.", this);
+        //if (budgetCalculator == null)
+            //Debug.LogError($"[{nameof(WaveSpawner)}] Missing required BudgetCalculator component on {gameObject.name}.", this);
 
         int removed = enemies.RemoveAll(e => e.enemyPrefab == null);
-        if (removed > 0)
-            Debug.LogWarning($"[{nameof(WaveSpawner)}] Removed {removed} EnemyEntry with a null prefab on {gameObject.name}. Check the 'enemies' list.", this);
+        //if (removed > 0)
+            //Debug.LogWarning($"[{nameof(WaveSpawner)}] Removed {removed} EnemyEntry with a null prefab on {gameObject.name}. Check the 'enemies' list.", this);
     }
 
     public void StartSpawningWave(int wave)
     {
         if (budgetCalculator == null)
         {
-            Debug.LogError($"[{nameof(WaveSpawner)}] Cannot start wave {wave}: BudgetCalculator is missing.", this);
+            //Debug.LogError($"[{nameof(WaveSpawner)}] Cannot start wave {wave}: BudgetCalculator is missing.", this);
             return;
         }
 
         int totalBudget = budgetCalculator.GetBudgetForWave(wave);
         if (totalBudget <= 0)
         {
-            Debug.LogWarning($"[{nameof(WaveSpawner)}] Wave {wave} has zero/negative budget ({totalBudget}). No enemies will spawn.", this);
+            //Debug.LogWarning($"[{nameof(WaveSpawner)}] Wave {wave} has zero/negative budget ({totalBudget}). No enemies will spawn.", this);
         }
 
         StartCoroutine(SpawnSquadsRoutine(totalBudget));
@@ -74,7 +74,7 @@ public class WaveSpawner : MonoBehaviour
             {
                 if (poolManager == null)
                 {
-                    Debug.LogError($"[{nameof(WaveSpawner)}] PoolManager dependency is null! Cannot spawn enemy '{prefab.name}'. Make sure PoolManager is registered in VContainer and injected.", this);
+                    //Debug.LogError($"[{nameof(WaveSpawner)}] PoolManager dependency is null! Cannot spawn enemy '{prefab.name}'. Make sure PoolManager is registered in VContainer and injected.", this);
                     continue;
                 }
 

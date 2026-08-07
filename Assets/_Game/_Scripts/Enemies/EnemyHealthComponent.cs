@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using VContainer;
 
 public class EnemyHealthComponent : MonoBehaviour, IDamageable
@@ -40,7 +40,7 @@ public class EnemyHealthComponent : MonoBehaviour, IDamageable
 
         currentHealth -= amount;
 
-        Debug.Log("Enemy Took Damage: " + currentHealth);
+        //Debug.Log("Enemy Took Damage: " + currentHealth);
 
         eventPublisher?.Publish(new EnemyTakeDamageEvent
         {

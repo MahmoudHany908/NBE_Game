@@ -16,11 +16,11 @@ public class DialogueTrigger : MonoBehaviour
 
     private void Awake()
     {
-        if (_dialogue == null)
-            Debug.LogError($"[DialogueTrigger] Dialogue SO is not assigned on {gameObject.name}.");
+        //if (_dialogue == null)
+            //Debug.LogError($"[DialogueTrigger] Dialogue SO is not assigned on {gameObject.name}.");
 
-        if (_speechUI == null)
-            Debug.LogError($"[DialogueTrigger] SpeechUIController is not assigned on {gameObject.name}.");
+        //if (_speechUI == null)
+            //Debug.LogError($"[DialogueTrigger] SpeechUIController is not assigned on {gameObject.name}.");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,7 +30,7 @@ public class DialogueTrigger : MonoBehaviour
 
         if (_dialogue == null || _speechUI == null)
         {
-            Debug.LogWarning($"[DialogueTrigger] Missing references on {gameObject.name}. Cannot show dialogue.");
+            //Debug.LogWarning($"[DialogueTrigger] Missing references on {gameObject.name}. Cannot show dialogue.");
             return;
         }
 

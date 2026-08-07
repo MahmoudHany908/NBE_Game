@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using VContainer;
 
 [RequireComponent(typeof(PooledObject))]
@@ -41,8 +41,8 @@ public class Enemy : MonoBehaviour, IPoolable
         targetProvider = GetComponentInChildren<ITargetProvider>();
         animator = GetComponentInChildren<Animator>();
 
-        if (targetProvider == null)
-            Debug.LogError($"[Enemy] Missing ITargetProvider on {gameObject.name}!", this);
+        //if (targetProvider == null)
+            //Debug.LogError($"[Enemy] Missing ITargetProvider on {gameObject.name}!", this);
     }
 
     void OnEnable()
@@ -139,7 +139,7 @@ public class Enemy : MonoBehaviour, IPoolable
     private void HandleDeath(EnemyDiedEvent obj)
     {
         if (obj.gameObject != gameObject) return;
-        Debug.Log($"{obj.gameObject.name} died at {obj.DeathPosition}");
+        //Debug.Log($"{obj.gameObject.name} died at {obj.DeathPosition}");
         pooledObject.ReturnToPool(0.1f);
     }
 

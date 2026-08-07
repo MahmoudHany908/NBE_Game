@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.IO;
@@ -12,12 +12,12 @@ public class ResetSaveDataEditor
         if (File.Exists(path))
         {
             File.Delete(path);
-            Debug.Log($"[SaveManager] Deleted save file at: {path}");
+            //Debug.Log($"[SaveManager] Deleted save file at: {path}");
             EditorUtility.DisplayDialog("Save Data Reset", "Your save data has been successfully deleted. You will start fresh on the next run.", "OK");
         }
         else
         {
-            Debug.LogWarning($"[SaveManager] No save file found at: {path}");
+            //Debug.LogWarning($"[SaveManager] No save file found at: {path}");
             EditorUtility.DisplayDialog("Save Data Reset", "No save file exists. You are already starting fresh.", "OK");
         }
     }
@@ -34,7 +34,7 @@ public class ResetSaveDataEditor
             {
                 data.resources.gold += 50000;
                 File.WriteAllText(path, JsonUtility.ToJson(data, true));
-                Debug.Log("[SaveManager] Added 50,000 Gold to save file.");
+                //Debug.Log("[SaveManager] Added 50,000 Gold to save file.");
                 EditorUtility.DisplayDialog("Cheat Added", "50,000 Gold has been added to your save file!", "OK");
             }
         }

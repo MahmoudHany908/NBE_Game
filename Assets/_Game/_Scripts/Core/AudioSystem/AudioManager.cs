@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -21,7 +21,7 @@ public class AudioManager : MonoBehaviour
 
     private void ApplyMuteState()
     {
-        Debug.Log($"AudioManager: Mute state changed to {isMuted}");
+        //Debug.Log($"AudioManager: Mute state changed to {isMuted}");
     }
 
     private AudioSource musicAudioSource;
@@ -43,7 +43,7 @@ public class AudioManager : MonoBehaviour
     {
         if (soundSourcePrefab == null)
         {
-            Debug.LogWarning("AudioManager: soundSourcePrefab was null. Creating a fallback 3D AudioSource prefab dynamically.");
+            //Debug.LogWarning("AudioManager: soundSourcePrefab was null. Creating a fallback 3D AudioSource prefab dynamically.");
             
             // Create a hidden GameObject to act as the prefab for PoolManager
             GameObject fallbackPrefab = new GameObject("FallbackSoundSourcePrefab");
@@ -68,19 +68,19 @@ public class AudioManager : MonoBehaviour
         AudioClip clip = data.GetClip();
         if (clip == null)
         {
-            Debug.LogWarning("AudioManager.PlaySoundAtPosition: SoundData returned a null clip.");
+            //Debug.LogWarning("AudioManager.PlaySoundAtPosition: SoundData returned a null clip.");
             return;
         }
 
         if (poolManager == null)
         {
-            Debug.LogError("AudioManager.PlaySoundAtPosition: poolManager is null! VContainer injection might have failed on AudioManager.", this);
+            //Debug.LogError("AudioManager.PlaySoundAtPosition: poolManager is null! VContainer injection might have failed on AudioManager.", this);
             return;
         }
 
         if (soundSourcePrefab == null)
         {
-            Debug.LogError("AudioManager.PlaySoundAtPosition: soundSourcePrefab is not assigned in the Inspector!", this);
+            //Debug.LogError("AudioManager.PlaySoundAtPosition: soundSourcePrefab is not assigned in the Inspector!", this);
             return;
         }
 
@@ -106,19 +106,19 @@ public class AudioManager : MonoBehaviour
         AudioClip clip = data.GetClip();
         if (clip == null)
         {
-            Debug.LogWarning("AudioManager.PlayAmbientAtPosition: SoundData returned a null clip.");
+            //Debug.LogWarning("AudioManager.PlayAmbientAtPosition: SoundData returned a null clip.");
             return null;
         }
 
         if (poolManager == null)
         {
-            Debug.LogError("AudioManager.PlayAmbientAtPosition: poolManager is null! VContainer injection might have failed.", this);
+            //Debug.LogError("AudioManager.PlayAmbientAtPosition: poolManager is null! VContainer injection might have failed.", this);
             return null;
         }
 
         if (soundSourcePrefab == null)
         {
-            Debug.LogError("AudioManager.PlayAmbientAtPosition: soundSourcePrefab is not assigned in the Inspector!", this);
+            //Debug.LogError("AudioManager.PlayAmbientAtPosition: soundSourcePrefab is not assigned in the Inspector!", this);
             return null;
         }
 

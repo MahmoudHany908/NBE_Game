@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VaultSurvivors.LoadingSystem
 {
@@ -64,7 +64,7 @@ namespace VaultSurvivors.LoadingSystem
             }
             else
             {
-                // No tap controller assigned — skip straight to Hub
+                // No tap controller assigned â€” skip straight to Hub
                 HandleTapDetected();
             }
         }
@@ -85,7 +85,7 @@ namespace VaultSurvivors.LoadingSystem
                     _loadingUIGroup.gameObject.SetActive(false);
             }
 
-            Debug.Log("[TitleScreenController] Tap detected — loading Hub with loading screen (no hints).");
+            //Debug.Log("[TitleScreenController] Tap detected â€” loading Hub with loading screen (no hints).");
 
             // Use LoadNoHints so the Loading Screen shows but the hint panel stays empty
             SceneLoader.LoadNoHints("HubScene", new HideoutState());

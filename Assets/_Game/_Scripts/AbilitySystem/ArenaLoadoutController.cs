@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -21,12 +21,12 @@ public class ArenaLoadoutController : MonoBehaviour
     }
 
     [Header("Slot References")]
-    [Tooltip("Slot 1 — shown for the first equipped character")]
+    [Tooltip("Slot 1 â€” shown for the first equipped character")]
     [SerializeField] private GameObject _slot1;
-    [Tooltip("Slot 2 — shown for the second equipped character")]
+    [Tooltip("Slot 2 â€” shown for the second equipped character")]
     [SerializeField] private GameObject _slot2;
 
-    [Header("Character → Slot Mapping")]
+    [Header("Character â†’ Slot Mapping")]
     [Tooltip("Map each CharacterId to its existing HUD button GameObject")]
     [SerializeField] private List<SlotMapping> _characterSlotMappings;
 
@@ -54,7 +54,7 @@ public class ArenaLoadoutController : MonoBehaviour
             equippedIds = data.workshop.equippedCharacterIds ?? new List<string>();
         }
 
-        Debug.Log($"[ArenaLoadoutController] Equipped characters: [{string.Join(", ", equippedIds)}]");
+        //Debug.Log($"[ArenaLoadoutController] Equipped characters: [{string.Join(", ", equippedIds)}]");
 
         // --- 2. Hide all tracked slot GameObjects first ---
         foreach (var mapping in _characterSlotMappings)
@@ -76,11 +76,11 @@ public class ArenaLoadoutController : MonoBehaviour
                 slotObj.SetActive(true);
                 // Move it to the slot 1 position by reparenting & resetting transform
                 PlaceInSlot(slotObj, _slot1);
-                Debug.Log($"[ArenaLoadoutController] Slot 1 → {slot1Id}");
+                //Debug.Log($"[ArenaLoadoutController] Slot 1 â†’ {slot1Id}");
             }
             else
             {
-                Debug.LogWarning($"[ArenaLoadoutController] No SlotMapping found for '{slot1Id}'");
+                //Debug.LogWarning($"[ArenaLoadoutController] No SlotMapping found for '{slot1Id}'");
             }
         }
 
@@ -92,11 +92,11 @@ public class ArenaLoadoutController : MonoBehaviour
             {
                 slotObj.SetActive(true);
                 PlaceInSlot(slotObj, _slot2);
-                Debug.Log($"[ArenaLoadoutController] Slot 2 → {slot2Id}");
+                //Debug.Log($"[ArenaLoadoutController] Slot 2 â†’ {slot2Id}");
             }
             else
             {
-                Debug.LogWarning($"[ArenaLoadoutController] No SlotMapping found for '{slot2Id}'");
+                //Debug.LogWarning($"[ArenaLoadoutController] No SlotMapping found for '{slot2Id}'");
             }
         }
 

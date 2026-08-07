@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
@@ -13,14 +13,14 @@ public class GameStateManager : MonoBehaviour, IGameStateManager
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, ISaveSystem saveSystem)
     {
-        Debug.Log("[GameStateManager] Construct called! Injecting dependencies.");
+        //Debug.Log("[GameStateManager] Construct called! Injecting dependencies.");
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
         _saveSystem = saveSystem;
 
         // Subscribe to incoming UI commands immediately
         _eventSubscriber.Subscribe<ChangeStateCommand>(HandleChangeStateCommand);
-        Debug.Log("[GameStateManager] Successfully subscribed to ChangeStateCommand.");
+        //Debug.Log("[GameStateManager] Successfully subscribed to ChangeStateCommand.");
     }
 
     private void OnDestroy()
@@ -42,7 +42,7 @@ public class GameStateManager : MonoBehaviour, IGameStateManager
     // --- Command Handler ---
     private void HandleChangeStateCommand(ChangeStateCommand command)
     {
-        Debug.Log($"[GameState] Received command to load: {command.TargetSceneName}");
+        //Debug.Log($"[GameState] Received command to load: {command.TargetSceneName}");
 
         if (!string.IsNullOrEmpty(command.TargetSceneName))
         {
@@ -63,7 +63,7 @@ public class GameStateManager : MonoBehaviour, IGameStateManager
 
         _eventPublisher?.Publish(new GameStateChangedEvent { NewState = _currentState });
 
-        Debug.Log($"[GameState] Transitioned to: {_currentState.GetType().Name}");
+        //Debug.Log($"[GameState] Transitioned to: {_currentState.GetType().Name}");
     }
 
     public void LoadSceneAndChangeState(string sceneName, IGameState stateAfterLoading)

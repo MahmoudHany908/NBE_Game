@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PooledAudioSource : MonoBehaviour, IPoolable
 {
@@ -13,10 +13,10 @@ public class PooledAudioSource : MonoBehaviour, IPoolable
         pooledObject = GetComponent<PooledObject>();
         source = GetComponent<AudioSource>();
 
-        if (pooledObject == null)
-            Debug.LogError("PooledAudioSource requires a PooledObject component.");
-        if (source == null)
-            Debug.LogError("PooledAudioSource requires an AudioSource component.");
+        //if (pooledObject == null)
+            //Debug.LogError("PooledAudioSource requires a PooledObject component.");
+        //if (source == null)
+            //Debug.LogError("PooledAudioSource requires an AudioSource component.");
     }
 
     public void OnSpawned()

@@ -169,7 +169,7 @@ public class JessyDrone : MonoBehaviour
     {
         if (attackPos == null)
         {
-            Debug.LogWarning($"[JessyDrone] attackPos is not assigned on {gameObject.name}!", this);
+            // Debug.LogWarning($"[JessyDrone] attackPos is not assigned on {gameObject.name}!", this);
             return;
         }
 

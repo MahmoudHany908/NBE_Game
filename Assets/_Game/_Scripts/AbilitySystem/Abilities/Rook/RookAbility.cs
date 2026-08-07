@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -54,10 +54,10 @@ public class RookAbility : MonoBehaviour, IAbility
         List<Transform> enemiesInRange = GetEnemiesInRange();
         List<Transform> selectedTargets = PickRandomTargets(enemiesInRange, rocketCount);
 
-        Debug.Log($"Found {enemiesInRange.Count} enemies in range. Selected {selectedTargets.Count} targets for rockets.");
+        //Debug.Log($"Found {enemiesInRange.Count} enemies in range. Selected {selectedTargets.Count} targets for rockets.");
         foreach (Transform target in selectedTargets)
         {
-            Debug.Log($"Spawning rocket for target: {target.name}");
+            //Debug.Log($"Spawning rocket for target: {target.name}");
             SpawnRocket(target);
         }
     }

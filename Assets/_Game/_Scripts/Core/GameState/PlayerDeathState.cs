@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerDeathState : IGameState
 {
     public void EnterState(GameStateManager manager)
     {
-        Debug.Log("Player has died. Triggering death sequence...");
+        //Debug.Log("Player has died. Triggering death sequence...");
         // Publish PlayerDiedEvent here
     }
 
@@ -15,6 +15,6 @@ public class PlayerDeathState : IGameState
 
     public void ExitState(GameStateManager manager)
     {
-        Debug.Log("Resetting from death state...");
+        //Debug.Log("Resetting from death state...");
     }
 }

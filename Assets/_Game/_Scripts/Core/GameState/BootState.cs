@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BootState : IGameState
 {
@@ -12,7 +12,7 @@ public class BootState : IGameState
 
     public void EnterState(GameStateManager manager)
     {
-        Debug.Log("Initializing App... Loading Save Files...");
+        //Debug.Log("Initializing App... Loading Save Files...");
         _isBootComplete = true;
     }
 
@@ -27,6 +27,6 @@ public class BootState : IGameState
 
     public void ExitState(GameStateManager manager)
     {
-        Debug.Log("Boot complete.");
+        //Debug.Log("Boot complete.");
     }
 }

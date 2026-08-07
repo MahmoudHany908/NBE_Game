@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class FrameRateTester : MonoBehaviour
@@ -9,7 +9,7 @@ public class FrameRateTester : MonoBehaviour
 
     // Internal variables for the FPS counter
     private float deltaTime = 0.0f;
-    private float currentFps = 0.0f;
+    // private int currentFps = 0.0f;
 
     private void Start()
     {
@@ -21,11 +21,11 @@ public class FrameRateTester : MonoBehaviour
     {
         // Simple, efficient calculation for the real-time FPS counter
         deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
-        currentFps = 1.0f / deltaTime;
+        // currentFps = 1 / deltaTime;
 
         if (fpsCounterText != null)
         {
-            fpsCounterText.text = $"FPS: {Mathf.Ceil(currentFps)} | Target: {Application.targetFrameRate}";
+            fpsCounterText.text = $"FPS: {Mathf.Ceil(1/deltaTime)} | Target: {Application.targetFrameRate}";
         }
     }
 
@@ -65,7 +65,7 @@ public class FrameRateTester : MonoBehaviour
     private void ApplyFrameRate(int target, string modeName)
     {
         Application.targetFrameRate = target;
-        Debug.Log($"[FrameRateTester] Switched to {modeName}. Target set to {target}.");
+        //Debug.Log($"[FrameRateTester] Switched to {modeName}. Target set to {target}.");
     }
 
     private float GetDeviceRefreshRate()

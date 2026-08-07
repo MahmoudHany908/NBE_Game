@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using VaultSurvivors.Core.Production;
 using VContainer;
 using VContainer.Unity;
@@ -202,10 +201,30 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
     }
 
     public List<SupportCharacterSO> GetUnlockedCharacters()
-        => _registry.Characters.Where(c => _unlockedIds.Contains(c.CharacterId)).ToList();
+    {
+        var result = new List<SupportCharacterSO>();
+        foreach (var c in _registry.Characters)
+        {
+            if (_unlockedIds.Contains(c.CharacterId))
+            {
+                result.Add(c);
+            }
+        }
+        return result;
+    }
 
     public List<SupportCharacterSO> GetEquippedCharacters()
-        => _registry.Characters.Where(c => _equippedIds.Contains(c.CharacterId)).ToList();
+    {
+        var result = new List<SupportCharacterSO>();
+        foreach (var c in _registry.Characters)
+        {
+            if (_equippedIds.Contains(c.CharacterId))
+            {
+                result.Add(c);
+            }
+        }
+        return result;
+    }
 
 
     private bool CanAfford(GameData gameData, List<ResourceCost> cost)
@@ -245,7 +264,7 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
 
     private void PersistState(GameData gameData)
     {
-        gameData.workshop.unlockedCharacterIds = _unlockedIds.ToList();
+        gameData.workshop.unlockedCharacterIds = new List<string>(_unlockedIds);
         gameData.workshop.equippedCharacterIds = new List<string>(_equippedIds);
         
         // Save without triggering the OnSaveDataLoaded event internally
@@ -263,11 +282,20 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
     private void PublishStateUpdated()
     {
         _publisher.Publish(new Event_WorkshopStateUpdated(
-            _unlockedIds.ToList(),
+            new List<string>(_unlockedIds),
             new List<string>(_equippedIds),
             _cachedPlayerLevel));
     }
 
     private SupportCharacterSO FindCharacter(string characterId)
-        => _registry.Characters.FirstOrDefault(c => c.CharacterId == characterId);
+    {
+        foreach (var c in _registry.Characters)
+        {
+            if (c.CharacterId == characterId)
+            {
+                return c;
+            }
+        }
+        return null;
+    }
 }

@@ -13,12 +13,12 @@ public class Effect : MonoBehaviour, IPoolable
     }
     public void OnDespawned()
     {
-        Debug.Log("Effect Despawned");
+        //Debug.Log("Effect Despawned");
     }
 
     public void OnSpawned()
     {
-        Debug.Log("Effect Spawned");
+        //Debug.Log("Effect Spawned");
         ParticleSystem ps = GetComponent<ParticleSystem>();
         if (ps != null)
         {

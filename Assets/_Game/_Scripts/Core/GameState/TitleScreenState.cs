@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TitleScreenState : IGameState
 {
@@ -11,7 +11,7 @@ public class TitleScreenState : IGameState
 
     public void EnterState(GameStateManager manager)
     {
-        Debug.Log("[TitleScreenState] Entered Title Screen.");
+        //Debug.Log("[TitleScreenState] Entered Title Screen.");
     }
 
     public void UpdateState(GameStateManager manager)
@@ -36,6 +36,6 @@ public class TitleScreenState : IGameState
 
     public void ExitState(GameStateManager manager)
     {
-        Debug.Log("[TitleScreenState] Exiting Title Screen.");
+        //Debug.Log("[TitleScreenState] Exiting Title Screen.");
     }
 }

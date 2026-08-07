@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -183,7 +183,7 @@ namespace VaultSurvivors.Core.Production
         {
             if (_globalLevel >= MaxLevel)
             {
-                Debug.Log("[ProductionManager] Factory is already at max level.");
+                //Debug.Log("[ProductionManager] Factory is already at max level.");
                 return;
             }
 
@@ -208,7 +208,7 @@ namespace VaultSurvivors.Core.Production
             }
             else
             {
-                Debug.LogWarning($"[Vault Survivors] Not enough Gold to upgrade! Need {cost}, but have {gameData.resources.gold}.");
+                //Debug.LogWarning($"[Vault Survivors] Not enough Gold to upgrade! Need {cost}, but have {gameData.resources.gold}.");
             }
         }
 

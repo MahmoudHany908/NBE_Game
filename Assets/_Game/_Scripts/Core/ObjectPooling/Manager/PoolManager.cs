@@ -208,7 +208,7 @@ public class PoolManager : MonoBehaviour
         var pooled = instance.GetComponent<PooledObject>();
         if (pooled == null || !_pools.TryGetValue(pooled.PrefabId, out var pool))
         {
-            Debug.LogWarning($"[PoolManager] '{instance.name}' was not spawned by this pool. Destroying instead.", instance);
+            // Debug.LogWarning($"[PoolManager] '{instance.name}' was not spawned by this pool. Destroying instead.", instance);
             Destroy(instance);
             return;
         }

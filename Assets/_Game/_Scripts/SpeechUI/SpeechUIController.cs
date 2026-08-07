@@ -24,10 +24,10 @@ public class SpeechUIController : MonoBehaviour
     private void Awake()
     {
         if (_panelRoot == null)
-            Debug.LogError($"[SpeechUIController] Panel Root is not assigned on {gameObject.name}.");
+            //Debug.LogError($"[SpeechUIController] Panel Root is not assigned on {gameObject.name}.");
 
         if (_dialogueText == null)
-            Debug.LogError($"[SpeechUIController] Dialogue Text is not assigned on {gameObject.name}.");
+            //Debug.LogError($"[SpeechUIController] Dialogue Text is not assigned on {gameObject.name}.");
 
         HideImmediate();
     }
@@ -37,7 +37,7 @@ public class SpeechUIController : MonoBehaviour
     {
         if (dialogue == null)
         {
-            Debug.LogWarning($"[SpeechUIController] ShowDialogue called with a null DialogueSO on {gameObject.name}.");
+            //Debug.LogWarning($"[SpeechUIController] ShowDialogue called with a null DialogueSO on {gameObject.name}.");
             return;
         }
 

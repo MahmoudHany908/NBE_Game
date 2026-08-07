@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -87,13 +87,13 @@ public class ExtractionUIController : MonoBehaviour
         if (healthBar != null)
         {
             healthBar.SetHealth(evt.healthPercentage);
-            Debug.Log($"Player took damage. New health percentage: {evt.healthPercentage}");
+            //Debug.Log($"Player took damage. New health percentage: {evt.healthPercentage}");
         }
     }
 
     private void HandleHealthChangedTakeHeal(PlayerHealedEvent evt)
     {
-        Debug.Log($"Player HEALED. New health percentage: {evt.healthPercentage}");
+        //Debug.Log($"Player HEALED. New health percentage: {evt.healthPercentage}");
         if (healthBar != null)
         {
             healthBar.SetHealth(evt.healthPercentage);
@@ -131,7 +131,7 @@ public class ExtractionUIController : MonoBehaviour
 
         if (rewardEntryPrefab == null)
         {
-            Debug.LogWarning("[ExtractionUIController] rewardEntryPrefab is missing!");
+            //Debug.LogWarning("[ExtractionUIController] rewardEntryPrefab is missing!");
             return;
         }
 

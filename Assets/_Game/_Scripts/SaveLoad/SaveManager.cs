@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -26,14 +26,14 @@ public class SaveManager : ISaveSystem
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(_savePath, json);
-        Debug.Log("Game Saved to: " + _savePath);
+        //Debug.Log("Game Saved to: " + _savePath);
     }
 
     public GameData Load()
     {
         if (!HasSaveFile())
         {
-            Debug.Log("[SaveManager] No save file found, returning new GameData");
+            //Debug.Log("[SaveManager] No save file found, returning new GameData");
             return new GameData();
         }
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,7 +36,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
     {
         if (handler == null)
         {
-            Debug.LogWarning("[EventBus] Tried to subscribe a null handler.");
+            //Debug.LogWarning("[EventBus] Tried to subscribe a null handler.");
             return;
         }
 
@@ -51,8 +51,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
 
             if (target[type].Contains(handler))
             {
-                Debug.LogWarning($"[EventBus] Handler already subscribed to {type.Name}. " +
-                                 "Duplicate subscription ignored. If using lambdas, cache them to avoid this.");
+                //Debug.LogWarning($"[EventBus] Handler already subscribed to {type.Name}. " + "Duplicate subscription ignored. If using lambdas, cache them to avoid this.");
                 return;
             }
 
@@ -64,7 +63,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
     {
         if (handler == null)
         {
-            Debug.LogWarning("[EventBus] Tried to unsubscribe a null handler.");
+            //Debug.LogWarning("[EventBus] Tried to unsubscribe a null handler.");
             return;
         }
 
@@ -83,13 +82,12 @@ public class EventBus : IEventPublisher, IEventSubscriber
                 if (_subscribers.TryGetValue(type, out var list))
                 {
                     int removed = list.RemoveAll(d => d.Equals(handler));
-                    if (removed == 0)
-                        Debug.LogWarning($"[EventBus] Unsubscribe called for {type.Name} but handler was not found. " +
-                                         "Check for mismatched Subscribe/Unsubscribe calls.");
+                    //if (removed == 0)
+                        //Debug.LogWarning($"[EventBus] Unsubscribe called for {type.Name} but handler was not found. " + "Check for mismatched Subscribe/Unsubscribe calls.");
                 }
                 else
                 {
-                    Debug.LogWarning($"[EventBus] Unsubscribe called for {type.Name} but no subscribers exist for that event.");
+                    //Debug.LogWarning($"[EventBus] Unsubscribe called for {type.Name} but no subscribers exist for that event.");
                 }
             }
         }
@@ -122,7 +120,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
                     }
                     catch (Exception e)
                     {
-                        Debug.LogException(e);
+                        //Debug.LogException(e);
                     }
                 }
             }
@@ -162,7 +160,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
             {
                 if (_subscribers[kvp.Key].Contains(del))
                 {
-                    Debug.LogWarning($"[EventBus] Deferred subscribe for {kvp.Key.Name}: duplicate handler ignored.");
+                    //Debug.LogWarning($"[EventBus] Deferred subscribe for {kvp.Key.Name}: duplicate handler ignored.");
                     continue;
                 }
                 _subscribers[kvp.Key].Add(del);
@@ -177,8 +175,8 @@ public class EventBus : IEventPublisher, IEventSubscriber
                 foreach (var del in kvp.Value)
                 {
                     int removed = list.RemoveAll(d => d.Equals(del));
-                    if (removed == 0)
-                        Debug.LogWarning($"[EventBus] Deferred unsubscribe for {kvp.Key.Name}: handler not found.");
+                    //if (removed == 0)
+                        //Debug.LogWarning($"[EventBus] Deferred unsubscribe for {kvp.Key.Name}: handler not found.");
                 }
             }
         }
@@ -203,7 +201,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
         {
             if (_subscribers.Count == 0)
             {
-                Debug.Log("[EventBus] No active subscribers.");
+                //Debug.Log("[EventBus] No active subscribers.");
                 return;
             }
 
@@ -211,7 +209,7 @@ public class EventBus : IEventPublisher, IEventSubscriber
             foreach (var kvp in _subscribers)
                 sb.AppendLine($"  {kvp.Key.Name}: {kvp.Value.Count} handler(s)");
 
-            Debug.Log(sb.ToString());
+            //Debug.Log(sb.ToString());
         }
     }
 #endif

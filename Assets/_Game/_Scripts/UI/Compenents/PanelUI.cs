@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using LitMotion;
 using UnityEngine;
@@ -86,7 +86,7 @@ using UnityEngine.Events;
             if (!string.IsNullOrEmpty(panelId))
             {
                 if (_registry.ContainsKey(panelId))
-                    Debug.LogWarning($"[PanelUI] Duplicate panelId '{panelId}' on '{name}'. Overwriting registry entry.", this);
+                    //Debug.LogWarning($"[PanelUI] Duplicate panelId '{panelId}' on '{name}'. Overwriting registry entry.", this);
                 _registry[panelId] = this;
             }
         }
