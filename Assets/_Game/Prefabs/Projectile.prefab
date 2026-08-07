@@ -112,8 +112,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 1.43
+  m_Center: {x: 0, y: 0, z: -0.87}
 --- !u!114 &2071282090456095421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,3 +140,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   lifeTime: 1
   speed: 30
+  isHoming: 1
+  homingRotationSpeed: 10
+  homingDetectionRadius: 5
+  homingTargetLayers:
+    serializedVersion: 2
+    m_Bits: 2147483648
