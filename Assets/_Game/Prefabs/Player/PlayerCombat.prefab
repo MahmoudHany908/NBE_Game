@@ -1309,7 +1309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 0.42075467, g: 1, b: 0.6028886, a: 0.10980392}
+  m_Color: {r: 1, g: 0.5936365, b: 0.41960788, a: 0.10980392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1780,7 +1780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 0.79607844, g: 0.39122245, b: 0.19215688, a: 0.5058824}
+  m_Color: {r: 0.79607844, g: 0.39122245, b: 0.19215688, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1980,7 +1980,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c69adab4096e1b449ac68ba65a148e0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DynamicOnScreenStick
-  joystickBackground: {fileID: 5789744079551803263}
+  joystickBackground: {fileID: 8106999579691362845}
   joystickKnob: {fileID: 8029485175554411733}
 --- !u!1 &8715803799505135197
 GameObject:
@@ -3115,6 +3115,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7613094905010779093, guid: 1f68414e92cbda441a0699a38500edbd, type: 3}
   m_PrefabInstance: {fileID: 4330476271830666743}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &7310169542260400671 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6442963651643453416, guid: 1f68414e92cbda441a0699a38500edbd, type: 3}
+  m_PrefabInstance: {fileID: 4330476271830666743}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7939541173594685906 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5923952701397961765, guid: 1f68414e92cbda441a0699a38500edbd, type: 3}
@@ -3133,7 +3138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpineAimRotator
   playerInputs: {fileID: 9198288608259141339}
-  playerRoot: {fileID: 8783658695282596998}
+  playerRoot: {fileID: 7310169542260400671}
   spineBones:
   - {fileID: 8403497506717230727}
   - {fileID: 6178890599550778914}
@@ -3154,7 +3159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AimArrow
   playerInputs: {fileID: 9198288608259141339}
   arrow: {fileID: 8763321645170005404}
-  playerRoot: {fileID: 8783658695282596998}
+  playerRoot: {fileID: 7310169542260400671}
   rotationSpeed: 20
   yawOffset: 0
   hideWhenNoAim: 1
