@@ -13,7 +13,7 @@ public class HubLifetimeScope : LifetimeScope
     [SerializeField] private FactoryBehavior factoryBehavior;
     [SerializeField] private MaterialsHUDController _materialsHUDController;
 
-    private FactoryControlPanel _factoryControlPanel;
+    [SerializeField] private FactoryControlPanel[] _factoryControlPanels;
     private FactoryUIController _factoryUIController;
 
     private CombatWorkshopControlPanel _combatWorkshopControlPanel;
@@ -26,11 +26,12 @@ public class HubLifetimeScope : LifetimeScope
     private MarketConfirmModal _marketConfirmModal;
     private MarketControlPanel _marketControlPanel;
 
+    private VaultSurvivors.Core.Production.FactoryCinematicController _factoryCinematicController;
+
     protected override void Configure(IContainerBuilder builder)
     {
         Debug.Log("[HubLifetimeScope] Configuring scope...");
 
-        _factoryControlPanel = FindAnyObjectByType<FactoryControlPanel>(FindObjectsInactive.Include);
         _factoryUIController = FindAnyObjectByType<FactoryUIController>(FindObjectsInactive.Include);
         var uiManager = FindAnyObjectByType<UIManager>(FindObjectsInactive.Include);
 
@@ -44,12 +45,13 @@ public class HubLifetimeScope : LifetimeScope
         _marketConfirmModal = FindAnyObjectByType<MarketConfirmModal>(FindObjectsInactive.Include);
         _marketControlPanel = FindAnyObjectByType<MarketControlPanel>(FindObjectsInactive.Include);
 
+        _factoryCinematicController = FindAnyObjectByType<VaultSurvivors.Core.Production.FactoryCinematicController>(FindObjectsInactive.Include);
+
         if (settingsMenu != null) builder.RegisterComponent(settingsMenu);
         if (statsMenu != null) builder.RegisterComponent(statsMenu);
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
         if (factoryBehavior != null) builder.RegisterComponent(factoryBehavior);
 
-        if (_factoryControlPanel != null) builder.RegisterComponent(_factoryControlPanel);
         if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
         if (_materialsHUDController != null) builder.RegisterComponent(_materialsHUDController);
         if (uiManager != null) builder.RegisterComponent(uiManager);
@@ -62,6 +64,8 @@ public class HubLifetimeScope : LifetimeScope
         if (_marketQuantityModal != null) builder.RegisterComponent(_marketQuantityModal);
         if (_marketConfirmModal != null) builder.RegisterComponent(_marketConfirmModal);
         if (_marketControlPanel != null) builder.RegisterComponent(_marketControlPanel);
+        
+        if (_factoryCinematicController != null) builder.RegisterComponent(_factoryCinematicController);
 
         builder.RegisterBuildCallback(container =>
         {
@@ -77,10 +81,13 @@ public class HubLifetimeScope : LifetimeScope
             if (statsButton != null && statsMenu != null)
                 statsButton.onClick.AddListener(statsMenu.OpenMenu);
 
-            if (_factoryControlPanel != null)
+            if (_factoryControlPanels != null && _factoryControlPanels.Length > 0)
             {
-                container.Inject(_factoryControlPanel);
-                Debug.Log("[FactoryControlPanel] Successfully Injected!");
+                foreach (var panel in _factoryControlPanels)
+                {
+                    container.Inject(panel);
+                }
+                Debug.Log($"[FactoryControlPanels] Successfully Injected {_factoryControlPanels.Length} panels!");
             }
             else
             {
@@ -145,6 +152,12 @@ public class HubLifetimeScope : LifetimeScope
             {
                 container.Inject(_marketControlPanel);
                 Debug.Log("[MarketControlPanel] Successfully Injected!");
+            }
+
+            if (_factoryCinematicController != null)
+            {
+                container.Inject(_factoryCinematicController);
+                Debug.Log("[FactoryCinematicController] Successfully Injected!");
             }
         });
     }

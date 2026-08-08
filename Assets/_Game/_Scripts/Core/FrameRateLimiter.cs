@@ -1,34 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class FrameRateTester : MonoBehaviour
 {
-    [Header("UI Display (Optional)")]
-    [Tooltip("Assign a UI Text element here to see the real-time FPS on your phone.")]
-    [SerializeField] private Text fpsCounterText;
-
-    // Internal variables for the FPS counter
     private float deltaTime = 0.0f;
-    private float currentFps = 0.0f;
 
     private void Start()
     {
         // Default to standard 60 FPS on launch
         SetTo60FPS();
     }
-
-    private void Update()
-    {
-        // Simple, efficient calculation for the real-time FPS counter
-        deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
-        currentFps = 1.0f / deltaTime;
-
-        if (fpsCounterText != null)
-        {
-            fpsCounterText.text = $"FPS: {Mathf.Ceil(currentFps)} | Target: {Application.targetFrameRate}";
-        }
-    }
-
+    
     // --- BUTTON CLICK FUNCTIONS ---
 
     /// <summary> Button 1: Cinematic / Battery Saver Mode </summary>
@@ -65,7 +47,7 @@ public class FrameRateTester : MonoBehaviour
     private void ApplyFrameRate(int target, string modeName)
     {
         Application.targetFrameRate = target;
-        Debug.Log($"[FrameRateTester] Switched to {modeName}. Target set to {target}.");
+        //Debug.Log($"[FrameRateTester] Switched to {modeName}. Target set to {target}.");
     }
 
     private float GetDeviceRefreshRate()

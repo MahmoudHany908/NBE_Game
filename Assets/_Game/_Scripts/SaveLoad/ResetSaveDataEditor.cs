@@ -40,7 +40,12 @@ public class ResetSaveDataEditor
         }
         else
         {
-            EditorUtility.DisplayDialog("Error", "No save file exists! Press Play and enter the game once to create a save file before adding gold.", "OK");
+            // Create a new save file with 50k gold since one doesn't exist yet
+            GameData data = new GameData();
+            data.resources.gold += 50000;
+            File.WriteAllText(path, JsonUtility.ToJson(data, true));
+            Debug.Log("[SaveManager] Created new save file and added 50,000 Gold.");
+            EditorUtility.DisplayDialog("Cheat Added", "Created a new save file and added 50,000 Gold!", "OK");
         }
         
     }

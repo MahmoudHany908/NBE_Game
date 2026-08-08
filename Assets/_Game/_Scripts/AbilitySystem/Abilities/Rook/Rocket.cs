@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 [RequireComponent(typeof(PooledObject))]
 public class Rocket : MonoBehaviour, IPoolable
@@ -20,6 +20,8 @@ public class Rocket : MonoBehaviour, IPoolable
     private bool hasHit;
     private bool isFalling;
     private float retargetTimer;
+
+    private static readonly Collider[] hitColliders = new Collider[16];
 
     private int enemyLayer;
     private int groundLayer;
@@ -78,14 +80,15 @@ public class Rocket : MonoBehaviour, IPoolable
         if (retargetTimer > 0f) return;
         retargetTimer = retargetCheckInterval;
 
-        Collider[] hits = Physics.OverlapSphere(transform.position, retargetRadius, enemySearchLayer);
-        if (hits.Length == 0) return;
+        int numHits = Physics.OverlapSphereNonAlloc(transform.position, retargetRadius, hitColliders, enemySearchLayer);
+        if (numHits == 0) return;
 
         Transform closest = null;
         float closestDistSqr = float.MaxValue;
 
-        foreach (Collider hit in hits)
+        for (int i = 0; i < numHits; i++)
         {
+            Collider hit = hitColliders[i];
             if (!hit.gameObject.activeInHierarchy) continue;
 
             float distSqr = (hit.transform.position - transform.position).sqrMagnitude;

@@ -1,0 +1,180 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using VContainer;
+using VaultSurvivors.Core.Production;
+using System.Threading.Tasks;
+using LitMotion;
+using LitMotion.Extensions;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace VaultSurvivors.Core.Production
+{
+    public class FactoryCinematicController : MonoBehaviour, IDisposable
+    {
+        [Header("Cinematic Settings")]
+        [SerializeField] private Transform cinematicCameraPos;
+        [SerializeField] private float vfxDuration = 2.0f;
+        [SerializeField] private float fadeDuration = 0.5f;
+
+        [Header("Visuals")]
+        [SerializeField] private GameObject[] vfxPrefabs;
+        [SerializeField] private GameObject level1Mesh;
+        [SerializeField] private GameObject level5Mesh;
+        [SerializeField] private GameObject[] barriers;
+
+        [Header("Audio")]
+        [SerializeField] private SoundData upgradeSound;
+
+        private IEventPublisher _eventPublisher;
+        private IEventSubscriber _eventSubscriber;
+        private AudioManager _audioManager;
+
+        [Inject]
+        public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, AudioManager audioManager)
+        {
+            _eventPublisher = eventPublisher;
+            _eventSubscriber = eventSubscriber;
+            _audioManager = audioManager;
+
+            // Subscribe to the upgrade event
+            _eventSubscriber.Subscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+        }
+
+        public void Dispose()
+        {
+            if (_eventSubscriber != null)
+            {
+                _eventSubscriber.Unsubscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+            }
+        }
+
+        private void OnFactoryVisualUpgrade(Event_FactoryVisualUpgrade evt)
+        {
+            // Only trigger cinematic at Level 5
+            if (evt.NewLevel == 5)
+            {
+                PlayCinematicSequence();
+            }
+        }
+
+        private async void PlayCinematicSequence()
+        {
+            // Step 1: Block input and close all menus
+            _eventPublisher.Publish(new Command_CloseAllMenus());
+            PlayerInputs playerInputs = FindAnyObjectByType<PlayerInputs>();
+            if (playerInputs != null) playerInputs.enabled = false;
+
+            // Create dynamic Canvas for screen fade
+            Canvas fadeCanvas = CreateFadeCanvas(out Image fadeImage);
+
+            // Step 2: Fade out
+            LMotion.Create(0f, 1f, fadeDuration).BindToColorA(fadeImage);
+            await Awaitable.WaitForSecondsAsync(fadeDuration);
+            
+            // Step 4: Cache camera, disable CinemachineBrain, and snap to cinematic position
+            Camera mainCam = Camera.main;
+            Vector3 originalCamPos = Vector3.zero;
+            Quaternion originalCamRot = Quaternion.identity;
+            MonoBehaviour cinemachineBrain = null;
+            
+            if (mainCam != null)
+            {
+                originalCamPos = mainCam.transform.position;
+                originalCamRot = mainCam.transform.rotation;
+
+                // Disable CinemachineBrain so it doesn't fight the manual position
+                cinemachineBrain = mainCam.GetComponent("Unity.Cinemachine.CinemachineBrain") as MonoBehaviour;
+                if (cinemachineBrain != null) cinemachineBrain.enabled = false;
+
+                if (cinematicCameraPos != null)
+                {
+                    mainCam.transform.position = cinematicCameraPos.position;
+                    mainCam.transform.rotation = cinematicCameraPos.rotation;
+                }
+            }
+
+            // Step 5: Fade back in
+            LMotion.Create(1f, 0f, fadeDuration).BindToColorA(fadeImage);
+            await Awaitable.WaitForSecondsAsync(fadeDuration);
+
+            // Step 6: Activate VFX and play audio
+            if (vfxPrefabs != null)
+            {
+                foreach (var vfx in vfxPrefabs)
+                {
+                    if (vfx != null) Instantiate(vfx, transform.position, transform.rotation);
+                }
+            }
+            
+            if (_audioManager != null && upgradeSound != null)
+            {
+                _audioManager.PlaySoundAtPosition(upgradeSound, transform.position);
+            }
+
+            // Step 7: Wait for VFX duration
+            await Awaitable.WaitForSecondsAsync(vfxDuration);
+
+            // Step 8: Swap meshes and remove barriers
+            if (level1Mesh != null) level1Mesh.SetActive(false);
+            if (level5Mesh != null) level5Mesh.SetActive(true);
+            
+            if (barriers != null)
+            {
+                foreach (var barrier in barriers)
+                {
+                    if (barrier != null) barrier.SetActive(false);
+                }
+            }
+
+            // Step 9: Wait 1 more second to show off the mesh
+            await Awaitable.WaitForSecondsAsync(1.0f);
+
+            // Step 10: Fade out, restore, fade in, open menu
+            LMotion.Create(0f, 1f, fadeDuration).BindToColorA(fadeImage);
+            await Awaitable.WaitForSecondsAsync(fadeDuration);
+
+            // Restore camera
+            if (mainCam != null)
+            {
+                mainCam.transform.position = originalCamPos;
+                mainCam.transform.rotation = originalCamRot;
+                if (cinemachineBrain != null) cinemachineBrain.enabled = true;
+            }
+
+            // Restore input and fade in
+            if (playerInputs != null) playerInputs.enabled = true;
+            LMotion.Create(1f, 0f, fadeDuration).BindToColorA(fadeImage);
+            await Awaitable.WaitForSecondsAsync(fadeDuration);
+
+            // Cleanup canvas
+            if (fadeCanvas != null) Destroy(fadeCanvas.gameObject);
+
+            // Removed Command_OpenFactoryUI so the panel stays hidden until player walks back into trigger
+        }
+
+        private Canvas CreateFadeCanvas(out Image img)
+        {
+            GameObject canvasGO = new GameObject("CinematicFadeCanvas");
+            Canvas canvas = canvasGO.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 9999;
+            canvasGO.AddComponent<GraphicRaycaster>(); // block clicks during fade
+
+            GameObject imageGO = new GameObject("FadeImage");
+            imageGO.transform.SetParent(canvasGO.transform, false);
+            img = imageGO.AddComponent<Image>();
+            img.color = new Color(0, 0, 0, 0); // Start transparent
+
+            RectTransform rt = img.rectTransform;
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.sizeDelta = Vector2.zero;
+
+            return canvas;
+        }
+    }
+}
