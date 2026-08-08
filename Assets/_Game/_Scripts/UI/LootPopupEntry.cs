@@ -1,4 +1,4 @@
-﻿using LitMotion;
+using LitMotion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -35,8 +35,8 @@ public class LootPopupEntry : MonoBehaviour
         if (label == null)
             label = GetComponentInChildren<TextMeshProUGUI>();
 
-        //if (label == null)
-            //Debug.LogError($"[{nameof(LootPopupEntry)}] Missing TextMeshProUGUI reference on {gameObject.name}.", this);
+        if (label == null)
+            Debug.LogError($"[{nameof(LootPopupEntry)}] Missing TextMeshProUGUI reference on {gameObject.name}.", this);
     }
 
     /// <summary>

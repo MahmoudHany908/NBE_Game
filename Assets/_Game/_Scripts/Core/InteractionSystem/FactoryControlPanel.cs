@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using VContainer;
 
 public class FactoryControlPanel : MonoBehaviour, IInteractable
@@ -11,12 +11,12 @@ public class FactoryControlPanel : MonoBehaviour, IInteractable
     public void Construct(IEventPublisher eventPublisher)
     {
         _eventPublisher = eventPublisher;
-        //Debug.Log($"[FactoryControlPanel] Constructed. EventPublisher is null? {_eventPublisher == null}");
+        Debug.Log($"[FactoryControlPanel] Constructed. EventPublisher is null? {_eventPublisher == null}");
     }
 
     public void Interact(Interactor interactor)
     {
-        //Debug.Log("[FactoryControlPanel] Interact triggered! Publishing Command_OpenFactoryUI.");
+        Debug.Log("[FactoryControlPanel] Interact triggered! Publishing Command_OpenFactoryUI.");
         _eventPublisher?.Publish(new Command_OpenFactoryUI());
     }
 
@@ -24,7 +24,7 @@ public class FactoryControlPanel : MonoBehaviour, IInteractable
     {
         if (other.CompareTag("Player"))
         {
-            //Debug.Log("[FactoryControlPanel] Player walked into trigger! Auto-opening UI.");
+            Debug.Log("[FactoryControlPanel] Player walked into trigger! Auto-opening UI.");
             _eventPublisher?.Publish(new Command_OpenFactoryUI());
         }
     }
@@ -33,7 +33,7 @@ public class FactoryControlPanel : MonoBehaviour, IInteractable
     {
         if (other.CompareTag("Player"))
         {
-            //Debug.Log("[FactoryControlPanel] Player left trigger! Auto-closing UI.");
+            Debug.Log("[FactoryControlPanel] Player left trigger! Auto-closing UI.");
             _eventPublisher?.Publish(new Command_CloseFactoryUI());
         }
     }

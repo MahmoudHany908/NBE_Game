@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -87,7 +87,7 @@ namespace VaultSurvivors.Core.Market
 
             if (foodUp == energyUp && energyUp == electronicsUp)
             {
-                // All moved in the same direction â€” flip one at random
+                // All moved in the same direction — flip one at random
                 int flipIndex = UnityEngine.Random.Range(0, 3);
                 switch (flipIndex)
                 {
@@ -108,7 +108,7 @@ namespace VaultSurvivors.Core.Market
 
         private float GetRandomizedPrice(float basePrice)
         {
-            // آ±12% swing, rounded to nearest whole integer
+            // ±12% swing, rounded to nearest whole integer
             float modifier = UnityEngine.Random.Range(0.88f, 1.12f);
             return Mathf.RoundToInt(basePrice * modifier);
         }
@@ -175,14 +175,14 @@ namespace VaultSurvivors.Core.Market
                 // This ensures the transaction is written to disk immediately
                 _saveSystem.Save(gameData);
                 
-                //Debug.Log($"[MarketManager] Sold {cmd.Amount} {cmd.Resource} for {goldGained} Gold.");
+                Debug.Log($"[MarketManager] Sold {cmd.Amount} {cmd.Resource} for {goldGained} Gold.");
                 
                 // Broadcast state update so Production UI updates if open
                 _eventPublisher.Publish(new Command_RequestFactoryState()); 
             }
             else
             {
-                //Debug.LogWarning($"[MarketManager] Not enough {cmd.Resource} to sell {cmd.Amount}.");
+                Debug.LogWarning($"[MarketManager] Not enough {cmd.Resource} to sell {cmd.Amount}.");
             }
         }
 

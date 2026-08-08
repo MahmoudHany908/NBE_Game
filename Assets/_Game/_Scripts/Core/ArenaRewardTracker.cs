@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VaultSurvivors.Core.Production;
@@ -10,7 +10,7 @@ using VaultSurvivors.Core.Production;
 /// On player death, discards all accumulated rewards.
 /// 
 /// Registered as a scoped singleton in <see cref="ArenaLifetimeScope"/>.
-/// This is a plain C# class â€” not a MonoBehaviour.
+/// This is a plain C# class — not a MonoBehaviour.
 /// </summary>
 public class ArenaRewardTracker : IDisposable
 {
@@ -71,12 +71,12 @@ public class ArenaRewardTracker : IDisposable
     {
         if (evt.Enemy == null)
         {
-            //Debug.LogWarning("[ArenaRewardTracker] EnemyDiedEvent received with null Enemy reference.");
+            Debug.LogWarning("[ArenaRewardTracker] EnemyDiedEvent received with null Enemy reference.");
             return;
         }
 
         EnemyLootTableSO lootTable = evt.Enemy.Data?.lootTable;
-        if (lootTable == null) return; // Enemy has no loot table â€” skip silently
+        if (lootTable == null) return; // Enemy has no loot table — skip silently
 
         LootResult result = lootTable.EvaluateDrops();
 
@@ -114,7 +114,7 @@ public class ArenaRewardTracker : IDisposable
 
     private void HandlePlayerDied(PlayerDiedEvent evt)
     {
-        //Debug.Log("[ArenaRewardTracker] Player died â€” all accumulated rewards discarded.");
+        Debug.Log("[ArenaRewardTracker] Player died — all accumulated rewards discarded.");
         ResetAccumulation();
     }
 
@@ -170,7 +170,7 @@ public class ArenaRewardTracker : IDisposable
     {
         if (_saveSystem == null)
         {
-            //Debug.LogError("[ArenaRewardTracker] Cannot apply rewards â€” ISaveSystem is null.");
+            Debug.LogError("[ArenaRewardTracker] Cannot apply rewards — ISaveSystem is null.");
             return;
         }
 
@@ -200,14 +200,18 @@ public class ArenaRewardTracker : IDisposable
                     data.resources.electronics += kvp.Value;
                     break;
                 default:
-                    //Debug.LogWarning($"[ArenaRewardTracker] Unknown resource type: {kvp.Key}");
+                    Debug.LogWarning($"[ArenaRewardTracker] Unknown resource type: {kvp.Key}");
                     break;
             }
         }
 
         _saveSystem.Save(data);
 
-        //Debug.Log($"[ArenaRewardTracker] Rewards applied â€” XP: {_accumulatedXP}, " + $"Gold: {_accumulatedResources[ResourceType.Gold]}, " + $"Food: {_accumulatedResources[ResourceType.Food]}, " + $"Energy: {_accumulatedResources[ResourceType.Energy]}, " + $"Electronics: {_accumulatedResources[ResourceType.Electronics]}");
+        Debug.Log($"[ArenaRewardTracker] Rewards applied — XP: {_accumulatedXP}, " +
+                  $"Gold: {_accumulatedResources[ResourceType.Gold]}, " +
+                  $"Food: {_accumulatedResources[ResourceType.Food]}, " +
+                  $"Energy: {_accumulatedResources[ResourceType.Energy]}, " +
+                  $"Electronics: {_accumulatedResources[ResourceType.Electronics]}");
     }
 
     /// <summary>
@@ -223,7 +227,7 @@ public class ArenaRewardTracker : IDisposable
             playerData.xp -= requiredXP;
             playerData.level++;
 
-            //Debug.Log($"[ArenaRewardTracker] Player leveled up to level {playerData.level}!");
+            Debug.Log($"[ArenaRewardTracker] Player leveled up to level {playerData.level}!");
 
             requiredXP = GetRequiredXPForLevel(playerData.level);
         }
@@ -231,7 +235,7 @@ public class ArenaRewardTracker : IDisposable
 
     /// <summary>
     /// Returns the XP required to advance from the given level to the next.
-    /// Formula: level * 100 (e.g., level 1 â†’ 100 XP, level 5 â†’ 500 XP).
+    /// Formula: level * 100 (e.g., level 1 → 100 XP, level 5 → 500 XP).
     /// </summary>
     private int GetRequiredXPForLevel(int level)
     {

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using VContainer;
 
 public class GateTrigger : MonoBehaviour
@@ -11,21 +11,21 @@ public class GateTrigger : MonoBehaviour
     [Inject]
     public void Construct(IEventPublisher eventPublisher)
     {
-        //Debug.Log("[GateTrigger] Construct called! Injecting EventPublisher.");
+        Debug.Log("[GateTrigger] Construct called! Injecting EventPublisher.");
         _eventPublisher = eventPublisher;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log($"[GateTrigger] Trigger entered by: {other.gameObject.name} with tag: {other.tag}");
+        Debug.Log($"[GateTrigger] Trigger entered by: {other.gameObject.name} with tag: {other.tag}");
 
         if (other.CompareTag("Player"))
         {
-            //Debug.Log($"[GateTrigger] Player entered gate. Opening Loadout UI...");
+            Debug.Log($"[GateTrigger] Player entered gate. Opening Loadout UI...");
 
             if (_eventPublisher == null)
             {
-                //Debug.LogError("[GateTrigger] CRITICAL ERROR: _eventPublisher is NULL! VContainer injection failed.");
+                Debug.LogError("[GateTrigger] CRITICAL ERROR: _eventPublisher is NULL! VContainer injection failed.");
             }
             else
             {

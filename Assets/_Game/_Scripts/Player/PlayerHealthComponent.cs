@@ -1,4 +1,4 @@
-﻿using Unity.VisualScripting;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
@@ -46,7 +46,7 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
         _eventPublisher?.Publish(new PlayerHealedEvent(healAmount: amount, healthPercentage: GetHealthPercentage()));
-        //Debug.Log("Player healed: " + currentHealth);
+        Debug.Log("Player healed: " + currentHealth);
     }
 
     public void TakeDamage(int amount)
@@ -57,7 +57,7 @@ public class PlayerHealthComponent : MonoBehaviour, IDamageable
 
         _eventPublisher?.Publish(new PlayerTakeDamageEvent(damage: amount, healthPercentage: GetHealthPercentage()));
 
-        //Debug.Log("Player took damage: " + currentHealth);
+        Debug.Log("Player took damage: " + currentHealth);
         if (currentHealth <= 0) Die();
     }
 

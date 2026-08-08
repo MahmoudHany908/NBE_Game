@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class Door : MonoBehaviour
 {
@@ -71,7 +71,7 @@ public class Door : MonoBehaviour
         {
             return;
         }
-        //Debug.Log("Enter");
+        Debug.Log("Enter");
         entitiesInTrigger++;
         UpdateDoorState();
     }
@@ -85,7 +85,7 @@ public class Door : MonoBehaviour
 
         entitiesInTrigger--;
         if (entitiesInTrigger < 0) entitiesInTrigger = 0;
-        //Debug.Log("Exit");
+        Debug.Log("Exit");
         UpdateDoorState();
     }
 

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -17,7 +17,7 @@ public class GameLifetimeScope : LifetimeScope
             loadingScreenController = FindAnyObjectByType<VaultSurvivors.LoadingSystem.LoadingScreenController>();
             if (loadingScreenController == null)
             {
-                //Debug.LogWarning("[GameLifetimeScope] LoadingScreenController not found in the scene! Injection will fail.");
+                Debug.LogWarning("[GameLifetimeScope] LoadingScreenController not found in the scene! Injection will fail.");
             }
         }
 
@@ -32,7 +32,7 @@ public class GameLifetimeScope : LifetimeScope
         }
         else
         {
-            //Debug.LogWarning("[GameLifetimeScope] SupportCharacterRegistrySO is not assigned in the inspector!");
+            Debug.LogWarning("[GameLifetimeScope] SupportCharacterRegistrySO is not assigned in the inspector!");
         }
 
         builder.RegisterEntryPoint<VaultSurvivors.Core.Production.ProductionManager>().As<VaultSurvivors.Core.Production.IProductionManager>();

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -61,7 +61,7 @@ public class LootPopupUI : MonoBehaviour
     {
         if (entryPrefab == null)
         {
-            //Debug.LogWarning($"[{nameof(LootPopupUI)}] Entry prefab is not assigned on {gameObject.name}.", this);
+            Debug.LogWarning($"[{nameof(LootPopupUI)}] Entry prefab is not assigned on {gameObject.name}.", this);
             return;
         }
 

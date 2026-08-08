@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VaultSurvivors.LoadingSystem.ScriptableObjects;
@@ -21,7 +21,7 @@ namespace VaultSurvivors.LoadingSystem
         {
             if (_database == null)
             {
-                //Debug.LogWarning("[HintController] HintDatabase is missing.");
+                Debug.LogWarning("[HintController] HintDatabase is missing.");
                 return;
             }
 

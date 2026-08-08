@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class JessyDroneProjectile : MonoBehaviour, IPoolable
 {
@@ -54,7 +54,7 @@ public class JessyDroneProjectile : MonoBehaviour, IPoolable
         if (damageable != null)
         {
             damageable.TakeDamage(damage);
-            //Debug.Log("Projectile hit something: " + other.name);
+            Debug.Log("Projectile hit something: " + other.name);
         }
 
         // Destroy the projectile if it hits a solid object like a wall

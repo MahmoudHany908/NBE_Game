@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace VaultSurvivors.LoadingSystem
@@ -43,17 +43,17 @@ namespace VaultSurvivors.LoadingSystem
                 _tapController.Disable();
         }
 
-        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ─────────────────────────────────────────────────────────────
         //  PUBLIC ENTRY POINT  (called by SceneLoader)
         //  Running on DontDestroyOnLoad ensures async survives scene transitions
-        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ─────────────────────────────────────────────────────────────
 
         /// <summary>Run the full loading sequence. showHints=false hides the hint panel.</summary>
         public async Awaitable RunLoad(string targetScene, IGameState targetState, bool showHints)
         {
             if (_isLoading)
             {
-                //Debug.LogWarning("[LoadingScreenController] A load operation is already in progress. Ignoring new request.");
+                Debug.LogWarning("[LoadingScreenController] A load operation is already in progress. Ignoring new request.");
                 return;
             }
             _isLoading = true;
@@ -69,7 +69,7 @@ namespace VaultSurvivors.LoadingSystem
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(targetScene);
             if (asyncLoad == null)
             {
-                //Debug.LogError($"[LoadingScreenController] Scene '{targetScene}' could not be loaded. Is it in Build Settings?");
+                Debug.LogError($"[LoadingScreenController] Scene '{targetScene}' could not be loaded. Is it in Build Settings?");
                 await HideAsync();
                 return;
             }
@@ -78,7 +78,7 @@ namespace VaultSurvivors.LoadingSystem
 
             float loadStartTime = Time.unscaledTime;
 
-            // 4. Drive progress bar (0 â†’ 90% maps to 0 â†’ 100% in UI)
+            // 4. Drive progress bar (0 → 90% maps to 0 → 100% in UI)
             while (asyncLoad.progress < 0.9f)
             {
                 float normalizedProgress = Mathf.Clamp01(asyncLoad.progress / 0.9f);
@@ -116,22 +116,22 @@ namespace VaultSurvivors.LoadingSystem
             // 9. Fade out and hide loading screen
             await HideAsync();
 
-            // 10. Transition game state (re-find GSM â€” it may be in new scene)
+            // 10. Transition game state (re-find GSM — it may be in new scene)
             if (targetState != null)
             {
                 gsm = Object.FindAnyObjectByType<GameStateManager>();
                 if (gsm != null)
                     gsm.ChangeState(targetState);
-                //else
-                    //Debug.LogWarning("[LoadingScreenController] GameStateManager not found after scene load.");
+                else
+                    Debug.LogWarning("[LoadingScreenController] GameStateManager not found after scene load.");
             }
 
             _isLoading = false;
         }
 
-        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ─────────────────────────────────────────────────────────────
         //  INTERNAL HELPERS
-        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ─────────────────────────────────────────────────────────────
 
         private async Awaitable ShowAsync(bool showHints)
         {

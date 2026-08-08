@@ -1,4 +1,4 @@
-﻿using Alchemy.Inspector;
+using Alchemy.Inspector;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ public class MeshCombiner : MonoBehaviour
         MeshFilter[] childFilters = GetComponentsInChildren<MeshFilter>();
 
         // Each entry = one sub-mesh list (one per material slot across all children)
-        // materialKey â†’ list of CombineInstances that share that material
+        // materialKey → list of CombineInstances that share that material
         Dictionary<Material, List<CombineInstance>> materialMap =
             new Dictionary<Material, List<CombineInstance>>();
 
@@ -32,7 +32,7 @@ public class MeshCombiner : MonoBehaviour
 
             if (mf.sharedMesh == null)
             {
-                //Debug.LogWarning($"[MeshCombiner] '{mf.gameObject.name}' has no mesh â€” skipping.", mf.gameObject);
+                Debug.LogWarning($"[MeshCombiner] '{mf.gameObject.name}' has no mesh — skipping.", mf.gameObject);
                 continue;
             }
 
@@ -47,7 +47,7 @@ public class MeshCombiner : MonoBehaviour
 
                 if (mat == null)
                 {
-                    //Debug.LogWarning($"[MeshCombiner] '{mf.gameObject.name}' submesh {sub} has no material (or no MeshRenderer). Skipping.", mf.gameObject);
+                    Debug.LogWarning($"[MeshCombiner] '{mf.gameObject.name}' submesh {sub} has no material (or no MeshRenderer). Skipping.", mf.gameObject);
                     continue;
                 }
 
@@ -68,11 +68,11 @@ public class MeshCombiner : MonoBehaviour
 
         if (materialMap.Count == 0)
         {
-            //Debug.LogWarning("[MeshCombiner] No valid child meshes found to combine.");
+            Debug.LogWarning("[MeshCombiner] No valid child meshes found to combine.");
             return;
         }
 
-        // Step 1 â€” merge each material group into its own sub-mesh
+        // Step 1 — merge each material group into its own sub-mesh
         List<CombineInstance> finalCombines = new List<CombineInstance>();
         List<Material> finalMaterials = new List<Material>();
 
@@ -87,7 +87,7 @@ public class MeshCombiner : MonoBehaviour
             finalMaterials.Add(kvp.Key);
         }
 
-        // Step 2 â€” merge all groups into one mesh, keeping one sub-mesh per material
+        // Step 2 — merge all groups into one mesh, keeping one sub-mesh per material
         Mesh combinedMesh = new Mesh();
         combinedMesh.name = "CombinedMesh";
         combinedMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -108,6 +108,8 @@ public class MeshCombiner : MonoBehaviour
                 child.SetActive(false);
         }
 
-        //Debug.Log($"[MeshCombiner] Combined into '{combinedMesh.name}' â€” " + $"{combinedMesh.vertexCount} verts, {combinedMesh.triangles.Length / 3} tris, " + $"{finalMaterials.Count} material(s).");
+        Debug.Log($"[MeshCombiner] Combined into '{combinedMesh.name}' — " +
+                  $"{combinedMesh.vertexCount} verts, {combinedMesh.triangles.Length / 3} tris, " +
+                  $"{finalMaterials.Count} material(s).");
     }
 }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using System.Collections;
 
@@ -24,7 +24,7 @@ public class FPSCounterUI : MonoBehaviour
     {
         if (fpsText == null)
         {
-            //Debug.LogError("[FPSCounterUI] TextMeshProUGUI component is not assigned!", this);
+            Debug.LogError("[FPSCounterUI] TextMeshProUGUI component is not assigned!", this);
             enabled = false;
             return;
         }

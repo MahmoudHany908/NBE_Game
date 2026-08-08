@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 
@@ -21,7 +21,7 @@ public class DynamicJoystickMover : MonoBehaviour, IPointerDownHandler, IPointer
         }
         else
         {
-            //Debug.LogWarning($"[{nameof(DynamicJoystickMover)}] {gameObject.name} is missing a reference to the Joystick Background.", gameObject);
+            Debug.LogWarning($"[{nameof(DynamicJoystickMover)}] {gameObject.name} is missing a reference to the Joystick Background.", gameObject);
         }
     }
 

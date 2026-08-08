@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using VContainer;
@@ -39,8 +39,8 @@ public class WaveMilestoneController : MonoBehaviour
 
     private void Awake()
     {
-        //if (waveSpawner == null)
-            //Debug.LogError($"[{nameof(WaveMilestoneController)}] Missing required WaveSpawner reference on {gameObject.name}.", this);
+        if (waveSpawner == null)
+            Debug.LogError($"[{nameof(WaveMilestoneController)}] Missing required WaveSpawner reference on {gameObject.name}.", this);
     }
 
     private void OnEnable()
