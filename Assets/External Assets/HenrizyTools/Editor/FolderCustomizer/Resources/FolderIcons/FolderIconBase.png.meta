@@ -1,5 +1,12 @@
 fileFormatVersion: 2
 guid: b8e2f1c308ef3834f9d357baf3654de6
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321256
+  packageName: Folder Customizer
+  packageVersion: 3.0
+  assetPath: Assets/HenrizyTools/Editor/FolderCustomizer/Resources/FolderIcons/FolderIconBase.png
+  uploadId: 855836
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -109,6 +116,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: 50
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 1
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -154,10 +174,3 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 321256
-  packageName: Folder Customizer
-  packageVersion: 3.0
-  assetPath: Assets/HenrizyTools/Editor/FolderCustomizer/Resources/FolderIcons/FolderIconBase.png
-  uploadId: 855836
