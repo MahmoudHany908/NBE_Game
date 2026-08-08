@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   enemyData: {fileID: 11400000, guid: 302ec096361ed6d4f8a4ff24cdfc4e99, type: 2}
+  animator: {fileID: 0}
 --- !u!114 &7170847601209022616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,8 +96,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 2, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.5, y: 3, z: 1.5}
+  m_Center: {x: 0, y: -0.3, z: 0}
 --- !u!54 &8596325106021846323
 Rigidbody:
   m_ObjectHideFlags: 0
