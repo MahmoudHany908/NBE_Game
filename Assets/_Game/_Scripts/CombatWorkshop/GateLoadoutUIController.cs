@@ -223,6 +223,9 @@ public class GateLoadoutUIController : MonoBehaviour
             else
             {
                 _emptyCard1Image.sprite = EmptyImage;
+                var color = _emptyCard1Image.color;
+                color.a = 0.3686275f;
+                _emptyCard1Image.color = color;
             }
         }
 
@@ -243,6 +246,9 @@ public class GateLoadoutUIController : MonoBehaviour
             else
             {
                 _emptyCard2Image.sprite = EmptyImage;
+                var color = _emptyCard2Image.color;
+                color.a = 0.3686275f;
+                _emptyCard2Image.color = color;
             }
         }
     }
