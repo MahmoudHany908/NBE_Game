@@ -1,7 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 
 public class SpeechUIController : MonoBehaviour
@@ -10,15 +11,10 @@ public class SpeechUIController : MonoBehaviour
     [SerializeField] private GameObject _panelRoot;
     [SerializeField] private TextMeshProUGUI _dialogueText;
 
-    [Header("Timing")]
-    [Tooltip("Seconds the panel stays visible before auto-hiding.")]
-    [SerializeField] private float _displayDuration = 5f;
-
     [Header("Events")]
     [SerializeField] private UnityEvent _onDialogueShown;
     [SerializeField] private UnityEvent _onDialogueHidden;
 
-    private Coroutine _hideCoroutine;
     private bool _isShowing;
 
     private void Awake()
@@ -32,6 +28,16 @@ public class SpeechUIController : MonoBehaviour
         HideImmediate();
     }
 
+    private void Update()
+    {
+        if (_isShowing)
+        {
+            if (Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
+            {
+                HideImmediate();
+            }
+        }
+    }
 
     public void ShowDialogue(DialogueSO dialogue, float delay = 0f)
     {
@@ -40,9 +46,6 @@ public class SpeechUIController : MonoBehaviour
             Debug.LogWarning($"[SpeechUIController] ShowDialogue called with a null DialogueSO on {gameObject.name}.");
             return;
         }
-
-        if (_isShowing)
-            CancelHide();
 
         if (delay > 0f)
             StartCoroutine(ShowWithDelay(dialogue, delay));
@@ -64,14 +67,6 @@ public class SpeechUIController : MonoBehaviour
         _panelRoot.SetActive(true);
         _isShowing = true;
         _onDialogueShown?.Invoke();
-
-        _hideCoroutine = StartCoroutine(AutoHide());
-    }
-
-    private IEnumerator AutoHide()
-    {
-        yield return new WaitForSeconds(_displayDuration);
-        HideImmediate();
     }
 
     private void HideImmediate()
@@ -81,19 +76,5 @@ public class SpeechUIController : MonoBehaviour
 
         _isShowing = false;
         _onDialogueHidden?.Invoke();
-    }
-
-    private void CancelHide()
-    {
-        if (_hideCoroutine != null)
-        {
-            StopCoroutine(_hideCoroutine);
-            _hideCoroutine = null;
-        }
-    }
-
-    private void OnDestroy()
-    {
-        CancelHide();
     }
 }

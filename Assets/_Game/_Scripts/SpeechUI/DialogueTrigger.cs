@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 
 [RequireComponent(typeof(Collider))]
@@ -34,9 +34,59 @@ public class DialogueTrigger : MonoBehaviour
             return;
         }
 
+        if (_oneShot)
+            _hasFired = true;
+
         _speechUI.ShowDialogue(_dialogue);
-        Destroy(gameObject,0.3f);
-         if (_oneShot)
-             _hasFired = true;
+
+        AudioManager audioManager = FindAnyObjectByType<AudioManager>();
+        Player player = other.GetComponent<Player>();
+        float waitTime = 0f;
+
+        if (audioManager != null && _dialogue.DialogueSound != null)
+        {
+            audioManager.PlaySoundAtPosition(_dialogue.DialogueSound, transform.position);
+            
+            if (_dialogue.DialogueSound.clips != null && _dialogue.DialogueSound.clips.Length > 0)
+            {
+                waitTime = _dialogue.DialogueSound.clips[0].length;
+            }
+        }
+
+        if (player != null)
+        {
+            StartCoroutine(HandlePlayerWait(player, waitTime));
+        }
+        else
+        {
+            Destroy(gameObject, waitTime + 0.1f);
+        }
+    }
+
+    private System.Collections.IEnumerator HandlePlayerWait(Player player, float waitTime)
+    {
+        PlayerInputs inputs = player.GetPlayerInputs();
+        Rigidbody rb = player.GetPlayerRigidBody();
+
+        if (inputs != null)
+        {
+            inputs.enabled = false;
+        }
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+        }
+
+        if (waitTime > 0f)
+        {
+            yield return new WaitForSeconds(waitTime);
+        }
+
+        if (inputs != null)
+        {
+            inputs.enabled = true;
+        }
+
+        Destroy(gameObject);
     }
 }
