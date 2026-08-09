@@ -77,25 +77,7 @@ namespace VaultSurvivors.UI
             if (_panelContainer != null) _panelContainer.SetActive(false);
         }
 
-        private void OnEnable()
-        {
-            if (foodUI != null && foodUI.sellButton != null)
-                foodUI.sellButton.onClick.AddListener(() => OnSellClicked(ResourceType.Food));
-            if (energyUI != null && energyUI.sellButton != null)
-                energyUI.sellButton.onClick.AddListener(() => OnSellClicked(ResourceType.Energy));
-            if (electronicsUI != null && electronicsUI.sellButton != null)
-                electronicsUI.sellButton.onClick.AddListener(() => OnSellClicked(ResourceType.Electronics));
-        }
-
-        private void OnDisable()
-        {
-            if (foodUI != null && foodUI.sellButton != null)
-                foodUI.sellButton.onClick.RemoveAllListeners();
-            if (energyUI != null && energyUI.sellButton != null)
-                energyUI.sellButton.onClick.RemoveAllListeners();
-            if (electronicsUI != null && electronicsUI.sellButton != null)
-                electronicsUI.sellButton.onClick.RemoveAllListeners();
-        }
+        // (Bindings moved to Start to avoid wiping out GlobalUIButtonAudio listeners)
 
         /// <summary>
         /// Called by VContainer when the LifetimeScope shuts down.
@@ -120,10 +102,18 @@ namespace VaultSurvivors.UI
             if (energyUI.nameText != null) energyUI.nameText.text = "Energy";
             if (electronicsUI.nameText != null) electronicsUI.nameText.text = "Electronics";
 
+            if (foodUI != null && foodUI.sellButton != null)
+                foodUI.sellButton.onClick.AddListener(() => OnSellClicked(ResourceType.Food));
+            if (energyUI != null && energyUI.sellButton != null)
+                energyUI.sellButton.onClick.AddListener(() => OnSellClicked(ResourceType.Energy));
+            if (electronicsUI != null && electronicsUI.sellButton != null)
+                electronicsUI.sellButton.onClick.AddListener(() => OnSellClicked(ResourceType.Electronics));
+
             if (quantityModal != null) quantityModal.Close();
             if (confirmModal != null) confirmModal.Close();
             if (_closeBtn != null)
             {
+                // Note: Keep this if the close button isn't globally audio tagged
                 _closeBtn.onClick.RemoveAllListeners();
                 _closeBtn.onClick.AddListener(() => OnCloseUI(null));
             }

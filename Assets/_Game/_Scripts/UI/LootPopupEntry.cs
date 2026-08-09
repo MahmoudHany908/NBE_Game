@@ -14,7 +14,6 @@ using UnityEngine.UI;
 public class LootPopupEntry : MonoBehaviour
 {
     [Header("Animation")]
-    [SerializeField] private float slideDistance = 80f;
     [SerializeField] private float slideInDuration = 0.25f;
     [SerializeField] private float displayDuration = 2.5f;
     [SerializeField] private float fadeOutDuration = 0.5f;

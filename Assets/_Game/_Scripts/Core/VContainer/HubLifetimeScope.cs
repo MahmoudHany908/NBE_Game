@@ -178,6 +178,13 @@ public class HubLifetimeScope : LifetimeScope
                 container.Inject(_factoryCinematicController);
                 Debug.Log("[FactoryCinematicController] Successfully Injected!");
             }
+
+            var globalAudio = GetComponent<GlobalUIButtonAudio>();
+            if (globalAudio != null)
+            {
+                container.Inject(globalAudio);
+                Debug.Log("[GlobalUIButtonAudio] Successfully Injected!");
+            }
         });
     }
 }

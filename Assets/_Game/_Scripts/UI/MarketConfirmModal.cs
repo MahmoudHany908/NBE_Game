@@ -25,6 +25,15 @@ namespace VaultSurvivors.UI
             _eventPublisher = eventPublisher;
         }
 
+        private void Awake()
+        {
+            if (confirmButton != null)
+                confirmButton.onClick.AddListener(OnConfirmClicked);
+
+            if (cancelButton != null)
+                cancelButton.onClick.AddListener(Close);
+        }
+
         public void Setup(MarketUIController uiController, ResourceType resource, int amount, float totalGold)
         {
             _uiController = uiController;
@@ -32,12 +41,6 @@ namespace VaultSurvivors.UI
             _amount = amount;
 
             confirmMessageText.text = $"Are you sure you want to sell {_amount} {_currentResource} for {totalGold:F1} Gold?";
-
-            confirmButton.onClick.RemoveAllListeners();
-            confirmButton.onClick.AddListener(OnConfirmClicked);
-
-            cancelButton.onClick.RemoveAllListeners();
-            cancelButton.onClick.AddListener(Close);
 
             gameObject.SetActive(true);
         }
