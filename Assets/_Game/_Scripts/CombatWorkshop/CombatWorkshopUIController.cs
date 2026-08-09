@@ -27,6 +27,7 @@ public class CombatWorkshopUIController : MonoBehaviour
 {
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
+    private ISaveSystem _saveSystem;
 
     [Header("Main Canvas")]
     [SerializeField] private GameObject _panelContainer;
@@ -65,10 +66,11 @@ public class CombatWorkshopUIController : MonoBehaviour
     private Dictionary<string, SupportCharacterSO> _characterLookup;
 
     [Inject]
-    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, ISaveSystem saveSystem)
     {
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+        _saveSystem = saveSystem;
     }
 
     private void Awake()
@@ -239,6 +241,7 @@ public class CombatWorkshopUIController : MonoBehaviour
         if (_currentlyViewedCharacter == null || _lastState == null) return;
 
         bool isUnlocked = _lastState.UnlockedIds.Contains(_currentlyViewedCharacter.CharacterId);
+        bool canAfford = true;
 
         if (_txtAbilityTitle != null) _txtAbilityTitle.text = _currentlyViewedCharacter.AbilityTitle;
         if (_txtCharacterDescription != null) _txtCharacterDescription.text = _currentlyViewedCharacter.Description;
@@ -252,9 +255,22 @@ public class CombatWorkshopUIController : MonoBehaviour
             }
             else if (_currentlyViewedCharacter.UnlockCost != null && _currentlyViewedCharacter.UnlockCost.Count > 0)
             {
+                GameData data = _saveSystem != null && _saveSystem.HasSaveFile() ? _saveSystem.Load() : new GameData();
+                
                 _detailCost.text = string.Join("\n",
                     _currentlyViewedCharacter.UnlockCost.Select(cost =>
-                        $"{cost.Amount} {cost.ResourceName}"));
+                    {
+                        float currentAmount = 0f;
+                        switch (cost.Type)
+                        {
+                            case VaultSurvivors.Core.Production.ResourceType.Food: currentAmount = data.resources.food; break;
+                            case VaultSurvivors.Core.Production.ResourceType.Energy: currentAmount = data.resources.energy; break;
+                            case VaultSurvivors.Core.Production.ResourceType.Electronics: currentAmount = data.resources.electronics; break;
+                            case VaultSurvivors.Core.Production.ResourceType.Gold: currentAmount = data.resources.gold; break;
+                        }
+                        if (currentAmount < cost.Amount) canAfford = false;
+                        return $"{cost.Amount} {cost.ResourceName}";
+                    }));
             }
             else
             {
@@ -262,7 +278,26 @@ public class CombatWorkshopUIController : MonoBehaviour
             }
         }
 
-        if (_unlockBtn != null) _unlockBtn.gameObject.SetActive(!isUnlocked);
+        if (_unlockBtn != null) 
+        {
+            bool interactable = !isUnlocked && canAfford;
+            _unlockBtn.interactable = interactable;
+            
+            Color dimmedColor = new Color32(102, 102, 102, 255);
+            Color activeGreen = new Color32(13, 249, 108, 255);
+            Color finalColor = interactable ? activeGreen : dimmedColor;
+
+            Image btnImage = _unlockBtn.GetComponent<Image>();
+            if (btnImage != null)
+                btnImage.color = finalColor;
+
+            TMP_Text btnText = _unlockBtn.GetComponentInChildren<TMP_Text>();
+            if (btnText != null)
+                btnText.color = finalColor;
+
+            // Only show the button if it's NOT unlocked yet.
+            _unlockBtn.gameObject.SetActive(!isUnlocked);
+        }
     }
 
     private void OnUnlockClicked()

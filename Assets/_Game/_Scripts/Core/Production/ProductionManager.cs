@@ -92,10 +92,20 @@ namespace VaultSurvivors.Core.Production
         public void Tick()
         {
             float newAccumulated = CalculateYield(_currentAccumulated, GetProductionRate(_activeResource), GetMaxCapacity(), UnityEngine.Time.deltaTime);
+            
+            // Optimization: Only update the UI/System if the integer value of accumulated resources has actually changed.
+            // This prevents the event from firing 60 times a second and completely ruining FPS.
+            int oldInt = Mathf.FloorToInt(_currentAccumulated);
+            int newInt = Mathf.FloorToInt(newAccumulated);
+
             if (Mathf.Abs(newAccumulated - _currentAccumulated) > 0.001f)
             {
                 _currentAccumulated = newAccumulated;
-                BroadcastState();
+                
+                if (oldInt != newInt)
+                {
+                    BroadcastState();
+                }
             }
         }
 

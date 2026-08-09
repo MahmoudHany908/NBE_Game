@@ -29,7 +29,7 @@ namespace VaultSurvivors.LoadingSystem
             }
 
             // Kick off the sequence on the persistent MonoBehaviour — safe across scene loads
-            LoadingScreenController.Instance.RunLoad(targetScene, targetState, showHints);
+            _ = LoadingScreenController.Instance.RunLoad(targetScene, targetState, showHints);
         }
     }
 }

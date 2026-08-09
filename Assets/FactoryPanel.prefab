@@ -3398,6 +3398,8 @@ GameObject:
   - component: {fileID: 3701572308319804708}
   - component: {fileID: 5378317906388795782}
   - component: {fileID: 3275974090787621795}
+  - component: {fileID: 3749023779250132765}
+  - component: {fileID: 2822269941484510560}
   m_Layer: 0
   m_Name: Upgrade_btn
   m_TagString: Untagged
@@ -3447,7 +3449,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 8313f79d637dfa84a945ef1e4c22b938, type: 2}
   m_Color: {r: 1, g: 0.9603219, b: 0.3254717, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3509,6 +3511,38 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3749023779250132765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8390531442712049326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 787650aa6341078438f29688806b508e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NeonImagePopup
+  triggerButton: {fileID: 3275974090787621795}
+  targetImage: {fileID: 5378317906388795782}
+  popDuration: 1
+  fadeInPortion: 0.35
+  restIntensity: 1
+  peakIntensity: 6
+  neonColor: {r: 0, g: 3, b: 3, a: 1}
+--- !u!114 &2822269941484510560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8390531442712049326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf733cea8727b9948b23bcbca30a74b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpecialButtonAudioTag
+  buttonType: 0
 --- !u!1 &8570120780604198478
 GameObject:
   m_ObjectHideFlags: 0

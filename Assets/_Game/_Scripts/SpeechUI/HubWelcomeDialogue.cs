@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 
 public class HubWelcomeDialogue : MonoBehaviour
@@ -10,8 +10,6 @@ public class HubWelcomeDialogue : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float _delayBeforeShow = 3f;
 
-    private bool _hasFired;
-
     private void Start()
     {
         if (_welcomeDialogue == null)
@@ -21,7 +19,6 @@ public class HubWelcomeDialogue : MonoBehaviour
             Debug.LogError($"[HubWelcomeDialogue] SpeechUIController is not assigned on {gameObject.name}.");
 
         _speechUI.ShowDialogue(_welcomeDialogue, _delayBeforeShow);
-        _hasFired = true;
     }
     
 

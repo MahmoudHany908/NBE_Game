@@ -1,10 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class FrameRateTester : MonoBehaviour
 {
-    private float deltaTime = 0.0f;
-
     private void Start()
     {
         // Default to standard 60 FPS on launch

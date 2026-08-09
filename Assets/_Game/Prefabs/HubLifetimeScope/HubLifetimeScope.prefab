@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 396738623006970596}
   - component: {fileID: 5394631782541549353}
+  - component: {fileID: 3504463145396859096}
   m_Layer: 0
   m_Name: HubLifetimeScope
   m_TagString: Untagged
@@ -25,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6227670950076707839}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.9835, y: 0.00674, z: -7.57955}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -55,4 +56,25 @@ MonoBehaviour:
   gateTrigger: {fileID: 0}
   factoryBehavior: {fileID: 0}
   _materialsHUDController: {fileID: 0}
+  _graphicsSettingsManager: {fileID: 0}
+  _graphicsQualityUI: {fileID: 0}
+  _factoryControlPanels:
+  - {fileID: 0}
+  - {fileID: 0}
   _gateLoadoutUIController: {fileID: 0}
+--- !u!114 &3504463145396859096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6227670950076707839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3e62070ff1974c4ba3e45b7223a3e61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalUIButtonAudio
+  genericClickSound: {fileID: 0}
+  upgradeClickSound: {fileID: 0}
+  unlockClickSound: {fileID: 0}
+  sellClickSound: {fileID: 0}

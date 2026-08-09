@@ -281,6 +281,12 @@ public class CombatWorkshopManager : ICombatWorkshopManager, IInitializable, IDi
 
     private void PublishStateUpdated()
     {
+        if (_saveSystem.HasSaveFile())
+        {
+            GameData gameData = LoadGameDataInternal();
+            _cachedPlayerLevel = gameData.player.level;
+        }
+
         _publisher.Publish(new Event_WorkshopStateUpdated(
             new List<string>(_unlockedIds),
             new List<string>(_equippedIds),

@@ -72,7 +72,7 @@ namespace VaultSurvivors.Core.Production
             Canvas fadeCanvas = CreateFadeCanvas(out Image fadeImage);
 
             // Step 2: Fade out
-            LMotion.Create(0f, 1f, fadeDuration).BindToColorA(fadeImage);
+            _ = LMotion.Create(0f, 1f, fadeDuration).BindToColorA(fadeImage);
             await Awaitable.WaitForSecondsAsync(fadeDuration);
             
             // Step 4: Cache camera, disable CinemachineBrain, and snap to cinematic position
@@ -98,7 +98,7 @@ namespace VaultSurvivors.Core.Production
             }
 
             // Step 5: Fade back in
-            LMotion.Create(1f, 0f, fadeDuration).BindToColorA(fadeImage);
+            _ = LMotion.Create(1f, 0f, fadeDuration).BindToColorA(fadeImage);
             await Awaitable.WaitForSecondsAsync(fadeDuration);
 
             // Step 6: Activate VFX and play audio
@@ -120,7 +120,17 @@ namespace VaultSurvivors.Core.Production
 
             // Step 8: Swap meshes and remove barriers
             if (level1Mesh != null) level1Mesh.SetActive(false);
-            if (level5Mesh != null) level5Mesh.SetActive(true);
+            if (level5Mesh != null) 
+            {
+                level5Mesh.SetActive(true);
+                
+                // Prevent the UI from immediately popping up since the player is already inside the zone
+                var panels = level5Mesh.GetComponentsInChildren<FactoryControlPanel>(true);
+                foreach (var panel in panels)
+                {
+                    panel.RequireExit();
+                }
+            }
             
             if (barriers != null)
             {
@@ -134,7 +144,7 @@ namespace VaultSurvivors.Core.Production
             await Awaitable.WaitForSecondsAsync(1.0f);
 
             // Step 10: Fade out, restore, fade in, open menu
-            LMotion.Create(0f, 1f, fadeDuration).BindToColorA(fadeImage);
+            _ = LMotion.Create(0f, 1f, fadeDuration).BindToColorA(fadeImage);
             await Awaitable.WaitForSecondsAsync(fadeDuration);
 
             // Restore camera
@@ -146,8 +156,9 @@ namespace VaultSurvivors.Core.Production
             }
 
             // Restore input and fade in
+            _eventPublisher.Publish(new Command_CloseAllMenus()); // Prevent UI from staying open if trigger fired during mesh swap
             if (playerInputs != null) playerInputs.enabled = true;
-            LMotion.Create(1f, 0f, fadeDuration).BindToColorA(fadeImage);
+            _ = LMotion.Create(1f, 0f, fadeDuration).BindToColorA(fadeImage);
             await Awaitable.WaitForSecondsAsync(fadeDuration);
 
             // Cleanup canvas

@@ -20,10 +20,19 @@ public class FactoryControlPanel : MonoBehaviour, IInteractable
         _eventPublisher?.Publish(new Command_OpenFactoryUI());
     }
 
+    private bool _requiresExit = false;
+
+    public void RequireExit()
+    {
+        _requiresExit = true;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            if (_requiresExit) return;
+
             Debug.Log("[FactoryControlPanel] Player walked into trigger! Auto-opening UI.");
             _eventPublisher?.Publish(new Command_OpenFactoryUI());
         }
@@ -33,6 +42,7 @@ public class FactoryControlPanel : MonoBehaviour, IInteractable
     {
         if (other.CompareTag("Player"))
         {
+            _requiresExit = false;
             Debug.Log("[FactoryControlPanel] Player left trigger! Auto-closing UI.");
             _eventPublisher?.Publish(new Command_CloseFactoryUI());
         }

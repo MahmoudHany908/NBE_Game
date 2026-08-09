@@ -49,6 +49,7 @@ public class FactoryUIController : MonoBehaviour
     private ResourceType _currentActiveResource = ResourceType.Energy;
     private ResourceType _pendingSwitchResource;
     private int _pendingCollectAmount;
+    private bool _isOnCollectCooldown = false;
 
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
@@ -172,7 +173,7 @@ public class FactoryUIController : MonoBehaviour
         if (_collectBtn != null)
         {
             if (_collectBtnText != null) _collectBtnText.text = $"Collect";
-            _collectBtn.interactable = amount > 0;
+            _collectBtn.interactable = amount > 0 && !_isOnCollectCooldown;
         }
 
         if (_upgradeBtn != null)
@@ -223,7 +224,21 @@ public class FactoryUIController : MonoBehaviour
 
     private void OnCollectClicked()
     {
+        if (_isOnCollectCooldown) return;
+        
         _eventPublisher?.Publish(new Command_CollectFactory());
+        StartCoroutine(CollectCooldownRoutine());
+    }
+
+    private System.Collections.IEnumerator CollectCooldownRoutine()
+    {
+        _isOnCollectCooldown = true;
+        if (_collectBtn != null) _collectBtn.interactable = false;
+
+        yield return new WaitForSeconds(1.5f);
+
+        _isOnCollectCooldown = false;
+        // It will automatically become interactable again on the next OnStateUpdated tick if amount > 0
     }
 
     private void OnUpgradeClicked()
