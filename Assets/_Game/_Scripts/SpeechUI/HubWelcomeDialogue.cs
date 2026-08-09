@@ -18,7 +18,15 @@ public class HubWelcomeDialogue : MonoBehaviour
         if (_speechUI == null)
             Debug.LogError($"[HubWelcomeDialogue] SpeechUIController is not assigned on {gameObject.name}.");
 
-        _speechUI.ShowDialogue(_welcomeDialogue, _delayBeforeShow);
+        AudioManager audioManager = FindAnyObjectByType<AudioManager>();
+        PooledAudioSource source = null;
+
+        if (audioManager != null && _welcomeDialogue.DialogueSound != null)
+        {
+            source = audioManager.PlayDialogue(_welcomeDialogue.DialogueSound, transform.position);
+        }
+
+        _speechUI.ShowDialogue(_welcomeDialogue, source, _delayBeforeShow);
     }
     
 

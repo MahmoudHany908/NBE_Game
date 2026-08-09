@@ -97,6 +97,28 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public PooledAudioSource PlayDialogue(SoundData data, Vector3 position)
+    {
+        AudioClip clip = data.GetClip();
+        if (clip == null) return null;
+
+        if (poolManager == null || soundSourcePrefab == null) return null;
+
+        PooledAudioSource pooled = poolManager.Spawn<PooledAudioSource>(
+            soundSourcePrefab.gameObject, position, Quaternion.identity);
+
+        if (pooled != null)
+        {
+            pooled.Source.clip = clip;
+            pooled.Source.volume = GetFinalVolume(data.volume, sfxVolume);
+            pooled.Source.pitch = RandomizePitch(data.pitchRange);
+            pooled.Source.loop = false;
+            pooled.Source.Play();
+        }
+
+        return pooled;
+    }
+
     #endregion
 
     #region AMBIENT

@@ -37,56 +37,50 @@ public class DialogueTrigger : MonoBehaviour
         if (_oneShot)
             _hasFired = true;
 
-        _speechUI.ShowDialogue(_dialogue);
-
         AudioManager audioManager = FindAnyObjectByType<AudioManager>();
-        Player player = other.GetComponent<Player>();
-        float waitTime = 0f;
+        PooledAudioSource source = null;
 
         if (audioManager != null && _dialogue.DialogueSound != null)
         {
-            audioManager.PlaySoundAtPosition(_dialogue.DialogueSound, transform.position);
-            
-            if (_dialogue.DialogueSound.clips != null && _dialogue.DialogueSound.clips.Length > 0)
-            {
-                waitTime = _dialogue.DialogueSound.clips[0].length;
-            }
+            source = audioManager.PlayDialogue(_dialogue.DialogueSound, transform.position);
         }
 
+        _speechUI.ShowDialogue(_dialogue, source);
+
+        Player player = other.GetComponent<Player>();
         if (player != null)
         {
-            StartCoroutine(HandlePlayerWait(player, waitTime));
+            StartCoroutine(HandlePlayerWait(player));
         }
         else
         {
-            Destroy(gameObject, waitTime + 0.1f);
+            StartCoroutine(HandleSelfDestroy());
         }
     }
 
-    private System.Collections.IEnumerator HandlePlayerWait(Player player, float waitTime)
+    private System.Collections.IEnumerator HandlePlayerWait(Player player)
     {
         PlayerInputs inputs = player.GetPlayerInputs();
         Rigidbody rb = player.GetPlayerRigidBody();
 
-        if (inputs != null)
+        if (inputs != null) inputs.enabled = false;
+        if (rb != null) rb.linearVelocity = Vector3.zero;
+
+        while (_speechUI.IsShowing)
         {
-            inputs.enabled = false;
-        }
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector3.zero;
+            yield return null;
         }
 
-        if (waitTime > 0f)
-        {
-            yield return new WaitForSeconds(waitTime);
-        }
+        if (inputs != null) inputs.enabled = true;
+        Destroy(gameObject);
+    }
 
-        if (inputs != null)
+    private System.Collections.IEnumerator HandleSelfDestroy()
+    {
+        while (_speechUI.IsShowing)
         {
-            inputs.enabled = true;
+            yield return null;
         }
-
         Destroy(gameObject);
     }
 }

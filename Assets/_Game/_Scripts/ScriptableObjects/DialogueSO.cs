@@ -1,20 +1,23 @@
 using UnityEngine;
 
+[System.Serializable]
+public struct DialoguePart
+{
+    [TextArea(3, 8)]
+    public string text;
+    [Tooltip("The timestamp in seconds in the audio clip where this part starts.")]
+    public float startTime;
+}
+
 /// <summary>
-/// ScriptableObject that holds a single dialogue message.
-/// Create via: Right-click > Create > NBE/Dialogue
+/// ScriptableObject that holds a dialogue message with parts.
 /// </summary>
 [CreateAssetMenu(fileName = "NewDialogue", menuName = "NBE/Dialogue")]
 public class DialogueSO : ScriptableObject
 {
-    [TextArea(3, 8)]
-    [SerializeField] private string _dialogueText;
-
     [SerializeField] private SoundData _dialogueSound;
+    [SerializeField] private DialoguePart[] _dialogueParts;
 
-    /// <summary>The text to display in the Speech UI panel.</summary>
-    public string DialogueText => _dialogueText;
-
-    /// <summary>The sound to play when the dialogue is shown.</summary>
     public SoundData DialogueSound => _dialogueSound;
+    public DialoguePart[] DialogueParts => _dialogueParts;
 }
