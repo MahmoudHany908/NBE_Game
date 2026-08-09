@@ -102,10 +102,17 @@ public class SetupNeonAndAudioEditor : Editor
             if (audioSetup == null)
             {
                 audioSetup = Undo.AddComponent<GlobalUIButtonAudio>(hubScope.gameObject);
-                EditorUtility.SetDirty(hubScope.gameObject);
-                ApplyPrefabRoot(hubScope.gameObject);
-                Debug.Log("Attached GlobalUIButtonAudio to HubLifetimeScope!");
             }
+            
+            // Automatically assign the sound data assets
+            audioSetup.genericClickSound = AssetDatabase.LoadAssetAtPath<SoundData>("Assets/_Game/ScriptableObjects/GenericButtonClickSound.asset");
+            audioSetup.upgradeClickSound = AssetDatabase.LoadAssetAtPath<SoundData>("Assets/_Game/ScriptableObjects/UpgradeClickSound.asset");
+            audioSetup.unlockClickSound = AssetDatabase.LoadAssetAtPath<SoundData>("Assets/_Game/ScriptableObjects/UnlockClickSound.asset");
+            audioSetup.sellClickSound = AssetDatabase.LoadAssetAtPath<SoundData>("Assets/_Game/ScriptableObjects/SellClickSound.asset");
+
+            EditorUtility.SetDirty(hubScope.gameObject);
+            ApplyPrefabRoot(hubScope.gameObject);
+            Debug.Log("Attached and configured GlobalUIButtonAudio to HubLifetimeScope!");
         }
 
         Debug.Log("Neon UI Setup Complete! Check your buttons.");
