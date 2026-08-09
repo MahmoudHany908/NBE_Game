@@ -74,7 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3e62070ff1974c4ba3e45b7223a3e61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlobalUIButtonAudio
-  genericClickSound: {fileID: 0}
-  upgradeClickSound: {fileID: 0}
-  unlockClickSound: {fileID: 0}
-  sellClickSound: {fileID: 0}
+  genericClickSound: {fileID: 11400000, guid: 6f19020032662f44c8b5cca561e49f11, type: 2}
+  upgradeClickSound: {fileID: 11400000, guid: c4ed1a2e3ee96de4f9c3074969749b86, type: 2}
+  unlockClickSound: {fileID: 11400000, guid: ac4991b7fe9e9bb4a970e1c0f4a76f75, type: 2}
+  sellClickSound: {fileID: 11400000, guid: 903157f9ab1f98e42b0d8470975473f8, type: 2}
