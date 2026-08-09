@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   enemyData: {fileID: 11400000, guid: 640204483f7b4a64a8da05237586e3d0, type: 2}
+  destroyedModel: {fileID: 3778606100826485364, guid: 818c61487f46c1c4fb21e5db7a973a2c, type: 3}
   animator: {fileID: 0}
 --- !u!114 &6823896736790411283
 MonoBehaviour:

@@ -57,7 +57,7 @@ public class SeeleAbility : MonoBehaviour, IAbility
             target.GetComponent<Enemy>()?.TakeStun(stunDuration);
             audioManager.PlaySoundAtPosition(soundData, target.position);
             Vector3 offset = new Vector3(0, 1, 0);
-            Instantiate(shockVFX, target.position, Quaternion.identity);
+            Instantiate(shockVFX, target.position + offset, Quaternion.identity);
         }
     }
 

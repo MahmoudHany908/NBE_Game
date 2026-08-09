@@ -6,6 +6,7 @@ using VContainer;
 public class Enemy : MonoBehaviour, IPoolable
 {
     [SerializeField] private EnemyDataSO enemyData;
+    [SerializeField] private GameObject destroyedModel;
 
     private PooledObject pooledObject;
     private EnemyHealthComponent enemyHealthComponent;
@@ -139,7 +140,7 @@ public class Enemy : MonoBehaviour, IPoolable
     private void HandleDeath(EnemyDiedEvent obj)
     {
         if (obj.gameObject != gameObject) return;
-        Debug.Log($"{obj.gameObject.name} died at {obj.DeathPosition}");
+        Instantiate(destroyedModel, transform.position, transform.rotation);
         pooledObject.ReturnToPool(0.1f);
     }
 
