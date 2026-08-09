@@ -9,6 +9,7 @@ public class GameData
     public ProductionData production = new ProductionData();
     public WorkshopData workshop = new WorkshopData();
     public AudioData audio = new AudioData();
+    public GraphicsData graphics = new GraphicsData();
     
     public long lastSeenTimestamp = 0;
 }
@@ -74,4 +75,11 @@ public class AudioData
     public float musicVolume = 1f;
     public float ambientVolume = 1f;
     public bool isMuted = false;
+}
+
+[System.Serializable]
+public class GraphicsData
+{
+    // 0 = Low, 1 = Medium, 2 = High
+    public int qualityLevel = 1;
 }

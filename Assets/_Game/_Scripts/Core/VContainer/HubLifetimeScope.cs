@@ -13,6 +13,10 @@ public class HubLifetimeScope : LifetimeScope
     [SerializeField] private FactoryBehavior factoryBehavior;
     [SerializeField] private MaterialsHUDController _materialsHUDController;
 
+    [Header("Graphics")]
+    [SerializeField] private GraphicsSettingsManager _graphicsSettingsManager;
+    [SerializeField] private GraphicsQualityUI _graphicsQualityUI;
+
     [SerializeField] private FactoryControlPanel[] _factoryControlPanels;
     private FactoryUIController _factoryUIController;
 
@@ -52,6 +56,10 @@ public class HubLifetimeScope : LifetimeScope
         if (gateTrigger != null) builder.RegisterComponent(gateTrigger);
         if (factoryBehavior != null) builder.RegisterComponent(factoryBehavior);
 
+        // Graphics Quality System
+        if (_graphicsSettingsManager != null) builder.RegisterComponent(_graphicsSettingsManager);
+        if (_graphicsQualityUI != null) builder.RegisterComponent(_graphicsQualityUI);
+
         if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
         if (_materialsHUDController != null) builder.RegisterComponent(_materialsHUDController);
         if (uiManager != null) builder.RegisterComponent(uiManager);
@@ -73,6 +81,17 @@ public class HubLifetimeScope : LifetimeScope
             if (statsMenu != null) container.Inject(statsMenu);
             if (gateTrigger != null) container.Inject(gateTrigger);
             if (factoryBehavior != null) container.Inject(factoryBehavior);
+
+            if (_graphicsSettingsManager != null)
+            {
+                container.Inject(_graphicsSettingsManager);
+                Debug.Log("[GraphicsSettingsManager] Successfully Injected!");
+            }
+            if (_graphicsQualityUI != null)
+            {
+                container.Inject(_graphicsQualityUI);
+                Debug.Log("[GraphicsQualityUI] Successfully Injected!");
+            }
 
             // Wire the settings button click to open the settings menu (no Inspector UnityEvents)
             if (settingsButton != null && settingsMenu != null)
