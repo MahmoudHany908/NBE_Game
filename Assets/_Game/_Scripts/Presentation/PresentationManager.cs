@@ -7,7 +7,7 @@ public class PresentationManager : MonoBehaviour
 {
     [Header("Slides Setup")]
     public List<PresentationSlide> slides = new List<PresentationSlide>();
-    
+
     [Header("Camera Setup")]
     [Tooltip("The main camera that will physically move to match the slide cameras.")]
     public Camera presentationCamera;
@@ -45,39 +45,39 @@ public class PresentationManager : MonoBehaviour
 
         if (keyboard.rightArrowKey.wasPressedThisFrame || keyboard.dKey.wasPressedThisFrame)
         {
-            Debug.Log("[PresentationManager] Right Arrow pressed.");
+            // Debug.Log("[PresentationManager] Right Arrow pressed.");
             NextStep();
         }
         else if (keyboard.leftArrowKey.wasPressedThisFrame || keyboard.aKey.wasPressedThisFrame)
         {
-            Debug.Log("[PresentationManager] Left Arrow pressed.");
+            // Debug.Log("[PresentationManager] Left Arrow pressed.");
             PreviousStep();
         }
     }
 
     public void NextStep()
     {
-        Debug.Log($"[PresentationManager] NextStep called. Current index: {currentSlideIndex}. Total slides: {slides.Count}");
+        // Debug.Log($"[PresentationManager] NextStep called. Current index: {currentSlideIndex}. Total slides: {slides.Count}");
         if (slides.Count == 0 || currentSlideIndex >= slides.Count) return;
 
         PresentationSlide currentSlide = slides[currentSlideIndex];
-        
+
         // Let the current slide try to handle the input (e.g. nested videos)
         if (currentSlide != null && currentSlide.TryNextInnerStep())
         {
             Debug.Log("[PresentationManager] Slide handled inner step. Not transitioning.");
-            return; 
+            return;
         }
 
         // Otherwise, move to the next slide
         if (currentSlideIndex < slides.Count - 1)
         {
-            Debug.Log($"[PresentationManager] Transitioning from slide {currentSlideIndex} to {currentSlideIndex + 1}");
+            //Debug.Log($"[PresentationManager] Transitioning from slide {currentSlideIndex} to {currentSlideIndex + 1}");
             if (currentSlide != null) currentSlide.ExitSlide();
-            
+
             currentSlideIndex++;
             PresentationSlide nextSlide = slides[currentSlideIndex];
-            
+
             if (nextSlide != null)
             {
                 nextSlide.EnterSlide();
@@ -88,7 +88,7 @@ public class PresentationManager : MonoBehaviour
 
     public void PreviousStep()
     {
-        Debug.Log($"[PresentationManager] PreviousStep called. Current index: {currentSlideIndex}");
+        // Debug.Log($"[PresentationManager] PreviousStep called. Current index: {currentSlideIndex}");
         if (slides.Count == 0 || currentSlideIndex < 0) return;
 
         PresentationSlide currentSlide = slides[currentSlideIndex];
@@ -103,7 +103,7 @@ public class PresentationManager : MonoBehaviour
         // Otherwise, move to the previous slide
         if (currentSlideIndex > 0)
         {
-            Debug.Log($"[PresentationManager] Transitioning from slide {currentSlideIndex} to {currentSlideIndex - 1}");
+            //Debug.Log($"[PresentationManager] Transitioning from slide {currentSlideIndex} to {currentSlideIndex - 1}");
             if (currentSlide != null) currentSlide.ExitSlide();
 
             currentSlideIndex--;
@@ -142,7 +142,7 @@ public class PresentationManager : MonoBehaviour
     {
         Vector3 startPos = presentationCamera.transform.position;
         Quaternion startRot = presentationCamera.transform.rotation;
-        
+
         float t = 0;
         while (t < 1f)
         {
