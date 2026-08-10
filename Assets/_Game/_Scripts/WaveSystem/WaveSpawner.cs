@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using VContainer;
 
 public class WaveSpawner : MonoBehaviour
@@ -78,9 +79,11 @@ public class WaveSpawner : MonoBehaviour
                     continue;
                 }
 
-                Vector3 spawnPos = GetGroundedSpawnPosition();
-                Vector3 offset = new Vector3(0f, prefab.transform.localScale.y - 1, 0f); //HERE IS A Problem
-                GameObject enemy = poolManager.Spawn(prefab, spawnPos + offset, Quaternion.identity);
+                Vector3 spawnPos = GetRandomNavMeshPosition();
+                
+                // Spawn the enemy directly at the NavMesh surface. 
+                // The NavMeshAgent component will handle its own height/offset properly.
+                GameObject enemy = poolManager.Spawn(prefab, spawnPos, Quaternion.identity);
                 if (enemy != null)
                 {
                     activeEnemies.Add(enemy);
@@ -94,17 +97,26 @@ public class WaveSpawner : MonoBehaviour
         OnAllSquadsSpawned?.Invoke();
     }
 
-    private Vector3 GetGroundedSpawnPosition()
+    private Vector3 GetRandomNavMeshPosition()
     {
         Vector3 center = transform.position;
-        float x = UnityEngine.Random.Range(-spawnBoxSize.x / 2f, spawnBoxSize.x / 2f);
-        float z = UnityEngine.Random.Range(-spawnBoxSize.z / 2f, spawnBoxSize.z / 2f);
-        Vector3 origin = center + new Vector3(x, raycastOriginHeight, z);
+        
+        // Attempt to find a valid NavMesh point up to 10 times to ensure we don't spawn out of bounds
+        for (int i = 0; i < 10; i++)
+        {
+            float x = UnityEngine.Random.Range(-spawnBoxSize.x / 2f, spawnBoxSize.x / 2f);
+            float z = UnityEngine.Random.Range(-spawnBoxSize.z / 2f, spawnBoxSize.z / 2f);
+            Vector3 randomPoint = center + new Vector3(x, 0f, z);
 
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, raycastOriginHeight * 2f, groundMask))
-            return hit.point;
+            // Sample within a reasonable vertical and horizontal radius (e.g., 5 units)
+            if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+            {
+                return hit.position;
+            }
+        }
 
-        return center + new Vector3(x, 0f, z);
+        // Fallback to center if no NavMesh point is found
+        return center;
     }
 
     private List<GameObject> GetEnemiesToSpawn(int points)

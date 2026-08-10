@@ -6,13 +6,18 @@ using Alchemy.Inspector;
 public class ChaseMovementStrategy : IMovementStrategy {
     public void Move(Enemy enemy, Transform target)
     {
+        if (enemy.Agent == null || !enemy.Agent.isOnNavMesh) return;
+
         float distance = Vector3.Distance(enemy.transform.position, target.transform.position);
 
-        if (distance <= enemy.Data.attackRange) return;
+        if (distance <= enemy.Data.attackRange) 
+        {
+            enemy.Agent.isStopped = true;
+            return;
+        }
 
-        Vector3 direction = (target.position - enemy.transform.position).normalized;
-        direction.y = 0f;
-        enemy.transform.position += direction * enemy.Data.moveSpeed * Time.deltaTime;
+        enemy.Agent.isStopped = false;
+        enemy.Agent.SetDestination(target.position);
     }
 }
 
@@ -31,6 +36,8 @@ public class KeepDistanceMovementStrategy : IMovementStrategy
     [SerializeField] private float maxHeight = 5f;
     public void Move(Enemy enemy, Transform target)
     {
+        if (enemy.Agent == null || !enemy.Agent.isOnNavMesh) return;
+
         if (enableFlying)
         {
             if (enemy.TargetHeight == 0f)
@@ -38,9 +45,7 @@ public class KeepDistanceMovementStrategy : IMovementStrategy
                 enemy.TargetHeight = UnityEngine.Random.Range(minHeight, maxHeight);
             }
             
-            Vector3 pos = enemy.transform.position;
-            pos.y = Mathf.MoveTowards(pos.y, enemy.TargetHeight, enemy.Data.moveSpeed * Time.deltaTime);
-            enemy.transform.position = pos;
+            enemy.Agent.baseOffset = Mathf.MoveTowards(enemy.Agent.baseOffset, enemy.TargetHeight, enemy.Data.moveSpeed * Time.deltaTime);
         }
 
         Vector3 flatSelf = new Vector3(enemy.transform.position.x, 0f, enemy.transform.position.z);
@@ -49,11 +54,24 @@ public class KeepDistanceMovementStrategy : IMovementStrategy
         float distance = Vector3.Distance(flatSelf, flatTarget);
         float difference = distance - preferredDistance;
 
-        if (Mathf.Abs(difference) <= distanceThreshold) return;
+        if (Mathf.Abs(difference) <= distanceThreshold) 
+        {
+            enemy.Agent.isStopped = true;
+            return;
+        }
+
         Vector3 direction = (flatSelf - flatTarget).normalized;
+        enemy.Agent.isStopped = false;
 
         if (difference > 0f)
-            direction = -direction;
-        enemy.transform.position += direction * enemy.Data.moveSpeed * Time.deltaTime;
+        {
+            // Too far, chase target
+            enemy.Agent.SetDestination(target.position);
+        }
+        else
+        {
+            // Too close, move away
+            enemy.Agent.Move(direction * enemy.Data.moveSpeed * Time.deltaTime);
+        }
     }
 }

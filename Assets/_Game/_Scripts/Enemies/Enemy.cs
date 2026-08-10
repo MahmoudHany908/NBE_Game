@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.AI;
 using VContainer;
 
 [RequireComponent(typeof(PooledObject))]
 [RequireComponent(typeof(EnemyHealthComponent))]
+[RequireComponent(typeof(NavMeshAgent))]
 public class Enemy : MonoBehaviour, IPoolable
 {
     [SerializeField] private EnemyDataSO enemyData;
@@ -18,6 +20,8 @@ public class Enemy : MonoBehaviour, IPoolable
     private ITargetProvider targetProvider;
     private Transform target;
     [SerializeField] private Animator animator;
+
+    public NavMeshAgent Agent { get; private set; }
 
     private bool isStunned;
     private float stunTimer;
@@ -41,6 +45,12 @@ public class Enemy : MonoBehaviour, IPoolable
         enemyHealthComponent = GetComponent<EnemyHealthComponent>();
         targetProvider = GetComponentInChildren<ITargetProvider>();
         animator = GetComponentInChildren<Animator>();
+        Agent = GetComponent<NavMeshAgent>();
+
+        if (Agent != null)
+        {
+            Agent.updateRotation = false; // We use FaceTarget() to rotate
+        }
 
         if (targetProvider == null)
             Debug.LogError($"[Enemy] Missing ITargetProvider on {gameObject.name}!", this);
@@ -51,6 +61,12 @@ public class Enemy : MonoBehaviour, IPoolable
         if (enemyData != null && enemyHealthComponent != null)
         {
             enemyHealthComponent.SetMaxHealth(enemyData.maxHealth);
+        }
+
+        if (Agent != null && enemyData != null)
+        {
+            Agent.speed = enemyData.moveSpeed;
+            Agent.enabled = true;
         }
 
         TargetHeight = 0f;
@@ -66,6 +82,11 @@ public class Enemy : MonoBehaviour, IPoolable
     {
         if (targetProvider != null)
             targetProvider.TargetChanged -= SetTarget;
+
+        if (Agent != null)
+        {
+            Agent.enabled = false;
+        }
 
         UnsubscribeFromEvents();
     }
@@ -160,12 +181,14 @@ public class Enemy : MonoBehaviour, IPoolable
     {
         isStunned = true;
         if (animator != null) animator.SetBool("IsStunned", true);
+        if (Agent != null && Agent.isOnNavMesh) Agent.isStopped = true;
     }
 
     private void EndStun()
     {
         isStunned = false;
         if (animator != null) animator.SetBool("IsStunned", false);
+        if (Agent != null && Agent.isOnNavMesh) Agent.isStopped = false;
     }
 
     #endregion
