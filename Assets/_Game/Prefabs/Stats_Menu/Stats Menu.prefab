@@ -498,7 +498,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Infinite  Money  Glitch
+  m_text: Infinite Resources Glitch
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e5c934d1c17a064b9d00057b6da269c, type: 2}
   m_sharedMaterial: {fileID: 3651383908449407638, guid: 8e5c934d1c17a064b9d00057b6da269c, type: 2}

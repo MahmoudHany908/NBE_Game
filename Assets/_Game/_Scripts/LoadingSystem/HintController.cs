@@ -17,6 +17,12 @@ namespace VaultSurvivors.LoadingSystem
 
         private static HintData _lastShownHint;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticData()
+        {
+            _lastShownHint = null;
+        }
+
         public void ShowRandomHint()
         {
             if (_database == null)

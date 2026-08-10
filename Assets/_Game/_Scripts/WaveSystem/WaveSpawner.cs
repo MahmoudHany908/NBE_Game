@@ -16,8 +16,6 @@ public class WaveSpawner : MonoBehaviour
 
     [Header("Spawn Area")]
     [SerializeField] private Vector3 spawnBoxSize = new Vector3(20f, 1f, 20f);
-    [SerializeField] private LayerMask groundMask;
-    [SerializeField] private float raycastOriginHeight = 10f;
 
     private BudgetCalculator budgetCalculator;
     private List<GameObject> activeEnemies = new List<GameObject>();

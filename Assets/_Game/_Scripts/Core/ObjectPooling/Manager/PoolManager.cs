@@ -23,6 +23,7 @@ public class PoolManager : MonoBehaviour
     {
         _eventSubscriber?.Unsubscribe<PlayerDiedEvent>(OnPlayerDied);
         _eventSubscriber?.Unsubscribe<ExtractionAvailableEvent>(OnExtractionAvailable);
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnPlayerDied(PlayerDiedEvent evt)

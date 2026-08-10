@@ -88,11 +88,23 @@ public class StatsMenuUIController : MonoBehaviour
     {
 #if UNITY_EDITOR
         ResetSaveDataEditor.AddGold();
+        // Since Editor cheat only adds Gold, we'll also just apply the runtime logic for the others
+        if (_saveSystem != null)
+        {
+            GameData data = _saveSystem.Load();
+            data.resources.food += 50000;
+            data.resources.energy += 50000;
+            data.resources.electronics += 50000;
+            _saveSystem.Save(data);
+        }
 #else
         if (_saveSystem != null)
         {
             GameData data = _saveSystem.Load();
             data.resources.gold += 50000;
+            data.resources.food += 50000;
+            data.resources.energy += 50000;
+            data.resources.electronics += 50000;
             _saveSystem.Save(data);
         }
 #endif

@@ -32,16 +32,35 @@ namespace VaultSurvivors.Core.Production
         private IEventPublisher _eventPublisher;
         private IEventSubscriber _eventSubscriber;
         private AudioManager _audioManager;
+        private ISaveSystem _saveSystem;
 
         [Inject]
-        public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, AudioManager audioManager)
+        public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, AudioManager audioManager, ISaveSystem saveSystem)
         {
             _eventPublisher = eventPublisher;
             _eventSubscriber = eventSubscriber;
             _audioManager = audioManager;
+            _saveSystem = saveSystem;
 
             // Subscribe to the upgrade event
             _eventSubscriber.Subscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+        }
+
+        private void Start()
+        {
+            if (_saveSystem != null)
+            {
+                GameData data = _saveSystem.Load();
+                int level = data.production.globalFactoryLevel > 0 ? data.production.globalFactoryLevel : 1;
+                SetInitialMesh(level);
+            }
+        }
+
+        private void SetInitialMesh(int level)
+        {
+            bool isLevel5 = level >= 5;
+            if (level1Mesh != null) level1Mesh.SetActive(!isLevel5);
+            if (level5Mesh != null) level5Mesh.SetActive(isLevel5);
         }
 
         public void Dispose()
