@@ -15,17 +15,33 @@ public class SettingsMenu : MonoBehaviour
 
     private IEventPublisher _eventPublisher;
     private IEventSubscriber _eventSubscriber;
+    private ISaveSystem _saveSystem;
 
     [Inject]
-    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
+    public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, ISaveSystem saveSystem)
     {
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
+        _saveSystem = saveSystem;
     }
 
     private void Start()
     {
         _eventSubscriber?.Subscribe<Command_CloseAllMenus>(OnCloseAllMenus);
+        
+        if (_saveSystem != null)
+        {
+            var data = _saveSystem.Load();
+            if (data?.audio != null)
+            {
+                var audioData = data.audio;
+                if (volumeToggle != null) volumeToggle.SetIsOnWithoutNotify(audioData.isMuted);
+                if (masterVolumeSlider != null) masterVolumeSlider.SetValueWithoutNotify(audioData.masterVolume);
+                if (musicVolumeSlider != null) musicVolumeSlider.SetValueWithoutNotify(audioData.musicVolume);
+                if (sfxVolumeSlider != null) sfxVolumeSlider.SetValueWithoutNotify(audioData.sfxVolume);
+                if (ambientVolumeSlider != null) ambientVolumeSlider.SetValueWithoutNotify(audioData.ambientVolume);
+            }
+        }
     }
     
     private void OnDestroy()

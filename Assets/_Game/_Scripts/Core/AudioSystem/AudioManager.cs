@@ -22,12 +22,27 @@ public class AudioManager : MonoBehaviour
     private void ApplyMuteState()
     {
         Debug.Log($"AudioManager: Mute state changed to {isMuted}");
+        if (isMuted)
+        {
+            if (musicAudioSource != null) musicAudioSource.volume = 0f;
+            foreach (var source in activeAmbientSources)
+            {
+                if (source != null && source.Source != null) source.Source.volume = 0f;
+            }
+        }
+        else
+        {
+            UpdateMusicVolume();
+            UpdateAmbientVolumes();
+        }
     }
 
     private AudioSource musicAudioSource;
 
-    // 1. Inject PoolManager via DI instead of using PoolManager.Instance
+    // 1. Inject DI Dependencies
     [Inject] private PoolManager poolManager;
+    [Inject] private ISaveSystem saveSystem;
+    [Inject] private IEventSubscriber eventSubscriber;
 
     private List<PooledAudioSource> activeAmbientSources = new List<PooledAudioSource>();
 
@@ -37,6 +52,140 @@ public class AudioManager : MonoBehaviour
         musicAudioSource.transform.SetParent(transform);
 
         EnsureSoundSourcePrefab();
+    }
+
+    private void Start()
+    {
+        if (saveSystem != null)
+        {
+            var data = saveSystem.Load();
+            if (data?.audio != null)
+            {
+                masterVolume = data.audio.masterVolume;
+                musicVolume = data.audio.musicVolume;
+                sfxVolume = data.audio.sfxVolume;
+                ambientVolume = data.audio.ambientVolume;
+                isMuted = data.audio.isMuted;
+                ApplyMuteState();
+            }
+        }
+
+        if (eventSubscriber != null)
+        {
+            eventSubscriber.Subscribe<OnMuteTogglePressedEvent>(OnMuteToggle);
+            eventSubscriber.Subscribe<OnMasterVolumeChangedEvent>(OnMasterVolume);
+            eventSubscriber.Subscribe<OnMusicVolumeChangedEvent>(OnMusicVolume);
+            eventSubscriber.Subscribe<OnSFXSliderChangeEvent>(OnSFXVolume);
+            eventSubscriber.Subscribe<OnAmbientSliderChangeEvent>(OnAmbientVolume);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (eventSubscriber != null)
+        {
+            eventSubscriber.Unsubscribe<OnMuteTogglePressedEvent>(OnMuteToggle);
+            eventSubscriber.Unsubscribe<OnMasterVolumeChangedEvent>(OnMasterVolume);
+            eventSubscriber.Unsubscribe<OnMusicVolumeChangedEvent>(OnMusicVolume);
+            eventSubscriber.Unsubscribe<OnSFXSliderChangeEvent>(OnSFXVolume);
+            eventSubscriber.Unsubscribe<OnAmbientSliderChangeEvent>(OnAmbientVolume);
+        }
+    }
+
+    private void OnMuteToggle(OnMuteTogglePressedEvent cmd)
+    {
+        isMuted = cmd.newValue;
+        if (saveSystem != null) 
+        { 
+            var data = saveSystem.Load();
+            if (data?.audio != null)
+            {
+                data.audio.isMuted = isMuted; 
+                saveSystem.Save(); 
+            }
+        }
+        ApplyMuteState();
+    }
+
+    private void OnMasterVolume(OnMasterVolumeChangedEvent cmd)
+    {
+        masterVolume = cmd.newValue;
+        if (saveSystem != null) 
+        { 
+            var data = saveSystem.Load();
+            if (data?.audio != null)
+            {
+                data.audio.masterVolume = masterVolume; 
+                saveSystem.Save(); 
+            }
+        }
+        UpdateMusicVolume();
+    }
+
+    private void OnMusicVolume(OnMusicVolumeChangedEvent cmd)
+    {
+        musicVolume = cmd.newValue;
+        if (saveSystem != null) 
+        { 
+            var data = saveSystem.Load();
+            if (data?.audio != null)
+            {
+                data.audio.musicVolume = musicVolume; 
+                saveSystem.Save(); 
+            }
+        }
+        UpdateMusicVolume();
+    }
+
+    private void OnSFXVolume(OnSFXSliderChangeEvent cmd)
+    {
+        sfxVolume = cmd.newValue;
+        if (saveSystem != null) 
+        { 
+            var data = saveSystem.Load();
+            if (data?.audio != null)
+            {
+                data.audio.sfxVolume = sfxVolume; 
+                saveSystem.Save(); 
+            }
+        }
+    }
+
+    private void OnAmbientVolume(OnAmbientSliderChangeEvent cmd)
+    {
+        ambientVolume = cmd.newValue;
+        if (saveSystem != null) 
+        { 
+            var data = saveSystem.Load();
+            if (data?.audio != null)
+            {
+                data.audio.ambientVolume = ambientVolume; 
+                saveSystem.Save(); 
+            }
+        }
+        UpdateAmbientVolumes();
+    }
+
+    private void UpdateMusicVolume()
+    {
+        if (musicAudioSource != null && musicAudioSource.isPlaying)
+        {
+            // Approximate final volume. We don't have the original SoundData volume here, 
+            // but normally music is played at volume 1. We just multiply it.
+            musicAudioSource.volume = GetFinalVolume(1f, musicVolume); 
+        }
+    }
+
+    private void UpdateAmbientVolumes()
+    {
+        foreach (var source in activeAmbientSources)
+        {
+            if (source != null && source.Source != null && source.Source.isPlaying)
+            {
+                // Note: we can't perfectly recover the original clip volume, assuming 1f base
+                source.Source.volume = GetFinalVolume(1f, ambientVolume);
+            }
+        }
     }
 
     private void EnsureSoundSourcePrefab()

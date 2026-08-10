@@ -20,6 +20,7 @@ public class PlayerData
     public int level = 1;
     public int xp = 0;
     public bool hasCompletedTutorial = false;
+    public bool Passed_Tutorial = false;
 }
 
 [System.Serializable]
@@ -80,6 +81,7 @@ public class AudioData
 [System.Serializable]
 public class GraphicsData
 {
-    // 0 = Low, 1 = Medium, 2 = High
+    // 0 = Low, 1 = High
     public int qualityLevel = 1;
+    public bool isHDREnabled = false;
 }

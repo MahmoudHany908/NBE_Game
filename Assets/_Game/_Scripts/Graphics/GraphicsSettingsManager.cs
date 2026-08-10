@@ -12,10 +12,10 @@ using VContainer;
 ///   - Persist the chosen preset via ISaveSystem (GameData.graphics).
 /// 
 /// Preset definitions:
-///   LOW    – HDR off, Global Volume off
-///   MEDIUM – HDR off, Global Volume on
-///   HIGH   – HDR on,  Global Volume on
-/// 
+///   LOW    – Global Volume off
+///   HIGH   – Global Volume on
+///   
+///   HDR and Bloom are controlled separately via a toggle, which requires a restart to apply. 
 /// Attach to: a dedicated "GraphicsManager" GameObject that persists across scenes
 ///            (or register it as a VContainer singleton in GameLifetimeScope).
 /// </summary>
@@ -27,11 +27,14 @@ public class GraphicsSettingsManager : MonoBehaviour
     [SerializeField] private Volume globalVolume;
 
     [Header("Default Quality")]
-    [SerializeField] private GraphicsQuality defaultQuality = GraphicsQuality.Medium;
+    [SerializeField] private GraphicsQuality defaultQuality = GraphicsQuality.High;
 
     // ── Private state ────────────────────────────────────────────────────────
     private ISaveSystem _saveSystem;
     private GraphicsQuality _currentQuality;
+    private bool _isHDREnabled;
+
+    public bool IsHDREnabled => _isHDREnabled;
 
     // ── VContainer Injection ─────────────────────────────────────────────────
     [Inject]
@@ -67,16 +70,21 @@ public class GraphicsSettingsManager : MonoBehaviour
     private void LoadAndApplySavedQuality()
     {
         GraphicsQuality savedQuality = defaultQuality;
+        _isHDREnabled = false; // Default to false if no save
 
         if (_saveSystem != null)
         {
             var data = _saveSystem.Load();
             if (data?.graphics != null)
+            {
                 savedQuality = (GraphicsQuality)data.graphics.qualityLevel;
+                _isHDREnabled = data.graphics.isHDREnabled;
+            }
         }
 
         _currentQuality = savedQuality;
         ApplyPreset(savedQuality);
+        ApplyHDRAndBloom(_isHDREnabled);
     }
 
     private void ApplyPreset(GraphicsQuality quality)
@@ -84,17 +92,10 @@ public class GraphicsSettingsManager : MonoBehaviour
         switch (quality)
         {
             case GraphicsQuality.Low:
-                SetHDR(false);
                 SetVolume(false);
                 break;
 
-            case GraphicsQuality.Medium:
-                SetHDR(false);
-                SetVolume(true);
-                break;
-
             case GraphicsQuality.High:
-                SetHDR(true);
                 SetVolume(true);
                 break;
         }
@@ -102,18 +103,37 @@ public class GraphicsSettingsManager : MonoBehaviour
         Debug.Log($"[GraphicsSettingsManager] Applied preset: {quality}");
     }
 
-    // ── HDR ──────────────────────────────────────────────────────────────────
-    private void SetHDR(bool enabled)
+    // ── HDR & Bloom ──────────────────────────────────────────────────────────
+    private void ApplyHDRAndBloom(bool enabled)
     {
         var urpAsset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
         if (urpAsset == null)
         {
             Debug.LogWarning("[GraphicsSettingsManager] No URP asset found.");
-            return;
+        }
+        else
+        {
+            // UniversalRenderPipelineAsset.supportsHDR is writable at runtime.
+            urpAsset.supportsHDR = enabled;
         }
 
-        // UniversalRenderPipelineAsset.supportsHDR is writable at runtime.
-        urpAsset.supportsHDR = enabled;
+        if (globalVolume != null && globalVolume.profile.TryGet(out Bloom bloom))
+        {
+            bloom.active = enabled;
+        }
+    }
+
+    public void SetHDREnabled(bool isEnabled)
+    {
+        _isHDREnabled = isEnabled;
+        
+        // Save the setting so it applies on the next restart
+        if (_saveSystem == null) return;
+        var data = _saveSystem.Load();
+        if (data?.graphics == null) return;
+        
+        data.graphics.isHDREnabled = isEnabled;
+        _saveSystem.Save(data);
     }
 
     // ── Global Volume ────────────────────────────────────────────────────────
