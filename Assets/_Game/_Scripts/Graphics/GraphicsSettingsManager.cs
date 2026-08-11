@@ -93,14 +93,18 @@ public class GraphicsSettingsManager : MonoBehaviour
         {
             case GraphicsQuality.Low:
                 SetVolume(false);
+                // Drop 2 mip levels: 2048 → 1024 → 512
+                QualitySettings.globalTextureMipmapLimit = 2;
                 break;
 
             case GraphicsQuality.High:
                 SetVolume(true);
+                // One mip level down: 2048 → 1024
+                QualitySettings.globalTextureMipmapLimit = 1;
                 break;
         }
 
-        Debug.Log($"[GraphicsSettingsManager] Applied preset: {quality}");
+        Debug.Log($"[GraphicsSettingsManager] Applied preset: {quality} | masterTextureLimit={QualitySettings.globalTextureMipmapLimit}");
     }
 
     // ── HDR & Bloom ──────────────────────────────────────────────────────────
