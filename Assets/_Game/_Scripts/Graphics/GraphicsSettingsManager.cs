@@ -126,14 +126,24 @@ public class GraphicsSettingsManager : MonoBehaviour
     public void SetHDREnabled(bool isEnabled)
     {
         _isHDREnabled = isEnabled;
-        
-        // Save the setting so it applies on the next restart
-        if (_saveSystem == null) return;
-        var data = _saveSystem.Load();
-        if (data?.graphics == null) return;
-        
-        data.graphics.isHDREnabled = isEnabled;
-        _saveSystem.Save(data);
+
+        // Persist the new value regardless of direction.
+        if (_saveSystem != null)
+        {
+            var data = _saveSystem.Load();
+            if (data?.graphics != null)
+            {
+                data.graphics.isHDREnabled = isEnabled;
+                _saveSystem.Save(data);
+            }
+        }
+
+        // Turning OFF applies immediately — no restart needed.
+        // Turning ON is deferred: the saved flag is picked up on next startup.
+        if (!isEnabled)
+        {
+            ApplyHDRAndBloom(false);
+        }
     }
 
     // ── Global Volume ────────────────────────────────────────────────────────

@@ -90,8 +90,8 @@ public class GraphicsQualityUI : MonoBehaviour
     {
         _graphicsManager?.SetHDREnabled(isOn);
         
-        // Show popup warning user that restart is required and fade it out
-        if (restartPopup != null)
+        // Only prompt restart when ENABLING HDR — disabling applies immediately.
+        if (isOn && restartPopup != null)
         {
             if (_popupCoroutine != null) StopCoroutine(_popupCoroutine);
             _popupCoroutine = StartCoroutine(ShowAndFadePopup());
