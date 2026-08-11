@@ -61,7 +61,7 @@ public class GateLoadoutUIController : MonoBehaviour
     [Inject]
     public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber)
     {
-        Debug.Log("[GateLoadoutUIController] Construct called! Dependencies injected.");
+        // Debug.Log("[GateLoadoutUIController] Construct called! Dependencies injected.");
         _eventPublisher = eventPublisher;
         _eventSubscriber = eventSubscriber;
     }
@@ -99,7 +99,7 @@ public class GateLoadoutUIController : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log($"[GateLoadoutUIController] Start called! _eventSubscriber is null? {_eventSubscriber == null}");
+        // Debug.Log($"[GateLoadoutUIController] Start called! _eventSubscriber is null? {_eventSubscriber == null}");
         
         _eventSubscriber?.Subscribe<Event_WorkshopStateUpdated>(OnStateUpdated);
         _eventSubscriber?.Subscribe<Command_OpenGateLoadoutUI>(OnOpenUI);
@@ -148,7 +148,7 @@ public class GateLoadoutUIController : MonoBehaviour
 
     private void OnOpenUI(Command_OpenGateLoadoutUI cmd)
     {
-        Debug.Log($"[GateLoadoutUIController] OnOpenUI received! PanelContainer assigned? {_panelContainer != null}");
+        // Debug.Log($"[GateLoadoutUIController] OnOpenUI received! PanelContainer assigned? {_panelContainer != null}");
         
         if (_panelContainer != null && !_panelContainer.activeSelf)
         {
@@ -383,7 +383,7 @@ public class GateLoadoutUIController : MonoBehaviour
     private void OnArenaClicked()
     {
         SceneLoader.Load("ArenaScene", new ArenaState());
-        Debug.Log("[GateLoadoutUIController] SceneLoader requested transition to ArenaScene.");
+        // Debug.Log("[GateLoadoutUIController] SceneLoader requested transition to ArenaScene.");
     }
 
     private Coroutine _popupCoroutine;
