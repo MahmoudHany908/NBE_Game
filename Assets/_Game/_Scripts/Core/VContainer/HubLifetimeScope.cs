@@ -22,7 +22,7 @@ public class HubLifetimeScope : LifetimeScope
 
     private CombatWorkshopControlPanel _combatWorkshopControlPanel;
     private CombatWorkshopUIController _combatWorkshopUIController;
-    
+
     [SerializeField] private GateLoadoutUIController _gateLoadoutUIController;
 
     private MarketUIController _marketUIController;
@@ -35,13 +35,14 @@ public class HubLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         Debug.Log("[HubLifetimeScope] Configuring scope...");
+        builder.RegisterComponentInHierarchy<HubMusicController>();
 
         _factoryUIController = FindAnyObjectByType<FactoryUIController>(FindObjectsInactive.Include);
         var uiManager = FindAnyObjectByType<UIManager>(FindObjectsInactive.Include);
 
         _combatWorkshopControlPanel = FindAnyObjectByType<CombatWorkshopControlPanel>(FindObjectsInactive.Include);
         _combatWorkshopUIController = FindAnyObjectByType<CombatWorkshopUIController>(FindObjectsInactive.Include);
-        
+
         gateTrigger = FindAnyObjectByType<GateTrigger>(FindObjectsInactive.Include);
 
         _marketUIController = FindAnyObjectByType<MarketUIController>(FindObjectsInactive.Include);
@@ -72,7 +73,7 @@ public class HubLifetimeScope : LifetimeScope
         if (_marketQuantityModal != null) builder.RegisterComponent(_marketQuantityModal);
         if (_marketConfirmModal != null) builder.RegisterComponent(_marketConfirmModal);
         if (_marketControlPanel != null) builder.RegisterComponent(_marketControlPanel);
-        
+
         if (_factoryCinematicController != null) builder.RegisterComponent(_factoryCinematicController);
 
         builder.RegisterBuildCallback(container =>
@@ -142,7 +143,7 @@ public class HubLifetimeScope : LifetimeScope
                 container.Inject(_combatWorkshopUIController);
                 Debug.Log("[CombatWorkshopUIController] Successfully Injected!");
             }
-            
+
             if (_gateLoadoutUIController != null)
             {
                 container.Inject(_gateLoadoutUIController);
