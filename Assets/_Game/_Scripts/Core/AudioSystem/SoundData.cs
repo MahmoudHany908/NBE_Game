@@ -8,6 +8,7 @@ public class SoundData : ScriptableObject
     [Range(0f, 1f)] public float volume = 1f;
     public Vector2 pitchRange = new Vector2(0.95f, 1.05f);
     public bool loop;
+    public float fade = 1;
 
     public AudioClip GetClip() => clips[Random.Range(0, clips.Length)];
 }
