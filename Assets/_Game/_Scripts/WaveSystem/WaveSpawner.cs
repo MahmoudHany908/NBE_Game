@@ -59,6 +59,11 @@ public class WaveSpawner : MonoBehaviour
         return activeEnemies.Count == 0;
     }
 
+    public void StopSpawning()
+    {
+        StopAllCoroutines();
+    }
+
     private IEnumerator SpawnSquadsRoutine(int totalBudget)
     {
         int baseChunk = totalBudget / squadCount;

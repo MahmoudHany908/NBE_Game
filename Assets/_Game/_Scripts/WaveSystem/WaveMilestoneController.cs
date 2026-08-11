@@ -151,5 +151,9 @@ public class WaveMilestoneController : MonoBehaviour
     private void HandlePlayerDied(PlayerDiedEvent evt)
     {
         StopAllCoroutines();
+        if (waveSpawner != null)
+        {
+            waveSpawner.StopSpawning();
+        }
     }
 }
