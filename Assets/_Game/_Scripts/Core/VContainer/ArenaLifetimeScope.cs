@@ -22,7 +22,7 @@ public class ArenaLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<DoctorAbility>();
         builder.RegisterComponentInHierarchy<SeeleAbility>();
         builder.RegisterComponentInHierarchy<ArenaLoadoutController>();
-
+        builder.RegisterComponentInHierarchy<ArenaMusicController>();
 
         builder.RegisterBuildCallback(container =>
         {

@@ -1,102 +1,131 @@
-using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
+using UnityEngine.InputSystem;
+using TMPro;
 
 public class RookAbility : MonoBehaviour, IAbility
 {
-    [SerializeField] private GameObject rocketPrefab;
-    [SerializeField] private int rocketCount = 3;
-    [SerializeField] private float detectionRadius = 15f;
-    [SerializeField] private float spawnHeight = 20f;
-    [SerializeField] private LayerMask enemyLayer;
+    private enum AbilityState
+    {
+        Ready,
+        PendingTarget,
+        Cooldown
+    }
+
+    [SerializeField] private GameObject beamPrefab;
+    [SerializeField] private LayerMask groundLayer;
+
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI instructionText;
 
     [Header("Cooldown")]
     [SerializeField] private float cooldownTime = 5f;
     [SerializeField] private UnityEngine.UI.Image cooldownImage;
 
-    private Vector3 castOrigin => transform.position;
-    private List<Transform> targets = new List<Transform>();
-    private GameObject player;
+    private AbilityState currentState = AbilityState.Ready;
     private float currentCooldown = 0f;
 
     [Inject] private PoolManager poolManager;
     [Inject] private AudioManager audioManager;
 
-    public bool IsOnCooldown => currentCooldown > 0f;
+    public bool IsOnCooldown => currentState == AbilityState.Cooldown;
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        if (instructionText != null)
+        {
+            instructionText.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (currentCooldown > 0f)
+        if (currentState == AbilityState.Cooldown)
         {
             currentCooldown -= Time.deltaTime;
             if (cooldownImage != null)
             {
                 cooldownImage.fillAmount = 1f - (currentCooldown / cooldownTime);
             }
+
+            if (currentCooldown <= 0f)
+            {
+                currentState = AbilityState.Ready;
+            }
+        }
+        else if (currentState == AbilityState.PendingTarget)
+        {
+            HandleTargeting();
         }
     }
 
     public void ActivateAbility()
     {
-        if (IsOnCooldown) return;
+        if (currentState == AbilityState.Cooldown) return;
 
+        if (currentState == AbilityState.PendingTarget)
+        {
+            CancelTargeting();
+            return;
+        }
+
+        currentState = AbilityState.PendingTarget;
+        if (instructionText != null)
+        {
+            instructionText.text = "Click on an area to call the orbital beam";
+            instructionText.gameObject.SetActive(true);
+        }
+    }
+
+    private void CancelTargeting()
+    {
+        currentState = AbilityState.Ready;
+        if (instructionText != null)
+        {
+            instructionText.gameObject.SetActive(false);
+        }
+    }
+
+    private void HandleTargeting()
+    {
+        // Pointer covers both mouse click and touch tap under the new Input System,
+        // so no separate touchscreen branch is needed.
+        if (Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
+        {
+            Vector2 screenPos = Pointer.current.position.ReadValue();
+            Ray ray = Camera.main.ScreenPointToRay(screenPos);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000f, groundLayer))
+            {
+                SpawnOrbitalBeam(hit.point);
+
+                if (instructionText != null)
+                {
+                    instructionText.gameObject.SetActive(false);
+                }
+
+                StartCooldown();
+            }
+        }
+    }
+
+    private void SpawnOrbitalBeam(Vector3 targetPosition)
+    {
+        GameObject beam = poolManager.Spawn(beamPrefab, targetPosition, Quaternion.identity);
+
+        if (beam.TryGetComponent<OrbitalBeam>(out var beamComponent))
+        {
+            beamComponent.Init(audioManager);
+        }
+    }
+
+    private void StartCooldown()
+    {
+        currentState = AbilityState.Cooldown;
         currentCooldown = cooldownTime;
         if (cooldownImage != null)
         {
             cooldownImage.fillAmount = 1f;
-        }
-
-        List<Transform> enemiesInRange = GetEnemiesInRange();
-        List<Transform> selectedTargets = PickRandomTargets(enemiesInRange, rocketCount);
-
-        Debug.Log($"Found {enemiesInRange.Count} enemies in range. Selected {selectedTargets.Count} targets for rockets.");
-        foreach (Transform target in selectedTargets)
-        {
-            Debug.Log($"Spawning rocket for target: {target.name}");
-            SpawnRocket(target);
-        }
-    }
-
-    private List<Transform> GetEnemiesInRange()
-    {
-        List<Transform> found = new List<Transform>();
-        Collider[] hits = Physics.OverlapSphere(player.transform.position, detectionRadius, enemyLayer);
-
-        foreach (Collider hit in hits)
-        {
-            found.Add(hit.transform);
-        }
-
-        return found;
-    }
-
-    private List<Transform> PickRandomTargets(List<Transform> pool, int count)
-    {
-        List<Transform> shuffled = new List<Transform>(pool);
-        for (int i = shuffled.Count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (shuffled[i], shuffled[j]) = (shuffled[j], shuffled[i]);
-        }
-
-        int takeCount = Mathf.Min(count, shuffled.Count);
-        return shuffled.GetRange(0, takeCount);
-    }
-
-    private void SpawnRocket(Transform target)
-    {
-        Vector3 spawnPos = player.transform.position + Vector3.up * spawnHeight;
-
-        GameObject rocket = poolManager.Spawn(rocketPrefab, spawnPos, Quaternion.identity);
-
-        if (rocket.TryGetComponent<Rocket>(out var rocketComponent))
-        {
-            rocketComponent.Init(target, audioManager);
         }
     }
 }
