@@ -3,8 +3,6 @@ using VContainer;
 
 public class GateTrigger : MonoBehaviour
 {
-    // Make sure this is set to "OsamaCombat" in the Unity Inspector!
-    [SerializeField] private string targetSceneName = "ArenaScene";
 
     private IEventPublisher _eventPublisher;
 

@@ -55,29 +55,84 @@ public class PresentationManager : MonoBehaviour
         }
     }
 
+    private bool isTransitioning = false;
+    public float fadeTransitionDuration = 0.5f;
+    private Canvas fadeCanvas;
+    private UnityEngine.UI.Image fadeImage;
+
+    private void EnsureFadeUI()
+    {
+        if (fadeCanvas != null) return;
+        
+        GameObject go = new GameObject("PresentationFadeOverlay");
+        go.transform.SetParent(this.transform);
+        
+        fadeCanvas = go.AddComponent<Canvas>();
+        fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        fadeCanvas.sortingOrder = 32767;
+        
+        GameObject imgGo = new GameObject("FadeImage");
+        imgGo.transform.SetParent(go.transform, false);
+        fadeImage = imgGo.AddComponent<UnityEngine.UI.Image>();
+        fadeImage.color = new Color(0, 0, 0, 0);
+        
+        var rect = fadeImage.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.sizeDelta = Vector2.zero;
+        
+        fadeImage.raycastTarget = true;
+    }
+
     public void NextStep()
     {
-        // Debug.Log($"[PresentationManager] NextStep called. Current index: {currentSlideIndex}. Total slides: {slides.Count}");
-        if (slides.Count == 0 || currentSlideIndex >= slides.Count) return;
+        if (isTransitioning || slides.Count == 0 || currentSlideIndex >= slides.Count) return;
 
-        PresentationSlide currentSlide = slides[currentSlideIndex];
-
-        // Let the current slide try to handle the input (e.g. nested videos)
-        if (currentSlide != null && currentSlide.TryNextInnerStep())
-        {
-            Debug.Log("[PresentationManager] Slide handled inner step. Not transitioning.");
-            return;
-        }
-
-        // Otherwise, move to the next slide
         if (currentSlideIndex < slides.Count - 1)
         {
-            //Debug.Log($"[PresentationManager] Transitioning from slide {currentSlideIndex} to {currentSlideIndex + 1}");
-            if (currentSlide != null) currentSlide.ExitSlide();
+            int targetIndex = currentSlideIndex + 1;
+            HandleSlideChange(targetIndex);
+        }
+    }
 
-            currentSlideIndex++;
-            PresentationSlide nextSlide = slides[currentSlideIndex];
+    public void PreviousStep()
+    {
+        if (isTransitioning || slides.Count == 0 || currentSlideIndex < 0) return;
 
+        if (currentSlideIndex > 0)
+        {
+            int targetIndex = currentSlideIndex - 1;
+            HandleSlideChange(targetIndex);
+        }
+    }
+
+    private void HandleSlideChange(int targetIndex)
+    {
+        PresentationSlide nextSlide = slides[targetIndex];
+        SlideTransitionType transitionType = SlideTransitionType.SmoothCamera;
+        if (nextSlide != null) transitionType = nextSlide.enterTransitionType;
+
+        if (transitionType == SlideTransitionType.FadeToBlack)
+        {
+            StartCoroutine(FadeToSlideRoutine(targetIndex));
+        }
+        else if (transitionType == SlideTransitionType.Cut)
+        {
+            if (slides[currentSlideIndex] != null) slides[currentSlideIndex].ExitSlide();
+            currentSlideIndex = targetIndex;
+            
+            if (nextSlide != null)
+            {
+                nextSlide.EnterSlide();
+                SnapCameraToSlide(nextSlide);
+            }
+        }
+        else
+        {
+            // Normal smooth transition
+            if (slides[currentSlideIndex] != null) slides[currentSlideIndex].ExitSlide();
+            currentSlideIndex = targetIndex;
+            
             if (nextSlide != null)
             {
                 nextSlide.EnterSlide();
@@ -86,35 +141,65 @@ public class PresentationManager : MonoBehaviour
         }
     }
 
-    public void PreviousStep()
+    private IEnumerator FadeToSlideRoutine(int targetIndex)
     {
-        // Debug.Log($"[PresentationManager] PreviousStep called. Current index: {currentSlideIndex}");
-        if (slides.Count == 0 || currentSlideIndex < 0) return;
+        isTransitioning = true;
+        EnsureFadeUI();
 
-        PresentationSlide currentSlide = slides[currentSlideIndex];
-
-        // Let the current slide try to handle the input (e.g. nested videos)
-        if (currentSlide != null && currentSlide.TryPreviousInnerStep())
+        // Fade to black
+        float t = 0;
+        while (t < 1f)
         {
-            Debug.Log("[PresentationManager] Slide handled previous inner step.");
-            return;
+            t += Time.deltaTime / (fadeTransitionDuration / 2f);
+            fadeImage.color = new Color(0, 0, 0, Mathf.Clamp01(t));
+            yield return null;
+        }
+        fadeImage.color = Color.black;
+
+        // Change slide instantly under the cover of black
+        if (slides[currentSlideIndex] != null) slides[currentSlideIndex].ExitSlide();
+        currentSlideIndex = targetIndex;
+        
+        PresentationSlide nextSlide = slides[currentSlideIndex];
+        if (nextSlide != null)
+        {
+            nextSlide.EnterSlide();
+            SnapCameraToSlide(nextSlide);
         }
 
-        // Otherwise, move to the previous slide
-        if (currentSlideIndex > 0)
+        // Fade back in
+        t = 0;
+        while (t < 1f)
         {
-            //Debug.Log($"[PresentationManager] Transitioning from slide {currentSlideIndex} to {currentSlideIndex - 1}");
-            if (currentSlide != null) currentSlide.ExitSlide();
+            t += Time.deltaTime / (fadeTransitionDuration / 2f);
+            fadeImage.color = new Color(0, 0, 0, 1f - Mathf.Clamp01(t));
+            yield return null;
+        }
+        fadeImage.color = new Color(0, 0, 0, 0);
 
-            currentSlideIndex--;
-            PresentationSlide prevSlide = slides[currentSlideIndex];
+        isTransitioning = false;
+    }
 
-            if (prevSlide != null)
+    private class CameraState
+    {
+        public Camera cam;
+        public Vector3 targetPos;
+        public Quaternion targetRot;
+    }
+    
+    private List<CameraState> camerasInTransition = new List<CameraState>();
+
+    private void CleanupPreviousTransition()
+    {
+        foreach(var state in camerasInTransition)
+        {
+            if (state.cam != null)
             {
-                prevSlide.EnterSlide();
-                TransitionCameraToSlide(prevSlide);
+                state.cam.transform.position = state.targetPos;
+                state.cam.transform.rotation = state.targetRot;
             }
         }
+        camerasInTransition.Clear();
     }
 
     private void SnapCameraToSlide(PresentationSlide slide)
@@ -123,6 +208,8 @@ public class PresentationManager : MonoBehaviour
 
         if (cameraTransitionCoroutine != null)
             StopCoroutine(cameraTransitionCoroutine);
+            
+        CleanupPreviousTransition();
 
         presentationCamera.transform.position = slide.targetCameraTransform.position;
         presentationCamera.transform.rotation = slide.targetCameraTransform.rotation;
@@ -134,14 +221,44 @@ public class PresentationManager : MonoBehaviour
 
         if (cameraTransitionCoroutine != null)
             StopCoroutine(cameraTransitionCoroutine);
+            
+        CleanupPreviousTransition();
 
-        cameraTransitionCoroutine = StartCoroutine(CameraTransitionRoutine(slide.targetCameraTransform));
+        cameraTransitionCoroutine = StartCoroutine(CameraTransitionRoutine(slide));
     }
 
-    private IEnumerator CameraTransitionRoutine(Transform target)
+    private IEnumerator CameraTransitionRoutine(PresentationSlide slide)
     {
+        Transform target = slide.targetCameraTransform;
+        if (target == null) yield break;
+
         Vector3 startPos = presentationCamera.transform.position;
         Quaternion startRot = presentationCamera.transform.rotation;
+        
+        // CACHE target positions BEFORE modifying anything to prevent instant cut bugs
+        Vector3 finalMainTargetPos = target.position;
+        Quaternion finalMainTargetRot = target.rotation;
+        
+        // Find all active cameras in the incoming slide
+        Camera[] allSlideCameras = slide.GetComponentsInChildren<Camera>(true);
+
+        foreach (var c in allSlideCameras)
+        {
+            // Only animate cameras that are actively contributing to the view
+            if (c.gameObject.activeInHierarchy && c.enabled)
+            {
+                camerasInTransition.Add(new CameraState 
+                { 
+                    cam = c, 
+                    targetPos = c.transform.position, 
+                    targetRot = c.transform.rotation 
+                });
+                
+                // Snap them to the start position immediately so they don't flash at their target position
+                c.transform.position = startPos;
+                c.transform.rotation = startRot;
+            }
+        }
 
         float t = 0;
         while (t < 1f)
@@ -149,13 +266,27 @@ public class PresentationManager : MonoBehaviour
             t += Time.deltaTime / cameraTransitionDuration;
             float curveT = cameraTransitionCurve.Evaluate(Mathf.Clamp01(t));
 
-            presentationCamera.transform.position = Vector3.Lerp(startPos, target.position, curveT);
-            presentationCamera.transform.rotation = Quaternion.Slerp(startRot, target.rotation, curveT);
+            // Move main presentation camera
+            presentationCamera.transform.position = Vector3.Lerp(startPos, finalMainTargetPos, curveT);
+            presentationCamera.transform.rotation = Quaternion.Slerp(startRot, finalMainTargetRot, curveT);
+            
+            // Move slide's internal cameras
+            foreach (var state in camerasInTransition)
+            {
+                if (state.cam != null)
+                {
+                    state.cam.transform.position = Vector3.Lerp(startPos, state.targetPos, curveT);
+                    state.cam.transform.rotation = Quaternion.Slerp(startRot, state.targetRot, curveT);
+                }
+            }
 
             yield return null;
         }
 
-        presentationCamera.transform.position = target.position;
-        presentationCamera.transform.rotation = target.rotation;
+        // Final snap for exact precision
+        presentationCamera.transform.position = finalMainTargetPos;
+        presentationCamera.transform.rotation = finalMainTargetRot;
+        
+        CleanupPreviousTransition();
     }
 }

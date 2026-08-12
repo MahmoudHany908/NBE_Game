@@ -1,8 +1,18 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum SlideTransitionType 
+{ 
+    SmoothCamera, 
+    FadeToBlack,
+    Cut
+}
+
 public class PresentationSlide : MonoBehaviour
 {
+    [Tooltip("How the presentation should transition INTO this slide.")]
+    public SlideTransitionType enterTransitionType = SlideTransitionType.SmoothCamera;
+
     [Tooltip("The camera transform to smoothly transition to when this slide is active.")]
     public Transform targetCameraTransform;
     
@@ -21,19 +31,4 @@ public class PresentationSlide : MonoBehaviour
         OnSlideExit?.Invoke();
     }
 
-    /// <summary>
-    /// Returns true if this slide consumed the "Next" input (e.g. for nested videos).
-    /// </summary>
-    public virtual bool TryNextInnerStep()
-    {
-        return false;
-    }
-
-    /// <summary>
-    /// Returns true if this slide consumed the "Previous" input (e.g. for nested videos).
-    /// </summary>
-    public virtual bool TryPreviousInnerStep()
-    {
-        return false;
-    }
 }
