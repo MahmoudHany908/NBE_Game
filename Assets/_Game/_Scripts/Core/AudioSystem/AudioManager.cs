@@ -22,7 +22,7 @@ public class AudioManager : MonoBehaviour
 
     private void ApplyMuteState()
     {
-        Debug.Log($"AudioManager: Mute state changed to {isMuted}");
+        // Debug.Log($"AudioManager: Mute state changed to {isMuted}");
         if (isMuted)
         {
             if (musicAudioSource != null) musicAudioSource.volume = 0f;

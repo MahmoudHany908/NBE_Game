@@ -17,6 +17,9 @@ public class HubLifetimeScope : LifetimeScope
     [SerializeField] private GraphicsSettingsManager _graphicsSettingsManager;
     [SerializeField] private GraphicsQualityUI _graphicsQualityUI;
 
+    [Header("Room Spawner")]
+    [SerializeField] private HubRoomSpawner _hubRoomSpawner;
+
     [SerializeField] private FactoryControlPanel[] _factoryControlPanels;
     private FactoryUIController _factoryUIController;
 
@@ -34,7 +37,7 @@ public class HubLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        Debug.Log("[HubLifetimeScope] Configuring scope...");
+        // Debug.Log("[HubLifetimeScope] Configuring scope...");
         builder.RegisterComponentInHierarchy<HubMusicController>();
 
         _factoryUIController = FindAnyObjectByType<FactoryUIController>(FindObjectsInactive.Include);
@@ -61,6 +64,9 @@ public class HubLifetimeScope : LifetimeScope
         if (_graphicsSettingsManager != null) builder.RegisterComponent(_graphicsSettingsManager);
         if (_graphicsQualityUI != null) builder.RegisterComponent(_graphicsQualityUI);
 
+        // Room Spawner
+        if (_hubRoomSpawner != null) builder.RegisterComponent(_hubRoomSpawner);
+
         if (_factoryUIController != null) builder.RegisterComponent(_factoryUIController);
         if (_materialsHUDController != null) builder.RegisterComponent(_materialsHUDController);
         if (uiManager != null) builder.RegisterComponent(uiManager);
@@ -86,12 +92,18 @@ public class HubLifetimeScope : LifetimeScope
             if (_graphicsSettingsManager != null)
             {
                 container.Inject(_graphicsSettingsManager);
-                Debug.Log("[GraphicsSettingsManager] Successfully Injected!");
+                // Debug.Log("[GraphicsSettingsManager] Successfully Injected!");
             }
             if (_graphicsQualityUI != null)
             {
                 container.Inject(_graphicsQualityUI);
-                Debug.Log("[GraphicsQualityUI] Successfully Injected!");
+                // Debug.Log("[GraphicsQualityUI] Successfully Injected!");
+            }
+
+            if (_hubRoomSpawner != null)
+            {
+                container.Inject(_hubRoomSpawner);
+                // Debug.Log("[HubRoomSpawner] Successfully Injected!");
             }
 
             // Wire the settings button click to open the settings menu (no Inspector UnityEvents)
@@ -107,7 +119,7 @@ public class HubLifetimeScope : LifetimeScope
                 {
                     container.Inject(panel);
                 }
-                Debug.Log($"[FactoryControlPanels] Successfully Injected {_factoryControlPanels.Length} panels!");
+                //Debug.Log($"[FactoryControlPanels] Successfully Injected {_factoryControlPanels.Length} panels!");
             }
             else
             {
@@ -117,74 +129,74 @@ public class HubLifetimeScope : LifetimeScope
             if (_factoryUIController != null)
             {
                 container.Inject(_factoryUIController);
-                Debug.Log("[FactoryUIController] Successfully Injected!");
+                // Debug.Log("[FactoryUIController] Successfully Injected!");
             }
 
             if (uiManager != null)
             {
                 container.Inject(uiManager);
-                Debug.Log("[UIManager] Successfully Injected!");
+                // Debug.Log("[UIManager] Successfully Injected!");
             }
 
             if (_materialsHUDController != null)
             {
                 container.Inject(_materialsHUDController);
-                Debug.Log("[MaterialsHUDController] Successfully Injected!");
+                // Debug.Log("[MaterialsHUDController] Successfully Injected!");
             }
 
             if (_combatWorkshopControlPanel != null)
             {
                 container.Inject(_combatWorkshopControlPanel);
-                Debug.Log("[CombatWorkshopControlPanel] Successfully Injected!");
+                // Debug.Log("[CombatWorkshopControlPanel] Successfully Injected!");
             }
 
             if (_combatWorkshopUIController != null)
             {
                 container.Inject(_combatWorkshopUIController);
-                Debug.Log("[CombatWorkshopUIController] Successfully Injected!");
+                // Debug.Log("[CombatWorkshopUIController] Successfully Injected!");
             }
 
             if (_gateLoadoutUIController != null)
             {
                 container.Inject(_gateLoadoutUIController);
-                Debug.Log("[GateLoadoutUIController] Successfully Injected!");
+                // Debug.Log("[GateLoadoutUIController] Successfully Injected!");
             }
 
             if (_marketUIController != null)
             {
                 container.Inject(_marketUIController);
-                Debug.Log("[MarketUIController] Successfully Injected!");
+                // Debug.Log("[MarketUIController] Successfully Injected!");
             }
 
             if (_marketQuantityModal != null)
             {
                 container.Inject(_marketQuantityModal);
-                Debug.Log("[MarketQuantityModal] Successfully Injected!");
+                // Debug.Log("[MarketQuantityModal] Successfully Injected!");
             }
 
             if (_marketConfirmModal != null)
             {
                 container.Inject(_marketConfirmModal);
-                Debug.Log("[MarketConfirmModal] Successfully Injected!");
+                // Debug.Log("[MarketConfirmModal] Successfully Injected!");
             }
 
             if (_marketControlPanel != null)
             {
                 container.Inject(_marketControlPanel);
-                Debug.Log("[MarketControlPanel] Successfully Injected!");
+                // Debug.Log("[MarketControlPanel] Successfully Injected!");
             }
 
             if (_factoryCinematicController != null)
             {
                 container.Inject(_factoryCinematicController);
-                Debug.Log("[FactoryCinematicController] Successfully Injected!");
+                // Debug.Log("[FactoryCinematicController] Successfully Injected!");
             }
 
             var globalAudio = GetComponent<GlobalUIButtonAudio>();
             if (globalAudio != null)
             {
                 container.Inject(globalAudio);
-                Debug.Log("[GlobalUIButtonAudio] Successfully Injected!");
+                // Debug.Log("[GlobalUIButtonAudio] Successfully Injected!");
             }
         });
     }
