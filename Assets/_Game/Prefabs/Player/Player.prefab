@@ -291,8 +291,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1244521767737012890}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.230997, y: 0.013416151, z: -0.003185557, w: 0.97285676}
-  m_LocalPosition: {x: 0, y: 5.661538, z: -7.692308}
+  m_LocalRotation: {x: 0.1271097, y: 0.37256694, z: -0.051597692, w: 0.9178098}
+  m_LocalPosition: {x: -3.384706, y: 3.7384613, z: -4.672022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -575,8 +575,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751959519908242766}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.230997, y: 0.01341615, z: -0.0031855563, w: 0.97285676}
-  m_LocalPosition: {x: 0, y: 5.661538, z: -7.692308}
+  m_LocalRotation: {x: 0.12710969, y: 0.37256688, z: -0.051597685, w: 0.9178098}
+  m_LocalPosition: {x: -3.384706, y: 3.7384613, z: -4.672022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -648,18 +648,18 @@ MonoBehaviour:
   Radius: 5
   Orbits:
     Top:
-      Radius: 5
-      Height: 2.25
+      Radius: 3.75
+      Height: 5
     Center:
       Radius: 5
       Height: 2.25
     Bottom:
-      Radius: 5
-      Height: 2.25
+      Radius: 3.75
+      Height: 1
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 0
+    Value: 35.921936
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -669,7 +669,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 17.5
+    Value: -10
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -744,8 +744,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OrbitCameraTouch
   rotationSpeed: 0.25
+  verticalRotationSpeed: 0.25
+  minVerticalAngle: -20
+  maxVerticalAngle: 60
   touchArea: {fileID: 7608159915169881364}
-  uiCamera: {fileID: 216248412716963409}
+  uiCamera: {fileID: 0}
 --- !u!114 &1922632319969354887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -758,7 +761,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
-  CameraRadius: 4
+  CameraRadius: 1
   Decollision:
     Enabled: 1
     ObstacleLayers:
@@ -766,7 +769,7 @@ MonoBehaviour:
       m_Bits: 65
     UseFollowTarget:
       Enabled: 1
-      YOffset: 3
+      YOffset: 0
     Damping: 7.39
     SmoothingTime: 2
   TerrainResolution:

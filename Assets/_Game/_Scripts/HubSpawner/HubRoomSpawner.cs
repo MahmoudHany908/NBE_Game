@@ -74,6 +74,10 @@ public class HubRoomSpawner : MonoBehaviour
     [Tooltip("Exact name of the placeholder state in the Player's Animator Controller.")]
     [SerializeField] private string hubIntroStateName = "HubIntro";
 
+    [Header("Dialogue")]
+    [Tooltip("Optional welcome dialogue to play when no intro animation is present.")]
+    [SerializeField] private HubWelcomeDialogue welcomeDialogue;
+
     // ── Dependencies ──────────────────────────────────────────────────────────
     private ISaveSystem _saveSystem;
 
@@ -92,6 +96,12 @@ public class HubRoomSpawner : MonoBehaviour
             Debug.Log("[HubRoomSpawner] Tutorial not yet passed — using default spawn point.");
             if (player != null && defaultSpawnPoint != null)
                 TeleportPlayer(defaultSpawnPoint);
+            
+            if (welcomeDialogue != null)
+            {
+                welcomeDialogue.ShowDialogue();
+            }
+
             return;
         }
 
@@ -149,6 +159,10 @@ public class HubRoomSpawner : MonoBehaviour
             {
                 yield return new WaitForSeconds(introAnimation.length);
             }
+        }
+        else if (welcomeDialogue != null)
+        {
+            welcomeDialogue.ShowDialogue();
         }
 
         // ── Phase 2: UI Fade-in (always runs) ────────────────────────────────

@@ -7,10 +7,7 @@ public class HubWelcomeDialogue : MonoBehaviour
     [SerializeField] private DialogueSO _welcomeDialogue;
     [SerializeField] private SpeechUIController _speechUI;
 
-    [Header("Settings")]
-    [SerializeField] private float _delayBeforeShow = 3f;
-
-    private void Start()
+    public void ShowDialogue()
     {
         if (_welcomeDialogue == null)
             Debug.LogError($"[HubWelcomeDialogue] Welcome Dialogue SO is not assigned on {gameObject.name}.");
@@ -26,8 +23,7 @@ public class HubWelcomeDialogue : MonoBehaviour
             source = audioManager.PlayDialogue(_welcomeDialogue.DialogueSound, transform.position);
         }
 
-        _speechUI.ShowDialogue(_welcomeDialogue, source, _delayBeforeShow);
+        _speechUI.ShowDialogue(_welcomeDialogue, source, 0f);
     }
-    
 
 }
