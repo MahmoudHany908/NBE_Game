@@ -12,6 +12,9 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)][SerializeField] private float musicVolume = 1f;
     [Range(0f, 1f)][SerializeField] private float sfxVolume = 1f;
     [Range(0f, 1f)][SerializeField] private float ambientVolume = 1f;
+
+    private float currentDuckingMultiplier = 1f;
+    private bool isMusicDucked = false;
     private Coroutine fadeCoroutine;
     private bool isMuted = false;
     public bool IsMuted
@@ -173,7 +176,9 @@ public class AudioManager : MonoBehaviour
         {
             // Approximate final volume. We don't have the original SoundData volume here, 
             // but normally music is played at volume 1. We just multiply it.
-            musicAudioSource.volume = GetFinalVolume(1f, musicVolume);
+            float targetVolume = GetFinalVolume(1f, musicVolume);
+            if (isMusicDucked) targetVolume *= currentDuckingMultiplier;
+            musicAudioSource.volume = targetVolume;
         }
     }
 
@@ -352,6 +357,7 @@ public class AudioManager : MonoBehaviour
 
         musicAudioSource.UnPause();
         float targetVolume = GetFinalVolume(1f, musicVolume);
+        if (isMusicDucked) targetVolume *= currentDuckingMultiplier;
         fadeCoroutine = StartCoroutine(FadeVolume(0f, targetVolume, 1f));
     }
 
@@ -367,6 +373,7 @@ public class AudioManager : MonoBehaviour
     private IEnumerator FadeToNewTrack(SoundData data)
     {
         float targetVolume = GetFinalVolume(data.volume, musicVolume);
+        if (isMusicDucked) targetVolume *= currentDuckingMultiplier;
 
         if (musicAudioSource.isPlaying)
             yield return FadeOut(null, data);
@@ -391,11 +398,28 @@ public class AudioManager : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < fadeDuration)
         {
-            elapsed += Time.deltaTime;
+            // Use unscaledDeltaTime in case Time.timeScale is 0 during menus
+            elapsed += Time.unscaledDeltaTime;
             musicAudioSource.volume = Mathf.Lerp(from, to, elapsed / fadeDuration);
             yield return null;
         }
         musicAudioSource.volume = to;
+    }
+
+    public void SetMusicDucking(bool isDucked, float duckMultiplier, float fadeDuration)
+    {
+        if (isMusicDucked == isDucked) return;
+        isMusicDucked = isDucked;
+        currentDuckingMultiplier = duckMultiplier;
+
+        if (fadeCoroutine != null)
+            StopCoroutine(fadeCoroutine);
+            
+        float targetVolume = GetFinalVolume(1f, musicVolume);
+        if (isMusicDucked)
+            targetVolume *= currentDuckingMultiplier;
+            
+        fadeCoroutine = StartCoroutine(FadeVolume(musicAudioSource.volume, targetVolume, fadeDuration));
     }
 
     #endregion

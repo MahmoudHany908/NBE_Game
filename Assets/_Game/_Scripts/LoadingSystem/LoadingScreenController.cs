@@ -65,6 +65,10 @@ namespace VaultSurvivors.LoadingSystem
             var gsm = Object.FindAnyObjectByType<GameStateManager>();
             gsm?.ChangeState(new LoadingState());
 
+            // Pause music during loading screen
+            var audioManager = Object.FindAnyObjectByType<AudioManager>();
+            audioManager?.PauseMusic();
+
             // 3. Begin background load (paused at 90%)
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(targetScene);
             if (asyncLoad == null)

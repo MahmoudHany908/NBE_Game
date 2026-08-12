@@ -321,8 +321,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -491.76, y: 0}
-  m_SizeDelta: {x: 654.7634, y: 450.1919}
+  m_AnchoredPosition: {x: -490, y: 0}
+  m_SizeDelta: {x: 536.7522, y: 358.9516}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2739316572060240247
 CanvasRenderer:
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: bloody fucking diabolical mate
+  m_text: Use a strong, unique password for your banking account.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e5c934d1c17a064b9d00057b6da269c, type: 2}
   m_sharedMaterial: {fileID: 3651383908449407638, guid: 8e5c934d1c17a064b9d00057b6da269c, type: 2}
@@ -595,8 +595,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 455.33, y: 68.994}
-  m_SizeDelta: {x: 848.465, y: 952.9885}
+  m_AnchoredPosition: {x: 455.33, y: 42.498}
+  m_SizeDelta: {x: 848.465, y: 899.99}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6266577555312239030
 CanvasRenderer:
@@ -626,7 +626,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 691ae0e96bb766c4abda8332e3913625, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fcd342d28445a654a8b408992a61a813, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -872,7 +872,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VaultSurvivors.LoadingSystem.HintController
   _titleText: {fileID: 1816401753370886577}
   _descriptionText: {fileID: 2920536285443126812}
-  _iconImage: {fileID: 2146325980273343201}
+  _hintImages:
+  - {fileID: 2390619283306753675}
+  - {fileID: 855143829230525396}
+  - {fileID: 7803055189893206950}
   _database: {fileID: 11400000, guid: 0a5c4d730fd3ef549a682ed577c98068, type: 2}
 --- !u!1 &4913180773764137976
 GameObject:

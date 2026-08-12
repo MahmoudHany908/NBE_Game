@@ -9,9 +9,13 @@ public class HubMusicController : MonoBehaviour
     [Header("References")]
     [SerializeField] private SoundData hubMusic;
 
+    [Header("Menu Ducking")]
+    [Range(0f, 1f)][SerializeField] private float menuDuckingMultiplier = 0.4f;
+    [SerializeField] private float duckingFadeDuration = 0.3f;
+
     [Inject] private AudioManager audioManager;
     [Inject] IEventSubscriber subscriber;
-
+    
     private int _openMenus = 0;
 
     IEnumerator Start()
@@ -42,7 +46,7 @@ public class HubMusicController : MonoBehaviour
             _openMenus++;
             if (_openMenus == 1)
             {
-                audioManager.PauseMusic();
+                audioManager.SetMusicDucking(true, menuDuckingMultiplier, duckingFadeDuration);
             }
         }
         else
@@ -51,7 +55,7 @@ public class HubMusicController : MonoBehaviour
             if (_openMenus <= 0)
             {
                 _openMenus = 0;
-                audioManager.ResumeMusic();
+                audioManager.SetMusicDucking(false, menuDuckingMultiplier, duckingFadeDuration);
             }
         }
     }

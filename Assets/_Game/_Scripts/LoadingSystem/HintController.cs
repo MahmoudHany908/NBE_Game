@@ -10,7 +10,7 @@ namespace VaultSurvivors.LoadingSystem
         [Header("UI References")]
         [SerializeField] private TMP_Text _titleText;
         [SerializeField] private TMP_Text _descriptionText;
-        [SerializeField] private Image _iconImage;
+        [SerializeField] private GameObject[] _hintImages;
 
         [Header("Data")]
         [SerializeField] private HintDatabase _database;
@@ -44,7 +44,14 @@ namespace VaultSurvivors.LoadingSystem
         {
             if (_titleText != null) _titleText.text = string.Empty;
             if (_descriptionText != null) _descriptionText.text = string.Empty;
-            if (_iconImage != null) _iconImage.gameObject.SetActive(false);
+            
+            if (_hintImages != null)
+            {
+                foreach (var img in _hintImages)
+                {
+                    if (img != null) img.SetActive(false);
+                }
+            }
         }
 
         private void UpdateVisuals(HintData data)
@@ -59,16 +66,17 @@ namespace VaultSurvivors.LoadingSystem
                 _descriptionText.text = data.Description;
             }
 
-            if (_iconImage != null)
+            if (_hintImages != null && _hintImages.Length > 0)
             {
-                if (data.Icon != null)
+                foreach (var img in _hintImages)
                 {
-                    _iconImage.sprite = data.Icon;
-                    _iconImage.gameObject.SetActive(true);
+                    if (img != null) img.SetActive(false);
                 }
-                else
+
+                int randomIndex = Random.Range(0, _hintImages.Length);
+                if (_hintImages[randomIndex] != null)
                 {
-                    _iconImage.gameObject.SetActive(false);
+                    _hintImages[randomIndex].SetActive(true);
                 }
             }
         }
