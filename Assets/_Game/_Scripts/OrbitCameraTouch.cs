@@ -54,6 +54,10 @@ public class OrbitCameraTouch : MonoBehaviour
     private void OnDisable()
     {
         EnhancedTouchSupport.Disable();
+        activeTouchId = -1;
+#if UNITY_EDITOR
+        isDraggingMouse = false;
+#endif
     }
 
     private void Update()
