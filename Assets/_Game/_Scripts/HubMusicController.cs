@@ -13,25 +13,47 @@ public class HubMusicController : MonoBehaviour
     [Range(0f, 1f)][SerializeField] private float menuDuckingMultiplier = 0.4f;
     [SerializeField] private float duckingFadeDuration = 0.3f;
 
-    [Inject] private AudioManager audioManager;
-    [Inject] IEventSubscriber subscriber;
+    private AudioManager audioManager;
+    private IEventSubscriber subscriber;
+
+    [Inject]
+    public void Construct(AudioManager audioManager, IEventSubscriber subscriber)
+    {
+        this.audioManager = audioManager;
+        this.subscriber = subscriber;
+
+        // Subscribe here if OnEnable already fired before VContainer injection completed
+        if (isActiveAndEnabled)
+        {
+            this.subscriber.Subscribe<Event_MenuStateChanged>(OnMenuStateChanged);
+        }
+    }
     
     private int _openMenus = 0;
 
     IEnumerator Start()
     {
         yield return new WaitForSeconds(2f);
-        audioManager.PlayMusic(hubMusic);
+        if (audioManager != null)
+        {
+            audioManager.PlayMusic(hubMusic);
+        }
     }
 
     private void OnEnable()
     {
-        subscriber.Subscribe<Event_MenuStateChanged>(OnMenuStateChanged);
+        if (subscriber != null)
+        {
+            subscriber.Subscribe<Event_MenuStateChanged>(OnMenuStateChanged);
+        }
     }
     
     private void OnDisable()
     {
-        subscriber.Unsubscribe<Event_MenuStateChanged>(OnMenuStateChanged);
+        if (subscriber != null)
+        {
+            subscriber.Unsubscribe<Event_MenuStateChanged>(OnMenuStateChanged);
+        }
         
         if (audioManager != null)
         {

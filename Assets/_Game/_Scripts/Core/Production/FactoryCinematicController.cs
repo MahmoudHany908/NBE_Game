@@ -13,7 +13,7 @@ using UnityEditor;
 
 namespace VaultSurvivors.Core.Production
 {
-    public class FactoryCinematicController : MonoBehaviour, IDisposable
+    public class FactoryCinematicController : MonoBehaviour
     {
         [Header("Cinematic Settings")]
         [SerializeField] private Transform cinematicCameraPos;
@@ -37,13 +37,35 @@ namespace VaultSurvivors.Core.Production
         [Inject]
         public void Construct(IEventPublisher eventPublisher, IEventSubscriber eventSubscriber, AudioManager audioManager, ISaveSystem saveSystem)
         {
+            // Prevent double-injection bugs if HubLifetimeScope forces multiple injections
+            if (_eventSubscriber != null) return;
+
             _eventPublisher = eventPublisher;
             _eventSubscriber = eventSubscriber;
             _audioManager = audioManager;
             _saveSystem = saveSystem;
 
-            // Subscribe to the upgrade event
-            _eventSubscriber.Subscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+            // Subscribe if already active (e.g. OnEnable fired before VContainer finished injecting)
+            if (isActiveAndEnabled)
+            {
+                _eventSubscriber.Subscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (_eventSubscriber != null)
+            {
+                _eventSubscriber.Subscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_eventSubscriber != null)
+            {
+                _eventSubscriber.Unsubscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
+            }
         }
 
         private void Start()
@@ -63,13 +85,7 @@ namespace VaultSurvivors.Core.Production
             if (level5Mesh != null) level5Mesh.SetActive(isLevel5);
         }
 
-        public void Dispose()
-        {
-            if (_eventSubscriber != null)
-            {
-                _eventSubscriber.Unsubscribe<Event_FactoryVisualUpgrade>(OnFactoryVisualUpgrade);
-            }
-        }
+
 
         private void OnFactoryVisualUpgrade(Event_FactoryVisualUpgrade evt)
         {

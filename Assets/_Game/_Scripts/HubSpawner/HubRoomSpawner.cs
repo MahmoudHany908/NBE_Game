@@ -15,6 +15,9 @@ public class HubSpawnPoint
 
     [Tooltip("Optional intro animation clip. Leave null to skip animation for this spawn point.")]
     public AnimationClip introAnimation;
+
+    [Tooltip("Playback speed multiplier for the intro animation.")]
+    public float animationSpeed = 1f;
 }
 
 [System.Serializable]
@@ -96,7 +99,7 @@ public class HubRoomSpawner : MonoBehaviour
             Debug.Log("[HubRoomSpawner] Tutorial not yet passed — using default spawn point.");
             if (player != null && defaultSpawnPoint != null)
                 TeleportPlayer(defaultSpawnPoint);
-            
+
             if (welcomeDialogue != null)
             {
                 welcomeDialogue.ShowDialogue();
@@ -130,7 +133,7 @@ public class HubRoomSpawner : MonoBehaviour
         // Hide UI immediately so the fade-in feels intentional.
         SetUIPanelsAlpha(0f);
 
-        StartCoroutine(SpawnSequence(chosen.introAnimation));
+        StartCoroutine(SpawnSequence(chosen));
     }
 
     // ── Spawn Sequence ────────────────────────────────────────────────────────
@@ -142,22 +145,26 @@ public class HubRoomSpawner : MonoBehaviour
     ///   3. Fade UI in
     ///   4. Unlock input
     /// </summary>
-    private IEnumerator SpawnSequence(AnimationClip introAnimation)
+    private IEnumerator SpawnSequence(HubSpawnPoint spawnPoint)
     {
-        PlayerInputs inputs  = player.GetPlayerInputs();
-        Rigidbody     rb     = player.GetPlayerRigidBody();
+        PlayerInputs inputs = player.GetPlayerInputs();
+        Rigidbody rb = player.GetPlayerRigidBody();
 
         // Lock input — mirrors the pattern used in DialogueTrigger.cs.
         if (inputs != null) inputs.enabled = false;
         if (rb != null) rb.linearVelocity = Vector3.zero;
 
         // ── Phase 1: Animation (optional) ────────────────────────────────────
-        if (introAnimation != null)
+        if (spawnPoint.introAnimation != null)
         {
-            bool animStarted = TryPlayAnimationOverride(introAnimation);
+            bool animStarted = TryPlayAnimationOverride(spawnPoint.introAnimation, spawnPoint.animationSpeed);
             if (animStarted)
             {
-                yield return new WaitForSeconds(introAnimation.length);
+                yield return new WaitForSeconds(spawnPoint.introAnimation.length / Mathf.Max(0.01f, spawnPoint.animationSpeed));
+
+                // Restore animator speed
+                Animator animator = player.GetComponentInChildren<Animator>(includeInactive: false);
+                if (animator != null) animator.speed = 1f;
             }
         }
         else if (welcomeDialogue != null)
@@ -223,8 +230,8 @@ public class HubRoomSpawner : MonoBehaviour
         Rigidbody rb = player.GetPlayerRigidBody();
         if (rb != null)
         {
-            rb.linearVelocity    = Vector3.zero;
-            rb.angularVelocity   = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
 
             // Use rb.position — setting transform.position on a Rigidbody is overridden
             // by the physics engine on the next FixedUpdate.
@@ -241,8 +248,6 @@ public class HubRoomSpawner : MonoBehaviour
 
         // Force the transform to sync with physics immediately.
         Physics.SyncTransforms();
-
-        // Debug.Log($"[HubRoomSpawner] Teleported player to {destination.name} at {destination.position}");
     }
 
     // ── UI Utilities ──────────────────────────────────────────────────────────
@@ -259,9 +264,10 @@ public class HubRoomSpawner : MonoBehaviour
     }
 
     // ── Animation Override ────────────────────────────────────────────────────
-    private bool TryPlayAnimationOverride(AnimationClip clip)
+    private bool TryPlayAnimationOverride(AnimationClip clip, float speed)
     {
         Animator animator = player.GetComponentInChildren<Animator>(includeInactive: false);
+
         if (animator == null || animator.runtimeAnimatorController == null)
         {
             Debug.LogWarning("[HubRoomSpawner] No Animator found on player — skipping intro animation.");
@@ -286,13 +292,14 @@ public class HubRoomSpawner : MonoBehaviour
 
         if (!foundSlot)
         {
-            Debug.LogWarning($"[HubRoomSpawner] No clip slot named '{hubIntroStateName}' found in the Animator Controller. " +
-                             "Add a state with that exact name and assign any placeholder clip to it.");
+            Debug.LogWarning($"[HubRoomSpawner] No placeholder clip named '{hubIntroStateName}' found in the Animator Controller. " +
+                             $"Make sure you have an AnimationClip named EXACTLY '{hubIntroStateName}' assigned to a state in your Animator!");
             return false;
         }
 
         overrideController.ApplyOverrides(overrides);
         animator.runtimeAnimatorController = overrideController;
+        animator.speed = speed;
         animator.Play(hubIntroStateName, 0, 0f);
         return true;
     }

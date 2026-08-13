@@ -347,7 +347,7 @@ public class AudioManager : MonoBehaviour
         if (fadeCoroutine != null)
             StopCoroutine(fadeCoroutine);
 
-        fadeCoroutine = StartCoroutine(FadeOut(() => musicAudioSource.Pause(), new SoundData { fade = 1f }));
+        fadeCoroutine = StartCoroutine(FadeOut(() => musicAudioSource.Pause(), 1f));
     }
 
     public void ResumeMusic()
@@ -367,7 +367,7 @@ public class AudioManager : MonoBehaviour
             StopCoroutine(fadeCoroutine);
 
 
-        fadeCoroutine = StartCoroutine(FadeOut(() => musicAudioSource.Stop(), new SoundData { fade = 1f }));
+        fadeCoroutine = StartCoroutine(FadeOut(() => musicAudioSource.Stop(), 1f));
     }
 
     private IEnumerator FadeToNewTrack(SoundData data)
@@ -376,7 +376,7 @@ public class AudioManager : MonoBehaviour
         if (isMusicDucked) targetVolume *= currentDuckingMultiplier;
 
         if (musicAudioSource.isPlaying)
-            yield return FadeOut(null, data);
+            yield return FadeOut(null, data.fade);
 
         musicAudioSource.clip = data.GetClip();
         musicAudioSource.loop = data.loop;
@@ -386,10 +386,10 @@ public class AudioManager : MonoBehaviour
         yield return FadeVolume(0f, targetVolume, data.fade);
     }
 
-    private IEnumerator FadeOut(System.Action onComplete, SoundData data)
+    private IEnumerator FadeOut(System.Action onComplete, float fadeDuration)
     {
         float startVolume = musicAudioSource.volume;
-        yield return FadeVolume(startVolume, 0f, data.fade);
+        yield return FadeVolume(startVolume, 0f, fadeDuration);
         onComplete?.Invoke();
     }
 
