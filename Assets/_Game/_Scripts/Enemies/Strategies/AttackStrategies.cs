@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class MeleeAttackStrategy : IAttackStrategy
 {
-    public void HandleAttack(Enemy enemy, Transform target, PoolManager poolManager)
+    public void HandleAttack(Enemy enemy, Transform target, PoolManager poolManager, AudioManager audioManager)
     {
         float distance = Vector3.Distance(enemy.transform.position, target.position);
         if (distance > enemy.Data.attackRange) return;
@@ -20,8 +20,9 @@ public class MeleeAttackStrategy : IAttackStrategy
 public class ProjectileAttackStrategy : IAttackStrategy
 {
     [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private SoundData attackSound;
 
-    public void HandleAttack(Enemy enemy, Transform target, PoolManager poolManager)
+    public void HandleAttack(Enemy enemy, Transform target, PoolManager poolManager, AudioManager audioManager)
     {
         if (projectilePrefab == null) return;
 
@@ -34,7 +35,8 @@ public class ProjectileAttackStrategy : IAttackStrategy
 
         var projectile = poolManager.Spawn<DroneProjectile>(
             projectilePrefab, enemy.transform.position, rotation);
-        
+
         projectile?.Init(aimTarget, enemy.Data.attackDamage);
+        audioManager?.PlaySoundAtPosition(attackSound, enemy.transform.position);
     }
 }

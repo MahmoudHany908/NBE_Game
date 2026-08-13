@@ -7,5 +7,5 @@ public interface IMovementStrategy
 
 public interface IAttackStrategy
 {
-    void HandleAttack(Enemy enemy, Transform target, PoolManager poolManager);
+    void HandleAttack(Enemy enemy, Transform target, PoolManager poolManager, AudioManager audioManager);
 }

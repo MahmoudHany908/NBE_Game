@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour, IPoolable
     private EnemyHealthComponent enemyHealthComponent;
     private IEventSubscriber eventSubscriber;
     private PoolManager poolManager;
+    private AudioManager audioManager;
 
     private bool isSubscribed = false;
 
@@ -32,9 +33,10 @@ public class Enemy : MonoBehaviour, IPoolable
     public EnemyDataSO Data => enemyData;
 
     [Inject]
-    public void Construct(IEventSubscriber subscriber, PoolManager pool)
+    public void Construct(IEventSubscriber subscriber, PoolManager pool, AudioManager am)
     {
         eventSubscriber = subscriber;
+        audioManager = am;
         poolManager = pool;
         SubscribeToEvents();
     }
@@ -115,7 +117,7 @@ public class Enemy : MonoBehaviour, IPoolable
         AttackTimer -= Time.deltaTime;
         if (AttackTimer <= 0f)
         {
-            enemyData.attackStrategy?.HandleAttack(this, target, poolManager);
+            enemyData.attackStrategy?.HandleAttack(this, target, poolManager, audioManager);
             AttackTimer = enemyData.attackCooldown;
         }
     }

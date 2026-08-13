@@ -11,7 +11,9 @@ public class OrbitalBeam : MonoBehaviour, IPoolable
 
     [Header("Effects")]
     [SerializeField] private GameObject impactEffect;
-    [SerializeField] private SoundData beamSound;
+    //[SerializeField] private SoundData beamSound;
+    [SerializeField] private AudioClip beamSound;
+    [SerializeField] private AudioSource beamSoundSource;
 
     private PooledObject pooledObject;
     private AudioManager audioManager;
@@ -23,6 +25,8 @@ public class OrbitalBeam : MonoBehaviour, IPoolable
     private void Awake()
     {
         pooledObject = GetComponent<PooledObject>();
+
+        beamSoundSource = GetComponent<AudioSource>();
     }
 
     public void Init(AudioManager audioManager)
@@ -41,10 +45,9 @@ public class OrbitalBeam : MonoBehaviour, IPoolable
             Instantiate(impactEffect, transform.position, impactEffect.transform.rotation);
         }
 
-        if (audioManager != null && beamSound != null)
-        {
-            audioManager.PlaySoundAtPosition(beamSound, transform.position);
-        }
+        beamSoundSource.clip = beamSound;
+        beamSoundSource.Play();
+        beamSoundSource.loop = true;
 
         pooledObject.ReturnToPool(duration);
     }
