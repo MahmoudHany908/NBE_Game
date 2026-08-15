@@ -15,6 +15,8 @@ public class PresentationManager : MonoBehaviour
     public AnimationCurve cameraTransitionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     private int currentSlideIndex = 0;
+    public int CurrentSlideIndex => currentSlideIndex;
+    
     private Coroutine cameraTransitionCoroutine;
 
     private void Start()
@@ -24,17 +26,37 @@ public class PresentationManager : MonoBehaviour
             presentationCamera = Camera.main;
         }
 
-        // Initialize all slides to exit state initially, except the first one
+        // Initialize all slides to exit state initially
         for (int i = 0; i < slides.Count; i++)
         {
             if (slides[i] != null)
                 slides[i].ExitSlide();
         }
 
-        if (slides.Count > 0 && slides[0] != null)
+        if (VaultSurvivors.Presentation.PresentationState.IsReturningFromSubscene)
         {
-            slides[0].EnterSlide();
-            SnapCameraToSlide(slides[0]);
+            // Clear the flag
+            VaultSurvivors.Presentation.PresentationState.IsReturningFromSubscene = false;
+            
+            // Resume at the saved index + 1 (the slide immediately following the transition slide)
+            currentSlideIndex = VaultSurvivors.Presentation.PresentationState.ReturnSlideIndex + 1;
+            
+            // Safety bound check
+            if (currentSlideIndex >= slides.Count) currentSlideIndex = slides.Count - 1;
+            if (currentSlideIndex < 0) currentSlideIndex = 0;
+        }
+
+        if (slides.Count > 0 && slides[currentSlideIndex] != null)
+        {
+            slides[currentSlideIndex].EnterSlide();
+            SnapCameraToSlide(slides[currentSlideIndex]);
+        }
+
+        // Check if we should fade in from black (from a scene transition)
+        if (VaultSurvivors.Presentation.PresentationState.NeedsFadeIn)
+        {
+            VaultSurvivors.Presentation.PresentationState.NeedsFadeIn = false;
+            StartCoroutine(FadeInFromBlackRoutine(VaultSurvivors.Presentation.PresentationState.FadeInDuration));
         }
     }
 
@@ -178,6 +200,48 @@ public class PresentationManager : MonoBehaviour
         fadeImage.color = new Color(0, 0, 0, 0);
 
         isTransitioning = false;
+    }
+
+    private IEnumerator FadeInFromBlackRoutine(float duration)
+    {
+        isTransitioning = true;
+        EnsureFadeUI();
+        
+        fadeImage.color = Color.black;
+
+        float t = 0;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            fadeImage.color = new Color(0, 0, 0, 1f - Mathf.Clamp01(t));
+            yield return null;
+        }
+        fadeImage.color = new Color(0, 0, 0, 0);
+        
+        isTransitioning = false;
+    }
+
+    public void TransitionToScene(string sceneName, float duration)
+    {
+        if (isTransitioning) return;
+        StartCoroutine(FadeAndLoadSceneRoutine(sceneName, duration));
+    }
+
+    private IEnumerator FadeAndLoadSceneRoutine(string sceneName, float duration)
+    {
+        isTransitioning = true;
+        EnsureFadeUI();
+
+        float t = 0;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            fadeImage.color = new Color(0, 0, 0, Mathf.Clamp01(t));
+            yield return null;
+        }
+        fadeImage.color = Color.black;
+
+        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
     }
 
     private class CameraState
