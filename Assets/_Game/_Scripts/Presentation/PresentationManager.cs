@@ -110,6 +110,12 @@ public class PresentationManager : MonoBehaviour
     {
         if (isTransitioning || slides.Count == 0 || currentSlideIndex >= slides.Count) return;
 
+        // Give the current slide a chance to handle the input (e.g., inner animations)
+        if (slides[currentSlideIndex] != null && slides[currentSlideIndex].TryNextInnerStep())
+        {
+            return; // Slide consumed the input, don't move to next slide
+        }
+
         if (currentSlideIndex < slides.Count - 1)
         {
             int targetIndex = currentSlideIndex + 1;
@@ -120,6 +126,12 @@ public class PresentationManager : MonoBehaviour
     public void PreviousStep()
     {
         if (isTransitioning || slides.Count == 0 || currentSlideIndex < 0) return;
+
+        // Give the current slide a chance to handle the input (e.g., rewind inner animations)
+        if (slides[currentSlideIndex] != null && slides[currentSlideIndex].TryPreviousInnerStep())
+        {
+            return; // Slide consumed the input, don't move to previous slide
+        }
 
         if (currentSlideIndex > 0)
         {
